@@ -1,0 +1,57 @@
+services:
+  # --- Development Services ---
+  # Run with: docker compose --profile dev up
+  backend-dev:
+    profiles: ["dev"]
+    build:
+      context: ./backend
+      target: development
+    ports:
+      - "${BACKEND_PORT}:8000"
+    volumes:
+      - ./backend/src:/app/src
+    env_file:
+      - .env.secret
+    restart: unless-stopped
+
+  frontend-dev:
+    profiles: ["dev"]
+    build:
+      context: ./frontend
+      target: development
+    ports:
+      - "${FRONTEND_PORT}:5173"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    env_file:
+      - .env.secret
+    depends_on:
+      - backend-dev
+    restart: unless-stopped
+
+  # --- Production Services ---
+  # Run with: docker compose --profile prod up
+  backend-prod:
+    profiles: ["prod"]
+    build:
+      context: ./backend
+      target: production
+    ports:
+      - "${BACKEND_PORT}:8000"
+    env_file:
+      - .env.secret
+    restart: always
+
+  frontend-prod:
+    profiles: ["prod"]
+    build:
+      context: ./frontend
+      target: production
+    ports:
+      - "${FRONTEND_PORT}:80"
+    env_file:
+      - .env.secret
+    depends_on:
+      - backend-prod
+    restart: always
