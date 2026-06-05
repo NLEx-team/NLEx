@@ -11,3 +11,4 @@ env/
 Dockerfile
 .dockerignore
 uploads/
+DS_Store

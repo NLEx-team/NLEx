@@ -269,3 +269,6 @@ yarn-error.log*
 .env.production
 .env.staging
 .env.development
+
+# System
+DS_Store
