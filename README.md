@@ -29,6 +29,13 @@ docker compose --env-file .env.secret --profile prod up --build
 - **Frontend:** [http://localhost:80](http://localhost:80)
 - **Backend API:** [http://localhost:8000](http://localhost:8000)
 
+#### Testing
+Runs the backend test suite in an isolated environment.
+```bash
+docker compose --env-file .env.secret --profile test up backend-test --build --abort-on-container-exit
+```
+This command automatically starts the database, runs the tests, and shuts everything down when finished.
+
 ### 3. Stopping the Services
 ```bash
 docker compose --profile dev down  # for development
