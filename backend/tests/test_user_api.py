@@ -62,7 +62,8 @@ def test_update_me_profile_flat(client: TestClient):
     data = response.json()
     assert data["profile"]["first_name"] == "Maksim"
     assert data["profile"]["last_name"] == "Maltsev"
-    assert data["profile"]["avatar_url"] == "http://image.url/"
+    assert data["profile"]["avatar_url"] == "http://image.url"
+
 
 def test_update_me_role_ignored(client: TestClient):
     email = "hacker@example.com"
@@ -84,7 +85,7 @@ def test_admin_update_other_user_role(client: TestClient, db_session):
     # 1. Create a visitor
     visitor_email = "victim@example.com"
     client.post("/auth/register", json={"email": visitor_email, "password": "password123"})
-    visitor = client.get("/auth/login", json={"email": visitor_email, "password": "password123"}).json()["user"]
+    visitor = client.post("/auth/login", json={"email": visitor_email, "password": "password123"}).json()["user"]
     visitor_id = visitor["id"]
 
     # 2. Create an admin manually

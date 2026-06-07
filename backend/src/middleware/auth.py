@@ -19,18 +19,22 @@ class AuthMiddleware(BaseHTTPMiddleware):
             payload = AuthService.decode_token(token)
             
             if payload:
-                user_id = payload.get("sub")
-                if user_id:
-                    # We need a database session here. 
-                    # Middleware runs outside the normal FastAPI dependency injection flow for routes.
-                    db = SessionLocal()
+                user_id_str = payload.get("sub")
+                if user_id_str:
                     try:
-                        user_service = UserService(db)
-                        user = user_service.get_user(user_id)
-                        if user:
-                            request.state.user = user
-                    finally:
-                        db.close()
+                        from uuid import UUID
+                        user_id = UUID(user_id_str)
+                        
+                        db = SessionLocal()
+                        try:
+                            user_service = UserService(db)
+                            user = user_service.get_user(user_id)
+                            if user:
+                                request.state.user = user
+                        finally:
+                            db.close()
+                    except (ValueError, ImportError):
+                        pass
         
         response = await call_next(request)
         return response

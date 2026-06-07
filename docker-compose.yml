@@ -88,6 +88,7 @@ services:
       - .env.secret
     environment:
       - PYTHONPATH=/app
+      - DATABASE_URL=sqlite:///./test.db
     depends_on:
       - db
     command: python -m pytest tests/
