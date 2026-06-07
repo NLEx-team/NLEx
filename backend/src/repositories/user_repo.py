@@ -1,21 +1,21 @@
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from src.database.models.user import User, UserProfile
-from src.models.schemas.user import UserUpdate, UserProfileBase
+from src.models.schemas.user import UserProfileBase
 from uuid import UUID
-from typing import List, Optional
+from typing import List, Optional, Any, Dict
 
 class UserRepository:
     def __init__(self, db: Session):
         self.db = db
 
     def get_user_by_id(self, user_id: UUID) -> Optional[User]:
-        return self.db.query(User).filter(User.id == user_id).first()
+        return self.db.query(User).options(joinedload(User.profile)).filter(User.id == user_id).first()
 
     def get_user_by_email(self, email: str) -> Optional[User]:
-        return self.db.query(User).filter(User.email == email).first()
+        return self.db.query(User).options(joinedload(User.profile)).filter(User.email == email).first()
 
     def list_users(self, skip: int = 0, limit: int = 100) -> List[User]:
-        return self.db.query(User).offset(skip).limit(limit).all()
+        return self.db.query(User).options(joinedload(User.profile)).offset(skip).limit(limit).all()
 
     def create(self, db_obj: User) -> User:
         self.db.add(db_obj)
@@ -23,14 +23,14 @@ class UserRepository:
         self.db.refresh(db_obj)
         return db_obj
 
-    def update_user(self, user_id: UUID, user_update: UserUpdate) -> Optional[User]:
+    def update_user_fields(self, user_id: UUID, update_data: Dict[str, Any]) -> Optional[User]:
         db_user = self.get_user_by_id(user_id)
         if not db_user:
             return None
         
-        update_data = user_update.model_dump(exclude_unset=True)
         for key, value in update_data.items():
-            setattr(db_user, key, value)
+            if hasattr(db_user, key):
+                setattr(db_user, key, value)
         
         self.db.commit()
         self.db.refresh(db_user)
@@ -43,7 +43,8 @@ class UserRepository:
         
         update_data = profile_update.model_dump(exclude_unset=True)
         for key, value in update_data.items():
-            setattr(db_profile, key, value)
+            if hasattr(db_profile, key):
+                setattr(db_profile, key, value)
         
         self.db.commit()
         self.db.refresh(db_profile)

@@ -1,7 +1,7 @@
 import pytest
 from src.services.users import UserService
 from src.services.auth import AuthService
-from src.models.schemas.user import UserCreate, UserUpdate, UserProfileCreate, UserRole
+from src.models.schemas.user import UserCreate, UserUpdate, UserAdminUpdate, UserProfileCreate, UserRole
 from sqlalchemy.orm import Session
 
 def test_create_user_with_automatic_profile(db_session: Session):
@@ -76,7 +76,7 @@ def test_password_hashing_and_verification():
     assert auth_service.verify_password(password, hashed) is True
     assert auth_service.verify_password("wrong_password", hashed) is False
 
-def test_update_user_and_profile(db_session: Session):
+def test_update_user_and_profile_flat_patching(db_session: Session):
     user_service = UserService(db_session)
     auth_service = AuthService()
     
@@ -87,13 +87,32 @@ def test_update_user_and_profile(db_session: Session):
     user_in = UserCreate(email=email, password=password)
     user = user_service.create_user(user_in, hashed_password)
     
-    # Update user role
-    user_update = UserUpdate(UserRole=UserRole.ADMIN)
+    # Update email and profile fields in one go (flat patching)
+    user_update = UserUpdate(
+        email="new_email@example.com",
+        first_name="Jane",
+        last_name="Smith"
+    )
     updated_user = user_service.update_user(user.id, user_update)
-    assert updated_user.role == UserRole.ADMIN
     
-    # Update profile
-    from src.models.schemas.user import UserProfileBase
-    profile_update = UserProfileBase(first_name="Jane")
-    updated_profile = user_service.update_profile(user.id, profile_update)
-    assert updated_profile.first_name == "Jane"
+    assert updated_user.email == "new_email@example.com"
+    assert updated_user.profile.first_name == "Jane"
+    assert updated_user.profile.last_name == "Smith"
+
+def test_admin_update_role(db_session: Session):
+    user_service = UserService(db_session)
+    auth_service = AuthService()
+    
+    email = "visitor@example.com"
+    password = "password123"
+    hashed_password = auth_service.get_password_hash(password)
+    
+    user_in = UserCreate(email=email, password=password)
+    user = user_service.create_user(user_in, hashed_password)
+    assert user.role == UserRole.VISITOR
+    
+    # Admin updates role
+    admin_update = UserAdminUpdate(role=UserRole.ADMIN)
+    updated_user = user_service.update_user(user.id, admin_update)
+    
+    assert updated_user.role == UserRole.ADMIN

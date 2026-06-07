@@ -30,8 +30,12 @@ class UserCreate(UserBase):
     password: str
     profile: Optional[UserProfileCreate] = None
 
-class UserUpdate(BaseModel):
+# For users to update themselves - no role
+class UserUpdate(UserProfileBase):
     email: Optional[EmailStr] = None
+
+# For admins to update anyone - includes role
+class UserAdminUpdate(UserUpdate):
     role: Optional[UserRole] = None
 
 class UserRead(UserBase):
