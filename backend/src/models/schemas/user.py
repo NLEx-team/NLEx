@@ -24,7 +24,7 @@ class UserProfileRead(UserProfileBase):
 
 class UserBase(BaseModel):
     email: EmailStr
-    is_admin: UserRole = UserRole.VISITOR
+    role: UserRole = UserRole.VISITOR
 
 class UserCreate(UserBase):
     password: str
@@ -32,7 +32,7 @@ class UserCreate(UserBase):
 
 class UserUpdate(BaseModel):
     email: Optional[EmailStr] = None
-    is_admin: Optional[UserRole] = None
+    role: Optional[UserRole] = None
 
 class UserRead(UserBase):
     model_config = ConfigDict(from_attributes=True)

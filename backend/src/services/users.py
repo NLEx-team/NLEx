@@ -14,7 +14,7 @@ class UserService:
         db_user = User(
             email=user_in.email,
             hashed_password=hashed_password,
-            is_admin=user_in.is_admin
+            role=user_in.role
         )
         
         # Prepare profile (use provided or default blank)

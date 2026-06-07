@@ -15,14 +15,14 @@ def test_create_user_with_automatic_profile(db_session: Session):
     user_in = UserCreate(
         email=email,
         password=password,
-        is_admin=UserRole.VISITOR
+        role=UserRole.VISITOR
     )
     
     user = user_service.create_user(user_in, hashed_password)
     
     assert user.email == email
     assert user.hashed_password == hashed_password
-    assert user.is_admin == UserRole.VISITOR
+    assert user.role == UserRole.VISITOR
     assert user.profile is not None
     assert user.profile.first_name is None
     assert user.profile.last_name is None
@@ -88,9 +88,9 @@ def test_update_user_and_profile(db_session: Session):
     user = user_service.create_user(user_in, hashed_password)
     
     # Update user role
-    user_update = UserUpdate(is_admin=UserRole.ADMIN)
+    user_update = UserUpdate(UserRole=UserRole.ADMIN)
     updated_user = user_service.update_user(user.id, user_update)
-    assert updated_user.is_admin == UserRole.ADMIN
+    assert updated_user.role == UserRole.ADMIN
     
     # Update profile
     from src.models.schemas.user import UserProfileBase
