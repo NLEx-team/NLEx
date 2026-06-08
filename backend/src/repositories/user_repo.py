@@ -1,30 +1,38 @@
-from sqlalchemy.orm import Session, joinedload
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
+from sqlalchemy import select, update, delete
 from src.database.models.user import User, UserProfile
 from src.models.schemas.user import UserProfileBase
 from uuid import UUID
 from typing import List, Optional, Any, Dict
 
 class UserRepository:
-    def __init__(self, db: Session):
+    def __init__(self, db: AsyncSession):
         self.db = db
 
-    def get_user_by_id(self, user_id: UUID) -> Optional[User]:
-        return self.db.query(User).options(joinedload(User.profile)).filter(User.id == user_id).first()
+    async def get_user_by_id(self, user_id: UUID) -> Optional[User]:
+        stmt = select(User).options(selectinload(User.profile)).where(User.id == user_id)
+        result = await self.db.execute(stmt)
+        return result.scalars().first()
 
-    def get_user_by_email(self, email: str) -> Optional[User]:
-        return self.db.query(User).options(joinedload(User.profile)).filter(User.email == email).first()
+    async def get_user_by_email(self, email: str) -> Optional[User]:
+        stmt = select(User).options(selectinload(User.profile)).where(User.email == email)
+        result = await self.db.execute(stmt)
+        return result.scalars().first()
 
-    def list_users(self, skip: int = 0, limit: int = 100) -> List[User]:
-        return self.db.query(User).options(joinedload(User.profile)).offset(skip).limit(limit).all()
+    async def list_users(self, skip: int = 0, limit: int = 100) -> List[User]:
+        stmt = select(User).options(selectinload(User.profile)).offset(skip).limit(limit)
+        result = await self.db.execute(stmt)
+        return result.scalars().all()
 
-    def create(self, db_obj: User) -> User:
+    async def create(self, db_obj: User) -> User:
         self.db.add(db_obj)
-        self.db.commit()
-        self.db.refresh(db_obj)
+        await self.db.commit()
+        await self.db.refresh(db_obj)
         return db_obj
 
-    def update_user_fields(self, user_id: UUID, update_data: Dict[str, Any]) -> Optional[User]:
-        db_user = self.get_user_by_id(user_id)
+    async def update_user_fields(self, user_id: UUID, update_data: Dict[str, Any]) -> Optional[User]:
+        db_user = await self.get_user_by_id(user_id)
         if not db_user:
             return None
         
@@ -32,12 +40,15 @@ class UserRepository:
             if hasattr(db_user, key):
                 setattr(db_user, key, value)
         
-        self.db.commit()
-        self.db.refresh(db_user)
+        await self.db.commit()
+        await self.db.refresh(db_user)
         return db_user
 
-    def update_user_profile(self, user_id: UUID, profile_update: UserProfileBase) -> Optional[UserProfile]:
-        db_profile = self.db.query(UserProfile).filter(UserProfile.user_id == user_id).first()
+    async def update_user_profile(self, user_id: UUID, profile_update: UserProfileBase) -> Optional[UserProfile]:
+        stmt = select(UserProfile).where(UserProfile.user_id == user_id)
+        result = await self.db.execute(stmt)
+        db_profile = result.scalars().first()
+        
         if not db_profile:
             return None
         
@@ -46,15 +57,15 @@ class UserRepository:
             if hasattr(db_profile, key):
                 setattr(db_profile, key, value)
         
-        self.db.commit()
-        self.db.refresh(db_profile)
+        await self.db.commit()
+        await self.db.refresh(db_profile)
         return db_profile
 
-    def delete_user(self, user_id: UUID) -> bool:
-        db_user = self.get_user_by_id(user_id)
+    async def delete_user(self, user_id: UUID) -> bool:
+        db_user = await self.get_user_by_id(user_id)
         if not db_user:
             return False
         
-        self.db.delete(db_user)
-        self.db.commit()
+        await self.db.delete(db_user)
+        await self.db.commit()
         return True

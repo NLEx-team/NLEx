@@ -3,7 +3,7 @@ from starlette.requests import Request
 from starlette.responses import Response
 
 from src.services.auth import AuthService
-from src.database.session import SessionLocal
+from src.database.session import AsyncSessionLocal
 from src.services.users import UserService
 
 class AuthMiddleware(BaseHTTPMiddleware):
@@ -25,14 +25,11 @@ class AuthMiddleware(BaseHTTPMiddleware):
                         from uuid import UUID
                         user_id = UUID(user_id_str)
                         
-                        db = SessionLocal()
-                        try:
+                        async with AsyncSessionLocal() as db:
                             user_service = UserService(db)
-                            user = user_service.get_user(user_id)
+                            user = await user_service.get_user(user_id)
                             if user:
                                 request.state.user = user
-                        finally:
-                            db.close()
                     except (ValueError, ImportError):
                         pass
         

@@ -1,27 +1,31 @@
 import pytest
-from fastapi.testclient import TestClient
+from httpx import AsyncClient
 from src.database.models.user import UserRole
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select
 
-def get_auth_headers(client: TestClient, email: str, password: str):
-    response = client.post(
+async def get_auth_headers(client: AsyncClient, email: str, password: str):
+    response = await client.post(
         "/auth/login",
         json={"email": email, "password": password}
     )
     token = response.json()["jwt_token"]
     return {"Authorization": f"Bearer {token}"}
 
-def test_get_me(client: TestClient):
+@pytest.mark.asyncio
+async def test_get_me(client: AsyncClient):
     # Register and login
     email = "me@example.com"
     password = "password123"
-    client.post("/auth/register", json={"email": email, "password": password})
-    headers = get_auth_headers(client, email, password)
+    await client.post("/auth/register", json={"email": email, "password": password})
+    headers = await get_auth_headers(client, email, password)
     
-    response = client.get("/users/me", headers=headers)
+    response = await client.get("/users/me", headers=headers)
     assert response.status_code == 200
     assert response.json()["email"] == email
 
-def test_get_all_users_admin_only(client: TestClient, db_session):
+@pytest.mark.asyncio
+async def test_get_all_users_admin_only(client: AsyncClient, db_session: AsyncSession):
     # Create an admin user manually in DB
     from src.services.auth import AuthService
     from src.database.models.user import User, UserProfile
@@ -33,23 +37,24 @@ def test_get_all_users_admin_only(client: TestClient, db_session):
     admin_user = User(email=admin_email, hashed_password=hashed_pwd, role=UserRole.ADMIN)
     admin_user.profile = UserProfile()
     db_session.add(admin_user)
-    db_session.commit()
+    await db_session.commit()
     
     # Login as admin
-    headers = get_auth_headers(client, admin_email, password)
+    headers = await get_auth_headers(client, admin_email, password)
     
     # Get all users
-    response = client.get("/users", headers=headers)
+    response = await client.get("/users", headers=headers)
     assert response.status_code == 200
     assert len(response.json()) >= 1
 
-def test_update_me_profile_flat(client: TestClient):
+@pytest.mark.asyncio
+async def test_update_me_profile_flat(client: AsyncClient):
     email = "flat_patch@example.com"
     password = "password123"
-    client.post("/auth/register", json={"email": email, "password": password})
-    headers = get_auth_headers(client, email, password)
+    await client.post("/auth/register", json={"email": email, "password": password})
+    headers = await get_auth_headers(client, email, password)
     
-    response = client.patch(
+    response = await client.patch(
         "/users/me",
         headers=headers,
         json={
@@ -65,14 +70,15 @@ def test_update_me_profile_flat(client: TestClient):
     assert data["profile"]["avatar_url"] == "http://image.url"
 
 
-def test_update_me_role_ignored(client: TestClient):
+@pytest.mark.asyncio
+async def test_update_me_role_ignored(client: AsyncClient):
     email = "hacker@example.com"
     password = "password123"
-    client.post("/auth/register", json={"email": email, "password": password})
-    headers = get_auth_headers(client, email, password)
+    await client.post("/auth/register", json={"email": email, "password": password})
+    headers = await get_auth_headers(client, email, password)
     
     # Attempt to change role
-    response = client.patch(
+    response = await client.patch(
         "/users/me",
         headers=headers,
         json={"role": "admin"}
@@ -81,12 +87,13 @@ def test_update_me_role_ignored(client: TestClient):
     # Role should still be visitor (ignored by schema)
     assert response.json()["role"] == UserRole.VISITOR
 
-def test_admin_update_other_user_role(client: TestClient, db_session):
+@pytest.mark.asyncio
+async def test_admin_update_other_user_role(client: AsyncClient, db_session: AsyncSession):
     # 1. Create a visitor
     visitor_email = "victim@example.com"
-    client.post("/auth/register", json={"email": visitor_email, "password": "password123"})
-    visitor = client.post("/auth/login", json={"email": visitor_email, "password": "password123"}).json()["user"]
-    visitor_id = visitor["id"]
+    await client.post("/auth/register", json={"email": visitor_email, "password": "password123"})
+    response = await client.post("/auth/login", json={"email": visitor_email, "password": "password123"})
+    visitor_id = response.json()["user"]["id"]
 
     # 2. Create an admin manually
     from src.services.auth import AuthService
@@ -96,12 +103,12 @@ def test_admin_update_other_user_role(client: TestClient, db_session):
     admin = User(email=admin_email, hashed_password=hashed_pwd, role=UserRole.ADMIN)
     admin.profile = UserProfile()
     db_session.add(admin)
-    db_session.commit()
+    await db_session.commit()
     
-    admin_headers = get_auth_headers(client, admin_email, "admin123")
+    admin_headers = await get_auth_headers(client, admin_email, "admin123")
 
     # 3. Admin promotes visitor
-    response = client.patch(
+    response = await client.patch(
         f"/users/{visitor_id}",
         headers=admin_headers,
         json={"role": "admin"}
@@ -109,11 +116,12 @@ def test_admin_update_other_user_role(client: TestClient, db_session):
     assert response.status_code == 200
     assert response.json()["role"] == UserRole.ADMIN
 
-def test_delete_me(client: TestClient):
+@pytest.mark.asyncio
+async def test_delete_me(client: AsyncClient):
     email = "delete_me@example.com"
     password = "password123"
-    client.post("/auth/register", json={"email": email, "password": password})
-    headers = get_auth_headers(client, email, password)
+    await client.post("/auth/register", json={"email": email, "password": password})
+    headers = await get_auth_headers(client, email, password)
     
-    response = client.delete("/users/me", headers=headers)
+    response = await client.delete("/users/me", headers=headers)
     assert response.status_code == 204

@@ -23,8 +23,13 @@ class Settings(BaseSettings):
     @property
     def SQLALCHEMY_DATABASE_URL(self) -> str:
         if self.DATABASE_URL:
-            return self.DATABASE_URL
-        return f"postgresql://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@{self.POSTGRES_HOST}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
+            url = self.DATABASE_URL
+            if url.startswith("postgresql://") and "+asyncpg" not in url:
+                return url.replace("postgresql://", "postgresql+asyncpg://", 1)
+            if url.startswith("sqlite://") and "+aiosqlite" not in url:
+                return url.replace("sqlite://", "sqlite+aiosqlite://", 1)
+            return url
+        return f"postgresql+asyncpg://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@{self.POSTGRES_HOST}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
 
     model_config = SettingsConfigDict(
         env_file=".env.secret",

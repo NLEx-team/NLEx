@@ -1,5 +1,5 @@
 from fastapi import HTTPException, status
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 from uuid import UUID
 from typing import List, Union
 
@@ -9,9 +9,9 @@ from src.models.schemas.user import UserUpdate, UserAdminUpdate
 
 class UserController:
     @staticmethod
-    async def get_user_by_id(db: Session, id: UUID) -> User:
+    async def get_user_by_id(db: AsyncSession, id: UUID) -> User:
         user_service = UserService(db)
-        user = user_service.get_user(id)
+        user = await user_service.get_user(id)
         if not user:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND, 
@@ -20,14 +20,14 @@ class UserController:
         return user
 
     @staticmethod
-    async def get_users(db: Session) -> List[User]:
+    async def get_users(db: AsyncSession) -> List[User]:
         user_service = UserService(db)
-        return user_service.list_users()
+        return await user_service.list_users()
 
     @staticmethod
-    async def update_user(db: Session, id: UUID, user_update: Union[UserUpdate, UserAdminUpdate]) -> User:
+    async def update_user(db: AsyncSession, id: UUID, user_update: Union[UserUpdate, UserAdminUpdate]) -> User:
         user_service = UserService(db)
-        updated_user = user_service.update_user(id, user_update)
+        updated_user = await user_service.update_user(id, user_update)
         if not updated_user:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND, 
@@ -36,9 +36,9 @@ class UserController:
         return updated_user
 
     @staticmethod
-    async def delete_me(db: Session, current_user: User) -> None:
+    async def delete_me(db: AsyncSession, current_user: User) -> None:
         user_service = UserService(db)
-        success = user_service.delete_user(current_user.id)
+        success = await user_service.delete_user(current_user.id)
         if not success:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND, 
@@ -46,9 +46,9 @@ class UserController:
             )
 
     @staticmethod
-    async def delete_user(db: Session, id: UUID) -> None:
+    async def delete_user(db: AsyncSession, id: UUID) -> None:
         user_service = UserService(db)
-        success = user_service.delete_user(id)
+        success = await user_service.delete_user(id)
         if not success:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND, 

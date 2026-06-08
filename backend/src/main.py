@@ -1,3 +1,4 @@
+from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from src.routers.auth import router as auth_router
 from src.routers.users import router as users_router
@@ -11,10 +12,15 @@ install(show_locals=True)
 # Ensure models are imported so SQLAlchemy knows about them
 from src.database.models import user 
 
-# Create tables on startup
-Base.metadata.create_all(bind=engine)
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Create tables on startup
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+    yield
+    # Clean up on shutdown if needed
 
-app = FastAPI(title="NLEx", version="1.0.0")
+app = FastAPI(title="NLEx", version="1.0.0", lifespan=lifespan)
 
 app.add_middleware(AuthMiddleware)
 app.include_router(auth_router, prefix="/auth", tags=["auth"])

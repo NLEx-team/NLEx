@@ -1,40 +1,56 @@
 import pytest
-from fastapi.testclient import TestClient
+import pytest_asyncio
+from httpx import AsyncClient, ASGITransport
 from src.main import app
-from src.database.session import Base, engine, get_db, SessionLocal
+from src.database.session import Base, engine, get_db, AsyncSessionLocal
 from src.database.models.user import User, UserProfile
+from sqlalchemy import delete
 
-@pytest.fixture(scope="session", autouse=True)
-def setup_test_db():
+# Configure pytest-asyncio to use the default event loop
+@pytest.fixture(scope="session")
+def event_loop():
+    import asyncio
+    loop = asyncio.get_event_loop_policy().new_event_loop()
+    yield loop
+    loop.close()
+
+@pytest_asyncio.fixture(scope="session", autouse=True)
+async def setup_test_db():
     """
     Creates tables once per test session.
     """
-    Base.metadata.create_all(bind=engine)
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
     yield
     # Optional: Drop tables after session
-    # Base.metadata.drop_all(bind=engine)
+    # async with engine.begin() as conn:
+    #     await conn.run_sync(Base.metadata.drop_all)
 
-@pytest.fixture(scope="function")
-def db_session():
+@pytest_asyncio.fixture(scope="function")
+async def db_session():
     """
     Provides a fresh session for each test and wipes data after.
     """
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+    async with AsyncSessionLocal() as session:
+        yield session
         # Clean up data after each test to ensure isolation
         # We delete in reverse order of dependencies
-        with engine.connect() as conn:
-            conn.execute(Base.metadata.tables["user_profiles"].delete())
-            conn.execute(Base.metadata.tables["users"].delete())
-            conn.commit()
+        await session.execute(delete(UserProfile))
+        await session.execute(delete(User))
+        await session.commit()
 
-@pytest.fixture(scope="function")
-def client(db_session):
+@pytest_asyncio.fixture(scope="function")
+async def client(db_session):
     """
-    FastAPI TestClient that uses the real database session.
+    FastAPI AsyncClient that uses the real database session.
     """
-    with TestClient(app) as c:
-        yield c
+    # Overriding get_db to return our test session
+    async def _get_test_db():
+        yield db_session
+    
+    app.dependency_overrides[get_db] = _get_test_db
+    
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
+        yield ac
+    
+    app.dependency_overrides.clear()
