@@ -14,7 +14,7 @@ router = APIRouter()
 async def me(user = Depends(get_current_user)):
     return user
 
-@router.get("/{id}", response_model=UserRead)
+@router.get("/{id}", response_model=UserRead, dependencies=[Depends(get_current_user)])
 async def get_user(id: UUID, db: Session = Depends(get_db)):
     return await UserController.get_user_by_id(db, id)
 
