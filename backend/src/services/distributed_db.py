@@ -33,16 +33,16 @@ class DistributedDatabaseService:
     async def execute_query_async(
         self,
         query: str,
-    ) -> asyncio.Future:
+    ) -> list[list[Any]]:
         return await asyncio.to_thread(
-            self._execute_query_sync,
+            self.execute_query_sync,
             query,
         )
 
     def execute_query_sync(
         self,
         query: str,
-    ) -> list[tuple[Any, ...]]:
+    ) -> list[list[Any]]:
         with closing(self._get_connection()) as conn:
             with closing(conn.cursor()) as cursor:
                 cursor.execute(query)
@@ -61,7 +61,7 @@ class DistributedDatabaseService:
 
         sql = f"""
         CREATE CATALOG {name}
-        USING {catalog.type}
+        USING {catalog.type.value}
         WITH (
             "connection-url" = '{catalog.url}',
             "connection-user" = '{catalog.user}',

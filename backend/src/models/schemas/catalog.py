@@ -1,3 +1,4 @@
+from enum import Enum
 from pydantic import BaseModel, HttpUrl
 
 class DatabaseType(str, Enum):
@@ -6,8 +7,7 @@ class DatabaseType(str, Enum):
 
 class CatalogConnection(BaseModel):
     type: DatabaseType
-    host: str
-    port: int
+    url: str
     user: str
     password: str
 
