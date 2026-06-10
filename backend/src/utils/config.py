@@ -14,6 +14,9 @@ class Settings(BaseSettings):
     
     # This can be set directly (e.g. for sqlite tests)
     DATABASE_URL: str | None = None
+
+    # Trino
+    TRINO_PORT: int = 8080
     
     # JWT
     JWT_SECRET_KEY: str = "your-super-secret-key-change-me"
