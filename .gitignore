@@ -219,4 +219,4 @@ __marimo__/
 .streamlit/secrets.toml
 
 # System
-DS_Store
+.DS_Store
