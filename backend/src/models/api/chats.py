@@ -1,15 +1,11 @@
 from typing import Optional, List, Dict, Any
 from pydantic import BaseModel
-from .auth import UserRead
+from uuid import UUID
 from ..schemas.chat import ChatRead, DatabaseConnectionRead, DraftRead, SchemaSnapshot, ClarificationQuestion
 
 class ChatCreateRequest(BaseModel):
     name: Optional[str] = None
-
-class ConnectionCreateRequest(BaseModel):
-    name: str
-    type: str
-    connection_params: Dict[str, Any]
+    connection_ids: List[UUID] = []
 
 class PromptRequest(BaseModel):
     prompt: str

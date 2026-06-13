@@ -5,7 +5,7 @@ from typing import List
 
 from src.dependencies.auth import get_current_user
 from src.models.api.chats import (
-    ChatCreateRequest, ConnectionCreateRequest, PromptRequest, 
+    ChatCreateRequest, PromptRequest, 
     ReviseRequest, ClarificationAnswer
 )
 from src.models.schemas.chat import (
@@ -17,7 +17,6 @@ router = APIRouter()
 
 # Mock storage
 MOCK_CHATS = {}
-MOCK_CONNECTIONS = {}
 MOCK_DRAFTS = {}
 
 @router.post("", response_model=ChatRead, status_code=status.HTTP_201_CREATED)
@@ -26,7 +25,7 @@ async def create_chat(request: ChatCreateRequest, user = Depends(get_current_use
     chat = ChatRead(
         id=chat_id,
         name=request.name or f"Chat {chat_id.hex[:8]}",
-        status=ChatStatus.IDLE,
+        status=ChatStatus.IDLE if not request.connection_ids else ChatStatus.READY_FOR_PROMPT,
         created_at=datetime.utcnow(),
         updated_at=datetime.utcnow()
     )
@@ -44,55 +43,15 @@ async def delete_chat(chat_id: UUID, user = Depends(get_current_user)):
     if chat_id not in MOCK_CHATS:
         raise HTTPException(status_code=404, detail="Chat not found")
     del MOCK_CHATS[chat_id]
-    if chat_id in MOCK_CONNECTIONS:
-        del MOCK_CONNECTIONS[chat_id]
     if chat_id in MOCK_DRAFTS:
         del MOCK_DRAFTS[chat_id]
     return None
-
-@router.post("/{chat_id}/connections", response_model=DatabaseConnectionRead)
-async def add_connection(chat_id: UUID, request: ConnectionCreateRequest, user = Depends(get_current_user)):
-    if chat_id not in MOCK_CHATS:
-        raise HTTPException(status_code=404, detail="Chat not found")
-    
-    connection_id = uuid4()
-    connection = DatabaseConnectionRead(
-        id=connection_id,
-        name=request.name,
-        type=request.type,
-        status="connected"
-    )
-    
-    if chat_id not in MOCK_CONNECTIONS:
-        MOCK_CONNECTIONS[chat_id] = []
-    MOCK_CONNECTIONS[chat_id].append(connection)
-    
-    return connection
-
-@router.get("/{chat_id}/connections", response_model=List[DatabaseConnectionRead])
-async def list_connections(chat_id: UUID, user = Depends(get_current_user)):
-    if chat_id not in MOCK_CHATS:
-        raise HTTPException(status_code=404, detail="Chat not found")
-    return MOCK_CONNECTIONS.get(chat_id, [])
-
-@router.post("/{chat_id}/connections:finalize", response_model=SchemaSnapshot)
-async def finalize_connections(chat_id: UUID, user = Depends(get_current_user)):
-    if chat_id not in MOCK_CHATS:
-        raise HTTPException(status_code=404, detail="Chat not found")
-    
-    chat = MOCK_CHATS[chat_id]
-    chat.status = ChatStatus.READY_FOR_PROMPT
-    chat.updated_at = datetime.utcnow()
-    
-    return SchemaSnapshot(
-        tables=[{"name": "sales", "columns": ["id", "amount", "date"]}],
-        relationships=[{"from": "sales.product_id", "to": "products.id"}]
-    )
 
 @router.get("/{chat_id}/schema", response_model=SchemaSnapshot)
 async def get_schema_snapshot(chat_id: UUID, user = Depends(get_current_user)):
     if chat_id not in MOCK_CHATS:
         raise HTTPException(status_code=404, detail="Chat not found")
+    # In a real app, this would aggregate schemas from connections linked to this chat
     return SchemaSnapshot(
         tables=[{"name": "sales", "columns": ["id", "amount", "date"]}],
         relationships=[{"from": "sales.product_id", "to": "products.id"}]
