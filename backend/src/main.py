@@ -2,6 +2,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from src.routers.auth import router as auth_router
 from src.routers.users import router as users_router
+from src.routers.chats import router as chats_router
 from src.middleware.auth import AuthMiddleware
 from src.database.session import engine, Base
 from rich.traceback import install
@@ -25,6 +26,7 @@ app = FastAPI(title="NLEx", version="1.0.0", lifespan=lifespan)
 app.add_middleware(AuthMiddleware)
 app.include_router(auth_router, prefix="/auth", tags=["auth"])
 app.include_router(users_router, prefix="/users", tags=["users"])
+app.include_router(chats_router, prefix="/chats", tags=["chats"])
 
 @app.get("/")
 async def root() -> dict[str, str]:
