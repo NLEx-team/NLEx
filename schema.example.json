@@ -1,0 +1,2000 @@
+{
+   "catalog":"pagila_test",
+   "schemas":[
+      {
+         "name":"pg_catalog",
+         "tables":[
+            
+         ]
+      },
+      {
+         "name":"public",
+         "tables":[
+            {
+               "name":"actor",
+               "columns":[
+                  {
+                     "name":"actor_id",
+                     "type":"integer",
+                     "nullable":false,
+                     "samples":[
+                        "1",
+                        "2",
+                        "3"
+                     ]
+                  },
+                  {
+                     "name":"first_name",
+                     "type":"varchar",
+                     "nullable":false,
+                     "samples":[
+                        "PENELOPE",
+                        "NICK",
+                        "ED"
+                     ]
+                  },
+                  {
+                     "name":"last_name",
+                     "type":"varchar",
+                     "nullable":false,
+                     "samples":[
+                        "GUINESS",
+                        "WAHLBERG",
+                        "CHASE"
+                     ]
+                  },
+                  {
+                     "name":"last_update",
+                     "type":"timestamp(6) with time zone",
+                     "nullable":false,
+                     "samples":[
+                        "2022-02-15 09:34:33+00:00",
+                        "2022-02-15 09:34:33+00:00",
+                        "2022-02-15 09:34:33+00:00"
+                     ]
+                  }
+               ],
+               "relationships":[
+                  
+               ]
+            },
+            {
+               "name":"actor_info",
+               "columns":[
+                  {
+                     "name":"actor_id",
+                     "type":"integer",
+                     "nullable":true,
+                     "samples":[
+                        "1",
+                        "2",
+                        "3"
+                     ]
+                  },
+                  {
+                     "name":"first_name",
+                     "type":"varchar",
+                     "nullable":true,
+                     "samples":[
+                        "PENELOPE",
+                        "NICK",
+                        "ED"
+                     ]
+                  },
+                  {
+                     "name":"last_name",
+                     "type":"varchar",
+                     "nullable":true,
+                     "samples":[
+                        "GUINESS",
+                        "WAHLBERG",
+                        "CHASE"
+                     ]
+                  },
+                  {
+                     "name":"film_info",
+                     "type":"varchar",
+                     "nullable":true,
+                     "samples":[
+                        "Action: ANGELS LIFE, HUMAN GRAFFITI, BULWORTH COMMANDMENTS, OKLAHOMA JUMANJI, ELEPHANT TROJAN, Animation: BULWORTH COMMANDMENTS, ELEPHANT TROJAN, Children: RULES HUMAN, SPLASH GUMP, CHEAPER CLYDE, Classics: LANGUAGE COWBOY, OKLAHOMA JUMANJI, LADY STAGE, SPLASH GUMP, ANGELS LIFE, Comedy: VERTIGO NORTHWEST, ANACONDA CONFESSIONS, Documentary: ANACONDA CONFESSIONS, GLEAMING JAWBREAKER, HUMAN GRAFFITI, COLOR PHILADELPHIA, Drama: ANGELS LIFE, WIZARD COLDBLOODED, COLOR PHILADELPHIA, KING EVOLUTION, Family: WIZARD COLDBLOODED, Foreign: COLOR PHILADELPHIA, CHEAPER CLYDE, GLEAMING JAWBREAKER, VERTIGO NORTHWEST, BULWORTH COMMANDMENTS, KING EVOLUTION, Games: ACADEMY DINOSAUR, Horror: ANACONDA CONFESSIONS, GLEAMING JAWBREAKER, HUMAN GRAFFITI, Music: LANGUAGE COWBOY, WESTWARD SEABISCUIT, New: LADY STAGE, WESTWARD SEABISCUIT, ACADEMY DINOSAUR, RULES HUMAN, Sports: CHEAPER CLYDE, MULHOLLAND BEAST, ELEPHANT TROJAN, Travel: KING EVOLUTION, MULHOLLAND BEAST, ACADEMY DINOSAUR",
+                        "Action: RUSHMORE MERMAID, ADAPTATION HOLES, GOODFELLAS SALUTE, Animation: MAGUIRE APACHE, JEKYLL FROGMEN, MASK PEACH, LIAISONS SWEET, MALLRATS UNITED, Children: MALLRATS UNITED, JERSEY SASSY, Classics: BABY HALL, JEKYLL FROGMEN, BULL SHAWSHANK, INDIAN LOVE, ROOF CHAMPION, CHAINSAW UPTOWN, DESTINY SATURDAY, Comedy: BABY HALL, GILBERT PELICAN, SMILE EARRING, Documentary: APACHE DIVINE, HAPPINESS UNITED, INDIAN LOVE, DRACULA CRYSTAL, GOODFELLAS SALUTE, Drama: DRACULA CRYSTAL, GILBERT PELICAN, LUCKY FLYING, ROOF CHAMPION, BABY HALL, INDIAN LOVE, Family: CHAINSAW UPTOWN, APACHE DIVINE, HAPPINESS UNITED, BULL SHAWSHANK, GILBERT PELICAN, Foreign: GOODFELLAS SALUTE, LIAISONS SWEET, SMILE EARRING, WARDROBE PHANTOM, FLASH WARS, Games: BULL SHAWSHANK, MASK PEACH, DRACULA CRYSTAL, RUSHMORE MERMAID, CHISUM BEHAVIOR, Horror: DESTINY SATURDAY, FIGHT JAWBREAKER, Music: CHISUM BEHAVIOR, LUCKY FLYING, FIGHT JAWBREAKER, New: ADAPTATION HOLES, DESTINY SATURDAY, APACHE DIVINE, WARDROBE PHANTOM, Sports: FIGHT JAWBREAKER, FLASH WARS, MALLRATS UNITED, LIAISONS SWEET, Travel: FLASH WARS, JERSEY SASSY, CHAINSAW UPTOWN, CHISUM BEHAVIOR, MAGUIRE APACHE, HAPPINESS UNITED",
+                        "Action: WEEKEND PERSONAL, Animation: FORREST SONS, WEDDING APOLLO, COWBOY DOOM, EVE RESURRECTION, FRENCH HOLIDAY, JEEPERS WEDDING, HALLOWEEN NUTS, CADDYSHACK JEDI, Children: FRENCH HOLIDAY, YOUNG LANGUAGE, PLATOON INSTINCT, Classics: ALONE TRIP, Comedy: IMAGE PRINCESS, LUCK OPUS, Documentary: CADDYSHACK JEDI, WHALE BIKINI, ARTIST COLDBLOODED, Drama: CADDYSHACK JEDI, NECKLACE OUTBREAK, Family: ALONE TRIP, EVE RESURRECTION, JEEPERS WEDDING, NECKLACE OUTBREAK, LUCK OPUS, YOUNG LANGUAGE, Foreign: COWBOY DOOM, ARTIST COLDBLOODED, IMAGE PRINCESS, Games: HALLOWEEN NUTS, BOONDOCK BALLROOM, FROST HEAD, WEDDING APOLLO, Horror: ARTIST COLDBLOODED, PLATOON INSTINCT, FORREST SONS, HUNTER ALTER, ARMY FLINTSTONES, Music: FROST HEAD, ALONE TRIP, ARMY FLINTSTONES, FRENCH HOLIDAY, New: SPICE SORORITY, FROST HEAD, Sci-Fi: ARMY FLINTSTONES, HUNTER ALTER, Sports: BOONDOCK BALLROOM, WEEKEND PERSONAL, FORREST SONS, Travel: SPICE SORORITY, BOONDOCK BALLROOM"
+                     ]
+                  }
+               ],
+               "relationships":[
+                  
+               ]
+            },
+            {
+               "name":"address",
+               "columns":[
+                  {
+                     "name":"address_id",
+                     "type":"integer",
+                     "nullable":false,
+                     "samples":[
+                        "1",
+                        "2",
+                        "3"
+                     ]
+                  },
+                  {
+                     "name":"address",
+                     "type":"varchar",
+                     "nullable":false,
+                     "samples":[
+                        "47 MySakila Drive",
+                        "28 MySQL Boulevard",
+                        "23 Workhaven Lane"
+                     ]
+                  },
+                  {
+                     "name":"address2",
+                     "type":"varchar",
+                     "nullable":true,
+                     "samples":[
+                        
+                     ]
+                  },
+                  {
+                     "name":"district",
+                     "type":"varchar",
+                     "nullable":false,
+                     "samples":[
+                        "Alberta",
+                        "QLD",
+                        "Alberta"
+                     ]
+                  },
+                  {
+                     "name":"city_id",
+                     "type":"integer",
+                     "nullable":false,
+                     "samples":[
+                        "300",
+                        "576",
+                        "300"
+                     ]
+                  },
+                  {
+                     "name":"postal_code",
+                     "type":"varchar",
+                     "nullable":true,
+                     "samples":[
+                        "",
+                        "",
+                        ""
+                     ]
+                  },
+                  {
+                     "name":"phone",
+                     "type":"varchar",
+                     "nullable":false,
+                     "samples":[
+                        "",
+                        "",
+                        "14033335568"
+                     ]
+                  },
+                  {
+                     "name":"last_update",
+                     "type":"timestamp(6) with time zone",
+                     "nullable":false,
+                     "samples":[
+                        "2022-02-15 09:45:30+00:00",
+                        "2022-02-15 09:45:30+00:00",
+                        "2022-02-15 09:45:30+00:00"
+                     ]
+                  }
+               ],
+               "relationships":[
+                  
+               ]
+            },
+            {
+               "name":"category",
+               "columns":[
+                  {
+                     "name":"category_id",
+                     "type":"integer",
+                     "nullable":false,
+                     "samples":[
+                        "1",
+                        "2",
+                        "3"
+                     ]
+                  },
+                  {
+                     "name":"name",
+                     "type":"varchar",
+                     "nullable":false,
+                     "samples":[
+                        "Action",
+                        "Animation",
+                        "Children"
+                     ]
+                  },
+                  {
+                     "name":"last_update",
+                     "type":"timestamp(6) with time zone",
+                     "nullable":false,
+                     "samples":[
+                        "2022-02-15 09:46:27+00:00",
+                        "2022-02-15 09:46:27+00:00",
+                        "2022-02-15 09:46:27+00:00"
+                     ]
+                  }
+               ],
+               "relationships":[
+                  
+               ]
+            },
+            {
+               "name":"city",
+               "columns":[
+                  {
+                     "name":"city_id",
+                     "type":"integer",
+                     "nullable":false,
+                     "samples":[
+                        "1",
+                        "2",
+                        "3"
+                     ]
+                  },
+                  {
+                     "name":"city",
+                     "type":"varchar",
+                     "nullable":false,
+                     "samples":[
+                        "A Corua (La Corua)",
+                        "Abha",
+                        "Abu Dhabi"
+                     ]
+                  },
+                  {
+                     "name":"country_id",
+                     "type":"integer",
+                     "nullable":false,
+                     "samples":[
+                        "87",
+                        "82",
+                        "101"
+                     ]
+                  },
+                  {
+                     "name":"last_update",
+                     "type":"timestamp(6) with time zone",
+                     "nullable":false,
+                     "samples":[
+                        "2022-02-15 09:45:25+00:00",
+                        "2022-02-15 09:45:25+00:00",
+                        "2022-02-15 09:45:25+00:00"
+                     ]
+                  }
+               ],
+               "relationships":[
+                  
+               ]
+            },
+            {
+               "name":"country",
+               "columns":[
+                  {
+                     "name":"country_id",
+                     "type":"integer",
+                     "nullable":false,
+                     "samples":[
+                        "1",
+                        "2",
+                        "3"
+                     ]
+                  },
+                  {
+                     "name":"country",
+                     "type":"varchar",
+                     "nullable":false,
+                     "samples":[
+                        "Afghanistan",
+                        "Algeria",
+                        "American Samoa"
+                     ]
+                  },
+                  {
+                     "name":"last_update",
+                     "type":"timestamp(6) with time zone",
+                     "nullable":false,
+                     "samples":[
+                        "2022-02-15 09:44:00+00:00",
+                        "2022-02-15 09:44:00+00:00",
+                        "2022-02-15 09:44:00+00:00"
+                     ]
+                  }
+               ],
+               "relationships":[
+                  
+               ]
+            },
+            {
+               "name":"customer",
+               "columns":[
+                  {
+                     "name":"customer_id",
+                     "type":"integer",
+                     "nullable":false,
+                     "samples":[
+                        "1",
+                        "2",
+                        "3"
+                     ]
+                  },
+                  {
+                     "name":"store_id",
+                     "type":"integer",
+                     "nullable":false,
+                     "samples":[
+                        "1",
+                        "1",
+                        "1"
+                     ]
+                  },
+                  {
+                     "name":"first_name",
+                     "type":"varchar",
+                     "nullable":false,
+                     "samples":[
+                        "MARY",
+                        "PATRICIA",
+                        "LINDA"
+                     ]
+                  },
+                  {
+                     "name":"last_name",
+                     "type":"varchar",
+                     "nullable":false,
+                     "samples":[
+                        "SMITH",
+                        "JOHNSON",
+                        "WILLIAMS"
+                     ]
+                  },
+                  {
+                     "name":"email",
+                     "type":"varchar",
+                     "nullable":true,
+                     "samples":[
+                        "MARY.SMITH@sakilacustomer.org",
+                        "PATRICIA.JOHNSON@sakilacustomer.org",
+                        "LINDA.WILLIAMS@sakilacustomer.org"
+                     ]
+                  },
+                  {
+                     "name":"address_id",
+                     "type":"integer",
+                     "nullable":false,
+                     "samples":[
+                        "5",
+                        "6",
+                        "7"
+                     ]
+                  },
+                  {
+                     "name":"activebool",
+                     "type":"boolean",
+                     "nullable":false,
+                     "samples":[
+                        "True",
+                        "True",
+                        "True"
+                     ]
+                  },
+                  {
+                     "name":"create_date",
+                     "type":"date",
+                     "nullable":false,
+                     "samples":[
+                        "2022-02-14",
+                        "2022-02-14",
+                        "2022-02-14"
+                     ]
+                  },
+                  {
+                     "name":"last_update",
+                     "type":"timestamp(6) with time zone",
+                     "nullable":true,
+                     "samples":[
+                        "2022-02-15 09:57:20+00:00",
+                        "2022-02-15 09:57:20+00:00",
+                        "2022-02-15 09:57:20+00:00"
+                     ]
+                  },
+                  {
+                     "name":"active",
+                     "type":"integer",
+                     "nullable":true,
+                     "samples":[
+                        "1",
+                        "1",
+                        "1"
+                     ]
+                  }
+               ],
+               "relationships":[
+                  
+               ]
+            },
+            {
+               "name":"customer_list",
+               "columns":[
+                  {
+                     "name":"id",
+                     "type":"integer",
+                     "nullable":true,
+                     "samples":[
+                        "1",
+                        "2",
+                        "3"
+                     ]
+                  },
+                  {
+                     "name":"name",
+                     "type":"varchar",
+                     "nullable":true,
+                     "samples":[
+                        "MARY SMITH",
+                        "PATRICIA JOHNSON",
+                        "LINDA WILLIAMS"
+                     ]
+                  },
+                  {
+                     "name":"address",
+                     "type":"varchar",
+                     "nullable":true,
+                     "samples":[
+                        "1913 Hanoi Way",
+                        "1121 Loja Avenue",
+                        "692 Joliet Street"
+                     ]
+                  },
+                  {
+                     "name":"zip code",
+                     "type":"varchar",
+                     "nullable":true,
+                     "samples":[
+                        "35200",
+                        "17886",
+                        "83579"
+                     ]
+                  },
+                  {
+                     "name":"phone",
+                     "type":"varchar",
+                     "nullable":true,
+                     "samples":[
+                        "28303384290",
+                        "838635286649",
+                        "448477190408"
+                     ]
+                  },
+                  {
+                     "name":"city",
+                     "type":"varchar",
+                     "nullable":true,
+                     "samples":[
+                        "Sasebo",
+                        "San Bernardino",
+                        "Athenai"
+                     ]
+                  },
+                  {
+                     "name":"country",
+                     "type":"varchar",
+                     "nullable":true,
+                     "samples":[
+                        "Japan",
+                        "United States",
+                        "Greece"
+                     ]
+                  },
+                  {
+                     "name":"notes",
+                     "type":"varchar",
+                     "nullable":true,
+                     "samples":[
+                        "active",
+                        "active",
+                        "active"
+                     ]
+                  },
+                  {
+                     "name":"sid",
+                     "type":"integer",
+                     "nullable":true,
+                     "samples":[
+                        "1",
+                        "1",
+                        "1"
+                     ]
+                  }
+               ],
+               "relationships":[
+                  
+               ]
+            },
+            {
+               "name":"film",
+               "columns":[
+                  {
+                     "name":"film_id",
+                     "type":"integer",
+                     "nullable":false,
+                     "samples":[
+                        "1",
+                        "2",
+                        "3"
+                     ]
+                  },
+                  {
+                     "name":"title",
+                     "type":"varchar",
+                     "nullable":false,
+                     "samples":[
+                        "ACADEMY DINOSAUR",
+                        "ACE GOLDFINGER",
+                        "ADAPTATION HOLES"
+                     ]
+                  },
+                  {
+                     "name":"description",
+                     "type":"varchar",
+                     "nullable":true,
+                     "samples":[
+                        "A Epic Drama of a Feminist And a Mad Scientist who must Battle a Teacher in The Canadian Rockies",
+                        "A Astounding Epistle of a Database Administrator And a Explorer who must Find a Car in Ancient China",
+                        "A Astounding Reflection of a Lumberjack And a Car who must Sink a Lumberjack in A Baloon Factory"
+                     ]
+                  },
+                  {
+                     "name":"language_id",
+                     "type":"integer",
+                     "nullable":false,
+                     "samples":[
+                        "1",
+                        "1",
+                        "2"
+                     ]
+                  },
+                  {
+                     "name":"original_language_id",
+                     "type":"integer",
+                     "nullable":true,
+                     "samples":[
+                        
+                     ]
+                  },
+                  {
+                     "name":"rental_duration",
+                     "type":"smallint",
+                     "nullable":false,
+                     "samples":[
+                        "6",
+                        "3",
+                        "7"
+                     ]
+                  },
+                  {
+                     "name":"rental_rate",
+                     "type":"decimal(4,2)",
+                     "nullable":false,
+                     "samples":[
+                        "0.99",
+                        "4.99",
+                        "2.99"
+                     ]
+                  },
+                  {
+                     "name":"length",
+                     "type":"smallint",
+                     "nullable":true,
+                     "samples":[
+                        "86",
+                        "48",
+                        "50"
+                     ]
+                  },
+                  {
+                     "name":"replacement_cost",
+                     "type":"decimal(5,2)",
+                     "nullable":false,
+                     "samples":[
+                        "20.99",
+                        "12.99",
+                        "18.99"
+                     ]
+                  },
+                  {
+                     "name":"rating",
+                     "type":"varchar",
+                     "nullable":true,
+                     "samples":[
+                        "PG",
+                        "G",
+                        "NC-17"
+                     ]
+                  },
+                  {
+                     "name":"last_update",
+                     "type":"timestamp(6) with time zone",
+                     "nullable":false,
+                     "samples":[
+                        "2022-09-10 16:46:03.905795+00:00",
+                        "2022-09-10 16:46:03.905795+00:00",
+                        "2022-09-10 16:46:03.905795+00:00"
+                     ]
+                  }
+               ],
+               "relationships":[
+                  
+               ]
+            },
+            {
+               "name":"film_actor",
+               "columns":[
+                  {
+                     "name":"actor_id",
+                     "type":"integer",
+                     "nullable":false,
+                     "samples":[
+                        "1",
+                        "1",
+                        "1"
+                     ]
+                  },
+                  {
+                     "name":"film_id",
+                     "type":"integer",
+                     "nullable":false,
+                     "samples":[
+                        "1",
+                        "23",
+                        "25"
+                     ]
+                  },
+                  {
+                     "name":"last_update",
+                     "type":"timestamp(6) with time zone",
+                     "nullable":false,
+                     "samples":[
+                        "2022-02-15 10:05:03+00:00",
+                        "2022-02-15 10:05:03+00:00",
+                        "2022-02-15 10:05:03+00:00"
+                     ]
+                  }
+               ],
+               "relationships":[
+                  
+               ]
+            },
+            {
+               "name":"film_category",
+               "columns":[
+                  {
+                     "name":"film_id",
+                     "type":"integer",
+                     "nullable":false,
+                     "samples":[
+                        "56",
+                        "62",
+                        "95"
+                     ]
+                  },
+                  {
+                     "name":"category_id",
+                     "type":"integer",
+                     "nullable":false,
+                     "samples":[
+                        "11",
+                        "5",
+                        "6"
+                     ]
+                  },
+                  {
+                     "name":"last_update",
+                     "type":"timestamp(6) with time zone",
+                     "nullable":false,
+                     "samples":[
+                        "2022-02-15 10:07:09+00:00",
+                        "2022-02-15 10:07:09+00:00",
+                        "2022-02-15 10:07:09+00:00"
+                     ]
+                  }
+               ],
+               "relationships":[
+                  
+               ]
+            },
+            {
+               "name":"film_list",
+               "columns":[
+                  {
+                     "name":"fid",
+                     "type":"integer",
+                     "nullable":true,
+                     "samples":[
+                        "1",
+                        "1",
+                        "1"
+                     ]
+                  },
+                  {
+                     "name":"title",
+                     "type":"varchar",
+                     "nullable":true,
+                     "samples":[
+                        "ACADEMY DINOSAUR",
+                        "ACADEMY DINOSAUR",
+                        "ACADEMY DINOSAUR"
+                     ]
+                  },
+                  {
+                     "name":"description",
+                     "type":"varchar",
+                     "nullable":true,
+                     "samples":[
+                        "A Epic Drama of a Feminist And a Mad Scientist who must Battle a Teacher in The Canadian Rockies",
+                        "A Epic Drama of a Feminist And a Mad Scientist who must Battle a Teacher in The Canadian Rockies",
+                        "A Epic Drama of a Feminist And a Mad Scientist who must Battle a Teacher in The Canadian Rockies"
+                     ]
+                  },
+                  {
+                     "name":"category",
+                     "type":"varchar",
+                     "nullable":true,
+                     "samples":[
+                        "Games",
+                        "New",
+                        "Travel"
+                     ]
+                  },
+                  {
+                     "name":"price",
+                     "type":"decimal(4,2)",
+                     "nullable":true,
+                     "samples":[
+                        "0.99",
+                        "0.99",
+                        "0.99"
+                     ]
+                  },
+                  {
+                     "name":"length",
+                     "type":"smallint",
+                     "nullable":true,
+                     "samples":[
+                        "86",
+                        "86",
+                        "86"
+                     ]
+                  },
+                  {
+                     "name":"rating",
+                     "type":"varchar",
+                     "nullable":true,
+                     "samples":[
+                        "PG",
+                        "PG",
+                        "PG"
+                     ]
+                  },
+                  {
+                     "name":"actors",
+                     "type":"varchar",
+                     "nullable":true,
+                     "samples":[
+                        "PENELOPE GUINESS, WARREN NOLTE, JOHNNY CAGE, MARY KEITEL, MENA TEMPLE, ROCK DUKAKIS, LUCILLE TRACY, CHRISTIAN GABLE, OPRAH KILMER, SANDRA PECK",
+                        "SANDRA PECK, PENELOPE GUINESS, CHRISTIAN GABLE, LUCILLE TRACY, JOHNNY CAGE, MENA TEMPLE, WARREN NOLTE, OPRAH KILMER, ROCK DUKAKIS, MARY KEITEL",
+                        "JOHNNY CAGE, WARREN NOLTE, MENA TEMPLE, OPRAH KILMER, CHRISTIAN GABLE, LUCILLE TRACY, ROCK DUKAKIS, PENELOPE GUINESS, SANDRA PECK, MARY KEITEL"
+                     ]
+                  }
+               ],
+               "relationships":[
+                  
+               ]
+            },
+            {
+               "name":"inventory",
+               "columns":[
+                  {
+                     "name":"inventory_id",
+                     "type":"integer",
+                     "nullable":false,
+                     "samples":[
+                        "1",
+                        "2",
+                        "3"
+                     ]
+                  },
+                  {
+                     "name":"film_id",
+                     "type":"integer",
+                     "nullable":false,
+                     "samples":[
+                        "1",
+                        "1",
+                        "1"
+                     ]
+                  },
+                  {
+                     "name":"store_id",
+                     "type":"integer",
+                     "nullable":false,
+                     "samples":[
+                        "1",
+                        "1",
+                        "1"
+                     ]
+                  },
+                  {
+                     "name":"last_update",
+                     "type":"timestamp(6) with time zone",
+                     "nullable":false,
+                     "samples":[
+                        "2022-02-15 10:09:17+00:00",
+                        "2022-02-15 10:09:17+00:00",
+                        "2022-02-15 10:09:17+00:00"
+                     ]
+                  }
+               ],
+               "relationships":[
+                  
+               ]
+            },
+            {
+               "name":"language",
+               "columns":[
+                  {
+                     "name":"language_id",
+                     "type":"integer",
+                     "nullable":false,
+                     "samples":[
+                        "1",
+                        "2",
+                        "3"
+                     ]
+                  },
+                  {
+                     "name":"name",
+                     "type":"char(20)",
+                     "nullable":false,
+                     "samples":[
+                        "English             ",
+                        "Italian             ",
+                        "Japanese            "
+                     ]
+                  },
+                  {
+                     "name":"last_update",
+                     "type":"timestamp(6) with time zone",
+                     "nullable":false,
+                     "samples":[
+                        "2022-02-15 10:02:19+00:00",
+                        "2022-02-15 10:02:19+00:00",
+                        "2022-02-15 10:02:19+00:00"
+                     ]
+                  }
+               ],
+               "relationships":[
+                  
+               ]
+            },
+            {
+               "name":"nicer_but_slower_film_list",
+               "columns":[
+                  {
+                     "name":"fid",
+                     "type":"integer",
+                     "nullable":true,
+                     "samples":[
+                        "1",
+                        "1",
+                        "1"
+                     ]
+                  },
+                  {
+                     "name":"title",
+                     "type":"varchar",
+                     "nullable":true,
+                     "samples":[
+                        "ACADEMY DINOSAUR",
+                        "ACADEMY DINOSAUR",
+                        "ACADEMY DINOSAUR"
+                     ]
+                  },
+                  {
+                     "name":"description",
+                     "type":"varchar",
+                     "nullable":true,
+                     "samples":[
+                        "A Epic Drama of a Feminist And a Mad Scientist who must Battle a Teacher in The Canadian Rockies",
+                        "A Epic Drama of a Feminist And a Mad Scientist who must Battle a Teacher in The Canadian Rockies",
+                        "A Epic Drama of a Feminist And a Mad Scientist who must Battle a Teacher in The Canadian Rockies"
+                     ]
+                  },
+                  {
+                     "name":"category",
+                     "type":"varchar",
+                     "nullable":true,
+                     "samples":[
+                        "Games",
+                        "New",
+                        "Travel"
+                     ]
+                  },
+                  {
+                     "name":"price",
+                     "type":"decimal(4,2)",
+                     "nullable":true,
+                     "samples":[
+                        "0.99",
+                        "0.99",
+                        "0.99"
+                     ]
+                  },
+                  {
+                     "name":"length",
+                     "type":"smallint",
+                     "nullable":true,
+                     "samples":[
+                        "86",
+                        "86",
+                        "86"
+                     ]
+                  },
+                  {
+                     "name":"rating",
+                     "type":"varchar",
+                     "nullable":true,
+                     "samples":[
+                        "PG",
+                        "PG",
+                        "PG"
+                     ]
+                  },
+                  {
+                     "name":"actors",
+                     "type":"varchar",
+                     "nullable":true,
+                     "samples":[
+                        "PenelopeGuiness, WarrenNolte, JohnnyCage, MaryKeitel, MenaTemple, RockDukakis, LucilleTracy, ChristianGable, OprahKilmer, SandraPeck",
+                        "SandraPeck, PenelopeGuiness, ChristianGable, LucilleTracy, JohnnyCage, MenaTemple, WarrenNolte, OprahKilmer, RockDukakis, MaryKeitel",
+                        "JohnnyCage, WarrenNolte, MenaTemple, OprahKilmer, ChristianGable, LucilleTracy, RockDukakis, PenelopeGuiness, SandraPeck, MaryKeitel"
+                     ]
+                  }
+               ],
+               "relationships":[
+                  
+               ]
+            },
+            {
+               "name":"packages_apt_postgresql_org",
+               "columns":[
+                  {
+                     "name":"id",
+                     "type":"integer",
+                     "nullable":false,
+                     "samples":[
+                        
+                     ]
+                  },
+                  {
+                     "name":"last_updated",
+                     "type":"timestamp(6)",
+                     "nullable":true,
+                     "samples":[
+                        
+                     ]
+                  },
+                  {
+                     "name":"aptdata",
+                     "type":"json",
+                     "nullable":true,
+                     "samples":[
+                        
+                     ]
+                  }
+               ],
+               "relationships":[
+                  
+               ]
+            },
+            {
+               "name":"packages_yum_postgresql_org",
+               "columns":[
+                  {
+                     "name":"id",
+                     "type":"integer",
+                     "nullable":false,
+                     "samples":[
+                        
+                     ]
+                  },
+                  {
+                     "name":"last_updated",
+                     "type":"timestamp(6)",
+                     "nullable":true,
+                     "samples":[
+                        
+                     ]
+                  },
+                  {
+                     "name":"yumdata",
+                     "type":"json",
+                     "nullable":true,
+                     "samples":[
+                        
+                     ]
+                  }
+               ],
+               "relationships":[
+                  
+               ]
+            },
+            {
+               "name":"payment",
+               "columns":[
+                  {
+                     "name":"payment_id",
+                     "type":"integer",
+                     "nullable":false,
+                     "samples":[
+                        "16051",
+                        "16065",
+                        "16109"
+                     ]
+                  },
+                  {
+                     "name":"customer_id",
+                     "type":"integer",
+                     "nullable":false,
+                     "samples":[
+                        "269",
+                        "274",
+                        "297"
+                     ]
+                  },
+                  {
+                     "name":"staff_id",
+                     "type":"integer",
+                     "nullable":false,
+                     "samples":[
+                        "1",
+                        "1",
+                        "2"
+                     ]
+                  },
+                  {
+                     "name":"rental_id",
+                     "type":"integer",
+                     "nullable":false,
+                     "samples":[
+                        "98",
+                        "147",
+                        "143"
+                     ]
+                  },
+                  {
+                     "name":"amount",
+                     "type":"decimal(5,2)",
+                     "nullable":false,
+                     "samples":[
+                        "0.99",
+                        "2.99",
+                        "0.99"
+                     ]
+                  },
+                  {
+                     "name":"payment_date",
+                     "type":"timestamp(6) with time zone",
+                     "nullable":false,
+                     "samples":[
+                        "2022-01-29 01:58:52.222594+00:00",
+                        "2022-01-25 12:14:16.895377+00:00",
+                        "2022-01-28 00:49:49.128218+00:00"
+                     ]
+                  }
+               ],
+               "relationships":[
+                  
+               ]
+            },
+            {
+               "name":"payment_p2022_01",
+               "columns":[
+                  {
+                     "name":"payment_id",
+                     "type":"integer",
+                     "nullable":false,
+                     "samples":[
+                        "16051",
+                        "16065",
+                        "16109"
+                     ]
+                  },
+                  {
+                     "name":"customer_id",
+                     "type":"integer",
+                     "nullable":false,
+                     "samples":[
+                        "269",
+                        "274",
+                        "297"
+                     ]
+                  },
+                  {
+                     "name":"staff_id",
+                     "type":"integer",
+                     "nullable":false,
+                     "samples":[
+                        "1",
+                        "1",
+                        "2"
+                     ]
+                  },
+                  {
+                     "name":"rental_id",
+                     "type":"integer",
+                     "nullable":false,
+                     "samples":[
+                        "98",
+                        "147",
+                        "143"
+                     ]
+                  },
+                  {
+                     "name":"amount",
+                     "type":"decimal(5,2)",
+                     "nullable":false,
+                     "samples":[
+                        "0.99",
+                        "2.99",
+                        "0.99"
+                     ]
+                  },
+                  {
+                     "name":"payment_date",
+                     "type":"timestamp(6) with time zone",
+                     "nullable":false,
+                     "samples":[
+                        "2022-01-29 01:58:52.222594+00:00",
+                        "2022-01-25 12:14:16.895377+00:00",
+                        "2022-01-28 00:49:49.128218+00:00"
+                     ]
+                  }
+               ],
+               "relationships":[
+                  
+               ]
+            },
+            {
+               "name":"payment_p2022_02",
+               "columns":[
+                  {
+                     "name":"payment_id",
+                     "type":"integer",
+                     "nullable":false,
+                     "samples":[
+                        "16056",
+                        "16075",
+                        "16077"
+                     ]
+                  },
+                  {
+                     "name":"customer_id",
+                     "type":"integer",
+                     "nullable":false,
+                     "samples":[
+                        "270",
+                        "278",
+                        "279"
+                     ]
+                  },
+                  {
+                     "name":"staff_id",
+                     "type":"integer",
+                     "nullable":false,
+                     "samples":[
+                        "1",
+                        "1",
+                        "2"
+                     ]
+                  },
+                  {
+                     "name":"rental_id",
+                     "type":"integer",
+                     "nullable":false,
+                     "samples":[
+                        "193",
+                        "1092",
+                        "1019"
+                     ]
+                  },
+                  {
+                     "name":"amount",
+                     "type":"decimal(5,2)",
+                     "nullable":false,
+                     "samples":[
+                        "1.99",
+                        "4.99",
+                        "0.99"
+                     ]
+                  },
+                  {
+                     "name":"payment_date",
+                     "type":"timestamp(6) with time zone",
+                     "nullable":false,
+                     "samples":[
+                        "2022-02-03 01:49:30.663659+00:00",
+                        "2022-02-14 16:08:09.981165+00:00",
+                        "2022-02-09 21:43:26.740315+00:00"
+                     ]
+                  }
+               ],
+               "relationships":[
+                  
+               ]
+            },
+            {
+               "name":"payment_p2022_03",
+               "columns":[
+                  {
+                     "name":"payment_id",
+                     "type":"integer",
+                     "nullable":false,
+                     "samples":[
+                        "16053",
+                        "16058",
+                        "16059"
+                     ]
+                  },
+                  {
+                     "name":"customer_id",
+                     "type":"integer",
+                     "nullable":false,
+                     "samples":[
+                        "269",
+                        "271",
+                        "272"
+                     ]
+                  },
+                  {
+                     "name":"staff_id",
+                     "type":"integer",
+                     "nullable":false,
+                     "samples":[
+                        "2",
+                        "1",
+                        "1"
+                     ]
+                  },
+                  {
+                     "name":"rental_id",
+                     "type":"integer",
+                     "nullable":false,
+                     "samples":[
+                        "703",
+                        "1096",
+                        "33"
+                     ]
+                  },
+                  {
+                     "name":"amount",
+                     "type":"decimal(5,2)",
+                     "nullable":false,
+                     "samples":[
+                        "0.99",
+                        "8.99",
+                        "0.99"
+                     ]
+                  },
+                  {
+                     "name":"payment_date",
+                     "type":"timestamp(6) with time zone",
+                     "nullable":false,
+                     "samples":[
+                        "2022-03-02 19:51:40.813503+00:00",
+                        "2022-03-19 06:19:47.019162+00:00",
+                        "2022-03-12 13:32:36.628975+00:00"
+                     ]
+                  }
+               ],
+               "relationships":[
+                  
+               ]
+            },
+            {
+               "name":"payment_p2022_04",
+               "columns":[
+                  {
+                     "name":"payment_id",
+                     "type":"integer",
+                     "nullable":false,
+                     "samples":[
+                        "16066",
+                        "16069",
+                        "16074"
+                     ]
+                  },
+                  {
+                     "name":"customer_id",
+                     "type":"integer",
+                     "nullable":false,
+                     "samples":[
+                        "274",
+                        "274",
+                        "277"
+                     ]
+                  },
+                  {
+                     "name":"staff_id",
+                     "type":"integer",
+                     "nullable":false,
+                     "samples":[
+                        "1",
+                        "2",
+                        "2"
+                     ]
+                  },
+                  {
+                     "name":"rental_id",
+                     "type":"integer",
+                     "nullable":false,
+                     "samples":[
+                        "208",
+                        "474",
+                        "308"
+                     ]
+                  },
+                  {
+                     "name":"amount",
+                     "type":"decimal(5,2)",
+                     "nullable":false,
+                     "samples":[
+                        "4.99",
+                        "2.99",
+                        "6.99"
+                     ]
+                  },
+                  {
+                     "name":"payment_date",
+                     "type":"timestamp(6) with time zone",
+                     "nullable":false,
+                     "samples":[
+                        "2022-04-15 12:28:07.452161+00:00",
+                        "2022-04-27 18:46:10.151444+00:00",
+                        "2022-04-04 10:51:07.496345+00:00"
+                     ]
+                  }
+               ],
+               "relationships":[
+                  
+               ]
+            },
+            {
+               "name":"payment_p2022_05",
+               "columns":[
+                  {
+                     "name":"payment_id",
+                     "type":"integer",
+                     "nullable":false,
+                     "samples":[
+                        "16055",
+                        "16057",
+                        "16067"
+                     ]
+                  },
+                  {
+                     "name":"customer_id",
+                     "type":"integer",
+                     "nullable":false,
+                     "samples":[
+                        "269",
+                        "270",
+                        "274"
+                     ]
+                  },
+                  {
+                     "name":"staff_id",
+                     "type":"integer",
+                     "nullable":false,
+                     "samples":[
+                        "2",
+                        "1",
+                        "2"
+                     ]
+                  },
+                  {
+                     "name":"rental_id",
+                     "type":"integer",
+                     "nullable":false,
+                     "samples":[
+                        "1099",
+                        "1040",
+                        "301"
+                     ]
+                  },
+                  {
+                     "name":"amount",
+                     "type":"decimal(5,2)",
+                     "nullable":false,
+                     "samples":[
+                        "2.99",
+                        "4.99",
+                        "2.99"
+                     ]
+                  },
+                  {
+                     "name":"payment_date",
+                     "type":"timestamp(6) with time zone",
+                     "nullable":false,
+                     "samples":[
+                        "2022-05-20 15:54:02.174545+00:00",
+                        "2022-05-11 09:27:17.752545+00:00",
+                        "2022-05-11 03:38:43.477404+00:00"
+                     ]
+                  }
+               ],
+               "relationships":[
+                  
+               ]
+            },
+            {
+               "name":"payment_p2022_06",
+               "columns":[
+                  {
+                     "name":"payment_id",
+                     "type":"integer",
+                     "nullable":false,
+                     "samples":[
+                        "16050",
+                        "16052",
+                        "16054"
+                     ]
+                  },
+                  {
+                     "name":"customer_id",
+                     "type":"integer",
+                     "nullable":false,
+                     "samples":[
+                        "269",
+                        "269",
+                        "269"
+                     ]
+                  },
+                  {
+                     "name":"staff_id",
+                     "type":"integer",
+                     "nullable":false,
+                     "samples":[
+                        "2",
+                        "2",
+                        "1"
+                     ]
+                  },
+                  {
+                     "name":"rental_id",
+                     "type":"integer",
+                     "nullable":false,
+                     "samples":[
+                        "7",
+                        "678",
+                        "750"
+                     ]
+                  },
+                  {
+                     "name":"amount",
+                     "type":"decimal(5,2)",
+                     "nullable":false,
+                     "samples":[
+                        "1.99",
+                        "6.99",
+                        "4.99"
+                     ]
+                  },
+                  {
+                     "name":"payment_date",
+                     "type":"timestamp(6) with time zone",
+                     "nullable":false,
+                     "samples":[
+                        "2022-06-21 07:41:50.707316+00:00",
+                        "2022-06-26 22:37:21.783785+00:00",
+                        "2022-06-02 03:29:53.301990+00:00"
+                     ]
+                  }
+               ],
+               "relationships":[
+                  
+               ]
+            },
+            {
+               "name":"payment_p2022_07",
+               "columns":[
+                  {
+                     "name":"payment_id",
+                     "type":"integer",
+                     "nullable":false,
+                     "samples":[
+                        "16061",
+                        "16064",
+                        "16071"
+                     ]
+                  },
+                  {
+                     "name":"customer_id",
+                     "type":"integer",
+                     "nullable":false,
+                     "samples":[
+                        "272",
+                        "273",
+                        "275"
+                     ]
+                  },
+                  {
+                     "name":"staff_id",
+                     "type":"integer",
+                     "nullable":false,
+                     "samples":[
+                        "1",
+                        "2",
+                        "2"
+                     ]
+                  },
+                  {
+                     "name":"rental_id",
+                     "type":"integer",
+                     "nullable":false,
+                     "samples":[
+                        "1041",
+                        "980",
+                        "336"
+                     ]
+                  },
+                  {
+                     "name":"amount",
+                     "type":"decimal(5,2)",
+                     "nullable":false,
+                     "samples":[
+                        "6.99",
+                        "0.99",
+                        "2.99"
+                     ]
+                  },
+                  {
+                     "name":"payment_date",
+                     "type":"timestamp(6) with time zone",
+                     "nullable":false,
+                     "samples":[
+                        "2022-07-19 06:32:02.911937+00:00",
+                        "2022-07-07 07:15:37.160099+00:00",
+                        "2022-07-04 09:47:03.440928+00:00"
+                     ]
+                  }
+               ],
+               "relationships":[
+                  
+               ]
+            },
+            {
+               "name":"rental",
+               "columns":[
+                  {
+                     "name":"rental_id",
+                     "type":"integer",
+                     "nullable":false,
+                     "samples":[
+                        "2",
+                        "3",
+                        "4"
+                     ]
+                  },
+                  {
+                     "name":"rental_date",
+                     "type":"timestamp(6) with time zone",
+                     "nullable":false,
+                     "samples":[
+                        "2022-05-24 21:54:33+00:00",
+                        "2022-05-24 22:03:39+00:00",
+                        "2022-05-24 22:04:41+00:00"
+                     ]
+                  },
+                  {
+                     "name":"inventory_id",
+                     "type":"integer",
+                     "nullable":false,
+                     "samples":[
+                        "1525",
+                        "1711",
+                        "2452"
+                     ]
+                  },
+                  {
+                     "name":"customer_id",
+                     "type":"integer",
+                     "nullable":false,
+                     "samples":[
+                        "459",
+                        "408",
+                        "333"
+                     ]
+                  },
+                  {
+                     "name":"return_date",
+                     "type":"timestamp(6) with time zone",
+                     "nullable":true,
+                     "samples":[
+                        "2022-05-28 18:40:33+00:00",
+                        "2022-06-01 21:12:39+00:00",
+                        "2022-06-03 00:43:41+00:00"
+                     ]
+                  },
+                  {
+                     "name":"staff_id",
+                     "type":"integer",
+                     "nullable":false,
+                     "samples":[
+                        "1",
+                        "1",
+                        "2"
+                     ]
+                  },
+                  {
+                     "name":"last_update",
+                     "type":"timestamp(6) with time zone",
+                     "nullable":false,
+                     "samples":[
+                        "2022-02-16 02:30:53+00:00",
+                        "2022-02-16 02:30:53+00:00",
+                        "2022-02-16 02:30:53+00:00"
+                     ]
+                  }
+               ],
+               "relationships":[
+                  
+               ]
+            },
+            {
+               "name":"rental_by_category",
+               "columns":[
+                  {
+                     "name":"category",
+                     "type":"varchar",
+                     "nullable":true,
+                     "samples":[
+                        
+                     ]
+                  },
+                  {
+                     "name":"total_sales",
+                     "type":"number",
+                     "nullable":true,
+                     "samples":[
+                        
+                     ]
+                  }
+               ],
+               "relationships":[
+                  
+               ]
+            },
+            {
+               "name":"sales_by_film_category",
+               "columns":[
+                  {
+                     "name":"category",
+                     "type":"varchar",
+                     "nullable":true,
+                     "samples":[
+                        
+                     ]
+                  },
+                  {
+                     "name":"total_sales",
+                     "type":"number",
+                     "nullable":true,
+                     "samples":[
+                        
+                     ]
+                  }
+               ],
+               "relationships":[
+                  
+               ]
+            },
+            {
+               "name":"sales_by_store",
+               "columns":[
+                  {
+                     "name":"store",
+                     "type":"varchar",
+                     "nullable":true,
+                     "samples":[
+                        
+                     ]
+                  },
+                  {
+                     "name":"manager",
+                     "type":"varchar",
+                     "nullable":true,
+                     "samples":[
+                        
+                     ]
+                  },
+                  {
+                     "name":"total_sales",
+                     "type":"number",
+                     "nullable":true,
+                     "samples":[
+                        
+                     ]
+                  }
+               ],
+               "relationships":[
+                  
+               ]
+            },
+            {
+               "name":"staff",
+               "columns":[
+                  {
+                     "name":"staff_id",
+                     "type":"integer",
+                     "nullable":false,
+                     "samples":[
+                        "0",
+                        "1",
+                        "2"
+                     ]
+                  },
+                  {
+                     "name":"first_name",
+                     "type":"varchar",
+                     "nullable":false,
+                     "samples":[
+                        "Tisha",
+                        "Warner",
+                        "Lavone"
+                     ]
+                  },
+                  {
+                     "name":"last_name",
+                     "type":"varchar",
+                     "nullable":false,
+                     "samples":[
+                        "DuBuque",
+                        "Hudson",
+                        "O'Reilly"
+                     ]
+                  },
+                  {
+                     "name":"address_id",
+                     "type":"integer",
+                     "nullable":false,
+                     "samples":[
+                        "28",
+                        "45",
+                        "6"
+                     ]
+                  },
+                  {
+                     "name":"email",
+                     "type":"varchar",
+                     "nullable":true,
+                     "samples":[
+                        "schneider9987@rosenbaumreichert.com",
+                        "hartmann1448@ratkehaley.com",
+                        "mclaughlin3045@kleinwisokyandswaniawski.com"
+                     ]
+                  },
+                  {
+                     "name":"store_id",
+                     "type":"integer",
+                     "nullable":false,
+                     "samples":[
+                        "23",
+                        "25",
+                        "33"
+                     ]
+                  },
+                  {
+                     "name":"active",
+                     "type":"boolean",
+                     "nullable":false,
+                     "samples":[
+                        "True",
+                        "True",
+                        "True"
+                     ]
+                  },
+                  {
+                     "name":"username",
+                     "type":"varchar",
+                     "nullable":false,
+                     "samples":[
+                        "sina.corkery",
+                        "fay.kub",
+                        "gaston.wuckert"
+                     ]
+                  },
+                  {
+                     "name":"password",
+                     "type":"varchar",
+                     "nullable":true,
+                     "samples":[
+                        "8cb2237d0679ca88db6464eac60da96345513964",
+                        "8cb2237d0679ca88db6464eac60da96345513964",
+                        "8cb2237d0679ca88db6464eac60da96345513964"
+                     ]
+                  },
+                  {
+                     "name":"last_update",
+                     "type":"timestamp(6) with time zone",
+                     "nullable":false,
+                     "samples":[
+                        "2022-05-16 15:13:11.793280+00:00",
+                        "2022-05-16 15:13:11.793280+00:00",
+                        "2022-05-16 15:13:11.793280+00:00"
+                     ]
+                  },
+                  {
+                     "name":"picture",
+                     "type":"varbinary",
+                     "nullable":true,
+                     "samples":[
+                        
+                     ]
+                  }
+               ],
+               "relationships":[
+                  
+               ]
+            },
+            {
+               "name":"staff_list",
+               "columns":[
+                  {
+                     "name":"id",
+                     "type":"integer",
+                     "nullable":true,
+                     "samples":[
+                        "0",
+                        "1",
+                        "2"
+                     ]
+                  },
+                  {
+                     "name":"name",
+                     "type":"varchar",
+                     "nullable":true,
+                     "samples":[
+                        "Tisha DuBuque",
+                        "Warner Hudson",
+                        "Lavone O'Reilly"
+                     ]
+                  },
+                  {
+                     "name":"address",
+                     "type":"varchar",
+                     "nullable":true,
+                     "samples":[
+                        "96 Tafuna Way",
+                        "42 Brindisi Place",
+                        "1121 Loja Avenue"
+                     ]
+                  },
+                  {
+                     "name":"zip code",
+                     "type":"varchar",
+                     "nullable":true,
+                     "samples":[
+                        "99865",
+                        "16744",
+                        "17886"
+                     ]
+                  },
+                  {
+                     "name":"phone",
+                     "type":"varchar",
+                     "nullable":true,
+                     "samples":[
+                        "934730187245",
+                        "42384721397",
+                        "838635286649"
+                     ]
+                  },
+                  {
+                     "name":"city",
+                     "type":"varchar",
+                     "nullable":true,
+                     "samples":[
+                        "Crdoba",
+                        "Yerevan",
+                        "San Bernardino"
+                     ]
+                  },
+                  {
+                     "name":"country",
+                     "type":"varchar",
+                     "nullable":true,
+                     "samples":[
+                        "Argentina",
+                        "Armenia",
+                        "United States"
+                     ]
+                  },
+                  {
+                     "name":"sid",
+                     "type":"integer",
+                     "nullable":true,
+                     "samples":[
+                        "23",
+                        "25",
+                        "33"
+                     ]
+                  }
+               ],
+               "relationships":[
+                  
+               ]
+            },
+            {
+               "name":"store",
+               "columns":[
+                  {
+                     "name":"store_id",
+                     "type":"integer",
+                     "nullable":false,
+                     "samples":[
+                        "0",
+                        "1",
+                        "2"
+                     ]
+                  },
+                  {
+                     "name":"manager_staff_id",
+                     "type":"integer",
+                     "nullable":false,
+                     "samples":[
+                        "0",
+                        "1",
+                        "2"
+                     ]
+                  },
+                  {
+                     "name":"address_id",
+                     "type":"integer",
+                     "nullable":false,
+                     "samples":[
+                        "73",
+                        "129",
+                        "12"
+                     ]
+                  },
+                  {
+                     "name":"last_update",
+                     "type":"timestamp(6) with time zone",
+                     "nullable":false,
+                     "samples":[
+                        "2022-02-15 09:57:12+00:00",
+                        "2022-02-15 09:57:12+00:00",
+                        "2022-02-15 09:57:12+00:00"
+                     ]
+                  }
+               ],
+               "relationships":[
+                  
+               ]
+            }
+         ]
+      }
+   ]
+}

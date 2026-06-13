@@ -271,4 +271,4 @@ yarn-error.log*
 .env.development
 
 # System
-DS_Store
+.DS_Store
