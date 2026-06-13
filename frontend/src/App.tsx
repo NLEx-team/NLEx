@@ -10,7 +10,7 @@ function App() {
     setLoading(true);
     setStatus(null);
     try {
-      const response = await fetch('http://194.226.97.77:8000/');
+      const response = await fetch('/api/');
       if (!response.ok) throw new Error('Network Error');
       await response.json();
       setStatus({ type: 'success', message: 'Успешное подключение к API!' });
