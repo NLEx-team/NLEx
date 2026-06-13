@@ -81,6 +81,73 @@ class DistributedDatabaseService:
             f"DROP CATALOG IF EXISTS {name}"
         )
 
+    async def get_catalogs(self) -> list[str]:
+        rows = await self.execute_query_async(
+            """
+            SELECT catalog_name
+            FROM system.metadata.catalogs
+            ORDER BY catalog_name
+            """
+        )
+        return [row[0] for row in rows]
+
+
+    async def get_namespaces(self, catalog: str) -> list[str]:
+        self._validate_catalog_name(catalog)
+
+        rows = await self.execute_query_async(
+            f"""
+            SHOW SCHEMAS FROM {catalog}
+            """
+        )
+        return [row[0] for row in rows]
+
+
+    async def get_tables(
+        self,
+        catalog: str,
+        namespace: str,
+    ) -> list[str]:
+        self._validate_catalog_name(catalog)
+
+        rows = await self.execute_query_async(
+            f"SHOW TABLES FROM {catalog}.{namespace}"
+        )
+        return [row[0] for row in rows]
+
+
+    async def get_columns(
+        self,
+        catalog: str,
+        namespace: str,
+        table: str,
+    ) -> list[dict[str, Any]]:
+        self._validate_catalog_name(catalog)
+
+        rows = await self.execute_query_async(
+            f"""
+            SELECT
+                column_name,
+                data_type,
+                is_nullable,
+                ordinal_position
+            FROM {catalog}.information_schema.columns
+            WHERE table_schema = '{namespace}'
+            AND table_name = '{table}'
+            ORDER BY ordinal_position
+            """
+        )
+
+        return [
+            {
+                "name": row[0],
+                "type": row[1],
+                "nullable": row[2] == "YES",
+                "position": row[3],
+            }
+            for row in rows
+        ]
+
     @staticmethod
     def _validate_catalog_name(name: str) -> None:
         if not CATALOG_NAME_RE.fullmatch(name):

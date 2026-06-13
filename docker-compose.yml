@@ -10,6 +10,8 @@ services:
       - "${POSTGRES_PORT}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    networks:
+      - app-net
 
   # --- Trino ---
   trino:
@@ -25,6 +27,9 @@ services:
       start_period: 30s
     volumes:
       - ./trino-config.properties:/etc/trino/config.properties:ro
+    networks:
+      - app-net
+      - shared-net
 
   # --- Development Services ---
   # Run with: docker compose --profile dev up
@@ -43,6 +48,8 @@ services:
       - db
       - trino
     restart: unless-stopped
+    networks:
+      - app-net
 
   frontend-dev:
     profiles: ["dev"]
@@ -61,6 +68,8 @@ services:
       - db
       - trino
     restart: unless-stopped
+    networks:
+      - app-net
 
   # --- Production Services ---
   # Run with: docker compose --profile prod up
@@ -77,6 +86,8 @@ services:
       - db
       - trino
     restart: always
+    networks:
+      - app-net
 
   frontend-prod:
     profiles: ["prod"]
@@ -92,6 +103,8 @@ services:
       - db
       - trino
     restart: always
+    networks:
+      - app-net
 
   # --- Testing Services ---
   # Run with: docker compose --profile test up
@@ -107,6 +120,9 @@ services:
       interval: 5s
       timeout: 5s
       retries: 20
+    networks:
+      - shared-net
+      - app-net
 
   backend-test:
     profiles: ["test"]
@@ -125,12 +141,21 @@ services:
       - TRINO_HOST=trino
       - TRINO_PORT=8080
 
+      # For trino connection tests
       - TEST_POSTGRES_HOST=postgres-test
       - TEST_POSTGRES_PORT=5432
-      - TEST_POSTGRES_DB=testdb
       - TEST_POSTGRES_USER=test
       - TEST_POSTGRES_PASSWORD=test
-    command: python -m pytest tests/
+
+      # For schema extraction tests
+      # The pagila database is used for testing
+      # Read more in README.md / Testing
+      - TEST_PAGILA_HOST=pagila
+      - TEST_PAGILA_PORT=5432
+      - TEST_PAGILA_DB=postgres
+      - TEST_POSTGRES_USER=postgres
+      - TEST_POSTGRES_PASSWORD=123456
+    command: python -m pytest -s tests/
     depends_on:
       db:
         condition: service_started
@@ -138,6 +163,14 @@ services:
         condition: service_healthy
       postgres-test:
         condition: service_healthy
+    networks:
+      - shared-net
+      - app-net
 
 volumes:
   postgres_data:
+
+networks:
+  app-net:
+  shared-net:
+    external: true
