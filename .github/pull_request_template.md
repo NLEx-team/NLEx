@@ -1,20 +1,20 @@
-## Что делает этот PR?
-<!-- Опишите в 1-2 предложениях, какую задачу решает этот Pull Request -->
+## What does this PR do?
+<!-- Describe in 1-2 sentences what this PR solves -->
 
-## Какие изменения были внесены?
-- [ ] Добавлена новая функциональность
-- [ ] Исправлен баг
-- [ ] Обновлена документация
-- [ ] Рефакторинг кода
+## What changes were made?
+- [ ] Added new feature
+- [ ] Fixed a bug
+- [ ] Updated documentation
+- [ ] Code refactoring
 
-## Как это протестировать?
-<!-- Напишите шаги для тестировщика (коллеги), как он может проверить вашу работу. Например:
-1. Запустите docker-compose
-2. Откройте страницу X
-3. Нажмите кнопку Y -->
+## How can this be tested?
+<!-- Provide steps for the reviewer to test your changes. For example:
+1. Run docker-compose
+2. Open page X
+3. Click button Y -->
 
-## Чеклист перед запросом ревью:
-- [ ] Я проверил свой код сам перед созданием PR
-- [ ] Мой код следует правилам из CONTRIBUTING.md
-- [ ] Я не закоммитил пароли или `.env` файлы
-- [ ] Я обновил зависимости (`requirements.txt` / `package.json`), если это необходимо
+## Checklist before requesting a review:
+- [ ] I have self-reviewed my code before creating this PR
+- [ ] My code follows the guidelines in CONTRIBUTING.md
+- [ ] I have not committed any passwords or `.env` files
+- [ ] I have updated dependencies (`requirements.txt` / `package.json`) if necessary
