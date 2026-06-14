@@ -1,0 +1,42 @@
+# Lychee link checker configuration
+# Docs: https://lychee.cli.rs/usage/config/
+
+# Verbosity name: Lychee Link Check
+
+on:
+  push:
+    branches: [develop, main]
+  pull_request:
+    branches: [deveru
+on:
+  push:
+    branc
+
+#  et    breh  pull_request:
+    branchesx_    branches: tr  schedule:
+    - cron: '0 6
+m    - cronen  workflow_dispatch:
+
+ H
+jobs:
+  link-check su  lisf    runs-on:on    permissions:
+      co1,      contents: 2      issues: write30    steps:
+      -40      - n#         cking links that require a
+      - name: Restore Lychee caess        uses: actions/cache@v4
+  ke        with:
+          path:na          pa)
+          key: cache-lychee\\          restore-keys: cache-lychee-
+
+     12
+      - name: Run Lychee link checkle         uses: lycheeverse/lychee-actir        with:
+          args: --config ly
+           ar/d          fail: true
+LYEOF
+echo "workflow OK"
+
+cat > /tmp/NLEx-fix/lychee.toml << 'TOMLEMaLYEOF
+echo "woks are echoreecho "woks areck
+exclude_mail = true
+
+# Default scheme assumed if none is specified
+include_fragments = false

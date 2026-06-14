@@ -50,7 +50,7 @@ Serafim presented the updated Agile user stories and MVP breakdown.
         - **US-17 (Usage statistics/monitoring dashboard):** Proposed to be elevated to **Must Have**, as it is critical for optimization and understanding system performance across users.
         - **Admin panel for MVP 2.0:** Introduced the concept of separating roles — an admin configures databases via a web panel, while end users simply log in and use the chat without seeing the underlying DB connections. The admin could also select which LLM model to use.
 - **Static vs. Dynamic DB connection debate (Technical Deep Dive):**
-    - The team uses **Trina** for cross-database queries. Dynamic catalog connections work in beta but are slower and require user isolation.
+    - The team uses **Trino** for cross-database queries. Dynamic catalog connections work in beta but are slower and require user isolation.
     - Static connections (config files, service restart) are faster for corporate use cases where databases don't change frequently.
     - Nikita proposed an architectural solution for MVP 2.0: an **orchestrator service** that manages configuration, issues restart commands, and effectively makes static configurations dynamic without complex in-app isolation.
     - **Decision:** For MVP 1.0, implement the simpler, more performant approach (config-based static connection or UI-driven), deferring the orchestration pattern to MVP 2.0.
