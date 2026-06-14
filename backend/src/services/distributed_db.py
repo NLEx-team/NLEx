@@ -91,6 +91,21 @@ class DistributedDatabaseService:
         )
         return [row[0] for row in rows]
 
+    async def get_catalog_type(self, catalog: str) -> str:
+        self._validate_catalog_name(catalog)
+        rows = await self.execute_query_async(
+            f"""
+            SELECT connector_id 
+            FROM system.metadata.catalogs 
+            WHERE catalog_name = '{catalog}'
+            """
+        )
+        if not rows:
+            return "unknown"
+        # connector_id is usually like "postgresql" or "postgresql-123"
+        connector_id = rows[0][0]
+        return connector_id.split('-')[0]
+
 
     async def get_namespaces(self, catalog: str) -> list[str]:
         self._validate_catalog_name(catalog)
