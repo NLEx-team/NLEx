@@ -32,8 +32,10 @@ class RelationshipService:
         # Standard Trino information_schema query
         query = f"""
         SELECT
+            kcu1.table_schema AS from_schema,
             kcu1.table_name AS from_table,
             kcu1.column_name AS from_column,
+            kcu2.table_schema AS to_schema,
             kcu2.table_name AS to_table,
             kcu2.column_name AS to_column
         FROM {catalog}.information_schema.key_column_usage kcu1
@@ -48,7 +50,7 @@ class RelationshipService:
         """
         try:
             rows = await self.db.execute_query_async(query)
-            return [self._format_relationship(row[0], row[1], row[2], row[3]) for row in rows]
+            return [self._format_relationship(row[0], row[1], row[2], row[3], row[4], row[5]) for row in rows]
         except Exception:
             return []
 
@@ -56,8 +58,10 @@ class RelationshipService:
         # Postgres-specific query via Trino
         query = f"""
         SELECT
+            kcu.table_schema AS from_schema,
             kcu.table_name AS from_table,
             kcu.column_name AS from_column,
+            ccu.table_schema AS to_schema,
             ccu.table_name AS to_table,
             ccu.column_name AS to_column
         FROM {catalog}.information_schema.table_constraints AS tc
@@ -73,7 +77,7 @@ class RelationshipService:
         """
         try:
             rows = await self.db.execute_query_async(query)
-            return [self._format_relationship(row[0], row[1], row[2], row[3]) for row in rows]
+            return [self._format_relationship(row[0], row[1], row[2], row[3], row[4], row[5]) for row in rows]
         except Exception:
             return []
 
@@ -81,8 +85,10 @@ class RelationshipService:
         # MySQL-specific query via Trino
         query = f"""
         SELECT
+            TABLE_SCHEMA AS from_schema,
             TABLE_NAME AS from_table,
             COLUMN_NAME AS from_column,
+            REFERENCED_TABLE_SCHEMA AS to_schema,
             REFERENCED_TABLE_NAME AS to_table,
             REFERENCED_COLUMN_NAME AS to_column
         FROM {catalog}.information_schema.key_column_usage
@@ -92,7 +98,7 @@ class RelationshipService:
         """
         try:
             rows = await self.db.execute_query_async(query)
-            return [self._format_relationship(row[0], row[1], row[2], row[3]) for row in rows]
+            return [self._format_relationship(row[0], row[1], row[2], row[3], row[4], row[5]) for row in rows]
         except Exception:
             return []
 
@@ -100,11 +106,19 @@ class RelationshipService:
         # ClickHouse does not support traditional foreign keys
         return []
 
-    def _format_relationship(self, from_table: str, from_column: str, to_table: str, to_column: str) -> dict[str, Any]:
+    def _format_relationship(
+        self, 
+        from_schema: str, 
+        from_table: str, 
+        from_column: str, 
+        to_schema: str, 
+        to_table: str, 
+        to_column: str
+    ) -> dict[str, Any]:
         return {
-            "from_table": from_table,
+            "from_table": f"{from_schema}.{from_table}",
             "from_column": from_column,
-            "to_table": to_table,
+            "to_table": f"{to_schema}.{to_table}",
             "to_column": to_column,
             "type": "many_to_one",
             "source": "foreign_key",
