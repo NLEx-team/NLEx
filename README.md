@@ -1,5 +1,15 @@
 # NLEx
 
+**NLEx — Natural Language to SQL.** A service that translates natural language requests into SQL queries, enabling business analysts to interact with databases without writing code.
+
+## Documentation
+
+- **License:** [MIT](LICENSE)
+- **Week 2 report (index):** [reports/week2/README.md](reports/week2/README.md)
+- **MVP v0 report:** [reports/week2/mvp-v0-report.md](reports/week2/mvp-v0-report.md)
+- **User stories:** [reports/week2/user-stories.md](reports/week2/user-stories.md)
+- **Contributing guide:** [CONTRIBUTING.md](CONTRIBUTING.md)
+
 ## How to Run with Docker
 
 ### 1. Environment Configuration
