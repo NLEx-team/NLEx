@@ -1,42 +1,40 @@
-# Lychee link checker configuration
+# Lychee link checker configuration.
 # Docs: https://lychee.cli.rs/usage/config/
 
-# Verbosity name: Lychee Link Check
+# Verbosity and reporting.
+verbose = "info"
+no_progress = true
 
-on:
-  push:
-    branches: [develop, main]
-  pull_request:
-    branches: [deveru
-on:
-  push:
-    branc
+# Caching successful results between runs.
+cache = true
+max_cache_age = "1d"
 
-#  et    breh  pull_request:
-    branchesx_    branches: tr  schedule:
-    - cron: '0 6
-m    - cronen  workflow_dispatch:
+# Network behaviour.
+max_redirects = 10
+max_retries = 2
+retry_wait_time = 2
+timeout = 20
+max_concurrency = 8
 
- H
-jobs:
-  link-check su  lisf    runs-on:on    permissions:
-      co1,      contents: 2      issues: write30    steps:
-      -40      - n#         cking links that require a
-      - name: Restore Lychee caess        uses: actions/cache@v4
-  ke        with:
-          path:na          pa)
-          key: cache-lychee\\          restore-keys: cache-lychee-
+# Accept these HTTP status codes as successful in addition to 2xx.
+accept = [200, 201, 202, 203, 204, 206, 301, 302, 303, 304, 307, 308, 401, 403, 429]
 
-     12
-      - name: Run Lychee link checkle         uses: lycheeverse/lychee-actir        with:
-          args: --config ly
-           ar/d          fail: true
-LYEOF
-echo "workflow OK"
+# Skip links that require authentication, only work on the internal network,
+# or rate-limit aggressively against anonymous CI clients.
+exclude = [
+    # Local backend on an Innopolis VM, only reachable from RU networks.
+    "^http://194\\.226\\.97\\.77",
+    # Local development URLs.
+    "^http://localhost",
+    "^http://127\\.0\\.0\\.1",
+    # Figma blocks HEAD probes / rate-limits anonymous traffic.
+    "^https://www\\.figma\\.com",
+    # Google Drive requires session cookies to confirm reachability of `view` URLs.
+    "^https://drive\\.google\\.com",
+]
 
-cat > /tmp/NLEx-fix/lychee.toml << 'TOMLEMaLYEOF
-echo "woks are echoreecho "woks areck
+# Mail and tel links are not real URLs to check.
 exclude_mail = true
 
-# Default scheme assumed if none is specified
+# Do not check anchor fragments on remote pages.
 include_fragments = false
