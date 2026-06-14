@@ -1,7 +1,3 @@
-Here is the updated **`reports/week2/README.md`** with the new images (`MIT-permission.png` and PR examples) and the corrected transcript filename:
-
----
-
 # Week 2 Report — NLEx
 
 **Project:** NLEx — Natural Language to SQL

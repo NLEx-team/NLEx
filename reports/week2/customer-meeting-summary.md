@@ -1,7 +1,7 @@
 **Meeting Summary: NLEx Team — Second Client Sync**
 
 **Date:** Saturday, Week 2 of Summer Semester
-**Attendees:** Nikita Maksimenko, Serafim Soldatov, Maksim Maltcev, Lyubov Savchenko, Maksim Merkushev, Polina Systerova
+**Attendees:** Nikita Maksimenko, Serafim Soldatov, Maksim Maltsev, Lyubov Savchenko, Maksim Merkushev, Polina Systerova
 
 ---
 
