@@ -144,6 +144,8 @@ class LLMService:
             response_format={"type": "json_object"},
         )
 
+        print(f"LLM response: {response}")
+
         raw_response = response.choices[0].message.content
         if not raw_response:
             raise ValueError("Empty response from LLM")
