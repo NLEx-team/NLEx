@@ -22,7 +22,17 @@ async def lifespan(app: FastAPI):
     yield
     # Clean up on shutdown if needed
 
+from fastapi.middleware.cors import CORSMiddleware
+
 app = FastAPI(title="NLEx", version="1.0.0", lifespan=lifespan)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Разрешаем запросы с любых адресов (для разработки)
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 app.add_middleware(AuthMiddleware)
 app.include_router(auth_router, prefix="/auth", tags=["auth"])
