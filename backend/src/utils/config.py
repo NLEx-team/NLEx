@@ -27,6 +27,7 @@ class Settings(BaseSettings):
     OPENAI_API_KEY: str | None = None
     OPENAI_BASE_URL: str = "https://api.openai.com/v1"
     LLM_MODEL: str = "gpt-4o-mini"
+    MAX_SQL_RETRIES: int = 3
     
     @property
     def SQLALCHEMY_DATABASE_URL(self) -> str:

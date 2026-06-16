@@ -26,13 +26,18 @@ class SQLGenerationService:
     def __init__(self, llm_service: LLMService | None = None):
         self.llm_service = llm_service or LLMService()
 
-    def generate_sql(self, user_prompt: str, schema: str) -> dict[str, Any]:
+    def generate_sql(
+        self, 
+        user_prompt: str | None, 
+        schema: str, 
+        history: list[dict[str, str]] | None = None
+    ) -> dict[str, Any]:
         """
         Генерирует SQL-запрос для Trino на основе вопроса пользователя.
         Схема (schema) содержит структуру всех таблиц из всех каталогов.
         """
         # Валидация входных данных
-        if not user_prompt or not user_prompt.strip():
+        if (not user_prompt or not user_prompt.strip()) and not history:
             return {"status": "error", "message": "Вопрос не может быть пустым."}
 
         if not schema or not schema.strip():
@@ -41,7 +46,11 @@ class SQLGenerationService:
         start_time = time.perf_counter()
 
         # Вызов LLM
-        result = self.llm_service.generate_sql(user_prompt=user_prompt, schema=schema)
+        result = self.llm_service.generate_sql(
+            user_prompt=user_prompt, 
+            schema=schema, 
+            history=history
+        )
         
         llm_time_ms = int((time.perf_counter() - start_time) * 1000)
 
