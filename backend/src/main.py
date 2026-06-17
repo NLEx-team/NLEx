@@ -3,7 +3,6 @@ from fastapi import FastAPI
 from src.routers.auth import router as auth_router
 from src.routers.users import router as users_router
 from src.routers.chats import router as chats_router
-from src.routers.connections import router as connections_router
 from src.routers.catalogs import router as catalogs_router
 from src.middleware.auth import AuthMiddleware
 from src.database.session import engine, Base
@@ -77,7 +76,6 @@ app.add_middleware(AuthMiddleware)
 app.include_router(auth_router, prefix="/auth", tags=["auth"])
 app.include_router(users_router, prefix="/users", tags=["users"])
 app.include_router(chats_router, prefix="/chats", tags=["chats"])
-app.include_router(connections_router, prefix="/connections", tags=["connections"])
 app.include_router(catalogs_router, prefix="/catalogs", tags=["catalogs"])
 
 @app.get("/")
