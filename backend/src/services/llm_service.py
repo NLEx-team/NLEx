@@ -63,20 +63,34 @@ class LLMService:
             timeout=_REQUEST_TIMEOUT,
         )
 
-    def generate_sql(self, user_prompt: str, schema: str) -> dict[str, Any]:
+    def generate_sql(
+        self, 
+        user_prompt: str | None, 
+        schema: str, 
+        history: list[dict[str, str]] | None = None
+    ) -> dict[str, Any]:
         """
         Generates Trino SQL query based on user question and schema.
         Includes retry on transient errors and response validation.
         """
-        user_message = USER_PROMPT_TEMPLATE.format(
-            schema=schema,
-            user_prompt=user_prompt,
-        )
-
-        messages = [
-            {"role": "system", "content": SYSTEM_PROMPT},
-            {"role": "user", "content": user_message},
-        ]
+        if not history:
+            # First call: include schema and prompt
+            user_message = USER_PROMPT_TEMPLATE.format(
+                schema=schema,
+                user_prompt=user_prompt or "",
+            )
+            messages = [
+                {"role": "system", "content": SYSTEM_PROMPT},
+                {"role": "user", "content": user_message},
+            ]
+        else:
+            # Subsequent call: use history and optionally append new prompt
+            messages = [
+                {"role": "system", "content": SYSTEM_PROMPT},
+                *history,
+            ]
+            if user_prompt:
+                messages.append({"role": "user", "content": user_prompt})
 
         return self._execute_with_retry(messages, "sql")
 
