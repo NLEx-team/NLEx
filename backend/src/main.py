@@ -12,6 +12,9 @@ from rich.traceback import install
 install(show_locals=True)
 
 # Ensure models are imported so SQLAlchemy knows about them
+from src.database.models import user
+from src.database.models import connection
+from src.database.models import chat 
 from src.database.models import User, UserProfile, Catalog, UserRole
 from src.repositories.user_repo import UserRepository
 from src.services.auth import AuthService
