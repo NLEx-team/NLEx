@@ -42,44 +42,58 @@ class OrchestratorService:
 
         self.state = OrchestratorState.IDLE
         self.chat_history: List[Dict[str, str]] = []
-        self.current_schema: Optional[Dict[str, Any]] = None
+        self.full_schema: Optional[Dict[str, Any]] = None
         self.max_retries = settings.MAX_SQL_RETRIES
-        self.current_catalog: Optional[str] = None
+        self.active_catalogs: List[str] = []
 
     def _transition(self, to_state: OrchestratorState):
         logger.info(f"Orchestrator transition: {self.state.value} -> {to_state.value}")
         self.state = to_state
 
-    async def connect_catalog(self, name: str, catalog_config: CatalogConnection):
+    async def initialize_session(self, active_catalogs: List[str]):
         """
-        1) Connect new catalog using DistributedDatabaseService.
+        Set up the session with the provided active catalogs.
         """
-        self._transition(OrchestratorState.CATALOG_CONNECTING)
-        try:
-            await self.db_service.connect_catalog(name, catalog_config)
-            self.current_catalog = name
-            self._transition(OrchestratorState.IDLE)
-        except Exception as e:
-            logger.error(f"Failed to connect catalog {name}: {e}")
-            self._transition(OrchestratorState.FAILED)
-            raise
+        self.active_catalogs = active_catalogs
+        if not self.active_catalogs:
+            logger.warning("Initializing session with no active catalogs")
 
-    async def infer_relationships(self, catalog: Optional[str] = None):
+    async def infer_relationships(self):
         """
-        2) Find relationships between tables using RelationshipInferenceService.
+        Aggregates schemas from all active catalogs and infers relationships.
         """
-        target_catalog = catalog or self.current_catalog
-        if not target_catalog:
-            raise ValueError("No catalog connected or specified")
+        if not self.active_catalogs:
+            raise ValueError("No active catalogs found. Please connect and activate at least one catalog.")
 
         self._transition(OrchestratorState.RELATIONSHIP_INFERRING)
         try:
-            # This fetches schema + infers relationships
-            self.current_schema = await self.inference_service.get_augmented_schema(target_catalog)
+            # Aggregate schemas from all active catalogs
+            combined_schemas = []
+            all_relationships = []
+            
+            for catalog_name in self.active_catalogs:
+                # RelationshipInferenceService.get_augmented_schema returns full schema for ONE catalog
+                catalog_schema = await self.inference_service.get_augmented_schema(catalog_name)
+                
+                # Prepend catalog name to schemas for unambiguous referencing in SQL
+                # The schema structure is {"catalog": "...", "schemas": [...], "relationships": [...]}
+                for schema in catalog_schema["schemas"]:
+                    combined_schemas.append({
+                        **schema,
+                        "catalog": catalog_name
+                    })
+                all_relationships.extend(catalog_schema.get("relationships", []))
+            
+            self.full_schema = {
+                "catalogs": self.active_catalogs,
+                "schemas": combined_schemas,
+                "relationships": all_relationships
+            }
+            
             self._transition(OrchestratorState.AWAITING_USER_QUERY)
-            return self.current_schema
+            return self.full_schema
         except Exception as e:
-            logger.error(f"Failed to infer relationships for {target_catalog}: {e}")
+            logger.error(f"Failed to infer relationships: {e}")
             self._transition(OrchestratorState.FAILED)
             raise
 
@@ -87,8 +101,8 @@ class OrchestratorService:
         """
         3) Get the text prompt from the user and start the execution loop.
         """
-        if not self.current_schema:
-            raise ValueError("Schema not loaded. Call infer_relationships first.")
+        if not self.full_schema:
+            await self.infer_relationships()
         
         # Reset chat history for a new query
         self.chat_history = []
@@ -115,7 +129,7 @@ class OrchestratorService:
         """
         attempts = 0
         current_prompt = user_prompt
-        schema_str = json.dumps(self.current_schema, ensure_ascii=False)
+        schema_str = json.dumps(self.full_schema, ensure_ascii=False)
         
         while attempts <= self.max_retries:
             # Call LLM via SQLGenerationService

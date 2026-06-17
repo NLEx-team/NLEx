@@ -15,6 +15,10 @@ class Settings(BaseSettings):
     # This can be set directly (e.g. for sqlite tests)
     DATABASE_URL: str | None = None
 
+    # Admin
+    ADMIN_EMAIL: str = "admin@nlex.ai"
+    ADMIN_PASSWORD: str = "admin123"
+
     # Trino
     TRINO_PORT: int = 8080
     
