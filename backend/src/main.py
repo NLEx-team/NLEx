@@ -69,7 +69,12 @@ app = FastAPI(title="NLEx", version="1.0.0", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Разрешаем запросы с любых адресов (для разработки)
+    allow_origins=[
+        "https://nlex.tech",
+        "https://www.nlex.tech",
+        "http://localhost:5173",
+        "http://127.0.0.1:5173"
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
