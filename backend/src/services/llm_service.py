@@ -46,20 +46,20 @@ _REQUEST_TIMEOUT = 60.0  # seconds
 
 
 class LLMService:
-    def __init__(self, api_key: str | None = None, base_url: str | None = None, model: str | None = None):
-        key = api_key or settings.OPENAI_API_KEY
-        if not key:
+    def __init__(self):
+        if not settings.OPENAI_API_KEY:
             raise ValueError("OPENAI_API_KEY is not configured")
 
-        self.model = model or settings.LLM_MODEL
+        self.model = settings.LLM_MODEL
 
-        url = base_url or settings.OPENAI_BASE_URL
-        if url and url.endswith("/chat/completions"):
-            url = url.rsplit("/chat/completions", 1)[0]
+        # Remove /chat/completions from base_url if present, as SDK appends it
+        base_url = settings.OPENAI_BASE_URL
+        if base_url and base_url.endswith("/chat/completions"):
+            base_url = base_url.rsplit("/chat/completions", 1)[0]
 
         self.client = OpenAI(
-            api_key=key,
-            base_url=url,
+            api_key=settings.OPENAI_API_KEY,
+            base_url=base_url,
             timeout=_REQUEST_TIMEOUT,
         )
 
