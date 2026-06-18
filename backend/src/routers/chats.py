@@ -1,108 +1,83 @@
-from fastapi import APIRouter, Depends, status
-from sqlalchemy.ext.asyncio import AsyncSession
-from uuid import UUID
+from fastapi import APIRouter, Depends, HTTPException, status
+from uuid import UUID, uuid4
+from datetime import datetime
+from typing import List, Dict, Any
 
 from src.dependencies.auth import get_current_user
-from src.dependencies.llm import get_llm_service
-from src.database.session import get_db
-from src.database.models.user import User
-
-from src.services.llm_service import LLMService
-
 from src.models.api.chats import (
     ChatCreateRequest, PromptRequest, 
-    ReviseRequest, ClarificationAnswer
+    ClarificationAnswer
 )
 from src.models.schemas.chat import (
-    ChatRead, SchemaSnapshot,
-    DraftRead, ExecutionStatus
+    ChatRead, ChatStatus
 )
-
-from src.controllers.chat import ChatController
+from src.routers.catalogs import get_catalog_service
+from src.services.catalog_service import CatalogService
+from src.controllers.chat_controller import ChatController
 
 router = APIRouter()
 
+# Mock storage for basic chat metadata
+MOCK_CHATS = {}
+
+def get_chat_controller(catalog_service: CatalogService = Depends(get_catalog_service)) -> ChatController:
+    return ChatController(catalog_service)
+
 @router.post("", response_model=ChatRead, status_code=status.HTTP_201_CREATED)
-async def create_chat(
-    request: ChatCreateRequest, 
-    user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
-):
-    return await ChatController.create_chat(db, request, user)
+async def create_chat(request: ChatCreateRequest, user = Depends(get_current_user)):
+    chat_id = uuid4()
+    chat = ChatRead(
+        id=chat_id,
+        name=request.name or f"Chat {chat_id.hex[:8]}",
+        status=ChatStatus.READY_FOR_PROMPT,
+        created_at=datetime.utcnow(),
+        updated_at=datetime.utcnow()
+    )
+    MOCK_CHATS[chat_id] = chat
+    return chat
 
-@router.get("/{chat_id}", response_model=ChatRead)
-async def get_chat(
-    chat_id: UUID, 
-    user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
-):
-    return await ChatController.get_chat(db, chat_id, user)
-
-@router.delete("/{chat_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_chat(
-    chat_id: UUID, 
-    user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
-):
-    await ChatController.delete_chat(db, chat_id, user)
-    return None
-
-@router.get("/{chat_id}/schema", response_model=SchemaSnapshot)
-async def get_schema_snapshot(
-    chat_id: UUID, 
-    user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
-):
-    return await ChatController.get_schema_snapshot(db, chat_id, user)
-
-@router.post("/{chat_id}/prompt", response_model=DraftRead)
+@router.post("/{chat_id}/prompt")
 async def submit_prompt(
     chat_id: UUID, 
     request: PromptRequest, 
-    user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db),
-    llm_service: LLMService = Depends(get_llm_service)
+    controller: ChatController = Depends(get_chat_controller),
+    user = Depends(get_current_user)
 ):
-    return await ChatController.submit_prompt(db, chat_id, request, user, llm_service)
+    if chat_id not in MOCK_CHATS:
+        # In a real app, we'd check DB. For now, let's allow "ghost" chats if ID is valid UUID
+        pass
+    
+    try:
+        return await controller.process_prompt(chat_id, request.prompt)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
-@router.get("/{chat_id}/draft", response_model=DraftRead)
-async def get_draft(
-    chat_id: UUID, 
-    user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
-):
-    return await ChatController.get_draft(db, chat_id, user)
-
-@router.post("/{chat_id}/draft:revise", response_model=DraftRead)
-async def revise_draft(
-    chat_id: UUID, 
-    request: ReviseRequest, 
-    user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
-):
-    return await ChatController.revise_draft(db, chat_id, request, user)
-
-@router.post("/{chat_id}/draft:confirm", response_model=DraftRead)
-async def confirm_draft(
-    chat_id: UUID, 
-    user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
-):
-    return await ChatController.confirm_draft(db, chat_id, user)
-
-@router.post("/{chat_id}/clarifications", response_model=DraftRead)
+@router.post("/{chat_id}/clarify")
 async def submit_clarification(
     chat_id: UUID, 
     answer: ClarificationAnswer, 
-    user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
+    controller: ChatController = Depends(get_chat_controller),
+    user = Depends(get_current_user)
 ):
-    return await ChatController.submit_clarification(db, chat_id, answer, user)
+    # Using custom_answer or first selected option as text clarification for now
+    clarification_text = answer.custom_answer or (answer.selected_options[0] if answer.selected_options else "")
+    if not clarification_text:
+        raise HTTPException(status_code=400, detail="Clarification text is required")
 
-@router.get("/{chat_id}/execution", response_model=ExecutionStatus)
-async def get_execution_status(
-    chat_id: UUID, 
-    user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
-):
-    return await ChatController.get_execution_status(db, chat_id, user)
+    try:
+        return await controller.process_clarification(chat_id, clarification_text)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/{chat_id}", response_model=ChatRead)
+async def get_chat(chat_id: UUID, user = Depends(get_current_user)):
+    if chat_id not in MOCK_CHATS:
+        raise HTTPException(status_code=404, detail="Chat not found")
+    return MOCK_CHATS[chat_id]
+
+@router.delete("/{chat_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_chat(chat_id: UUID, user = Depends(get_current_user)):
+    if chat_id not in MOCK_CHATS:
+        raise HTTPException(status_code=404, detail="Chat not found")
+    del MOCK_CHATS[chat_id]
+    return None
