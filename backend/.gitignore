@@ -1,0 +1,274 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+pythonenv*
+
+# Virtual Environment
+venv/
+.venv/
+env/
+.env
+.env.*
+!.env.example
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+.project
+.pydevproject
+.settings/
+*.sublime-*
+*.sublime-workspace
+
+# Jupyter Notebook
+.ipynb_checkpoints
+*.ipynb
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+test-results/
+
+# MyPy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.pyre/
+.pytype/
+
+# PyCharm
+.idea/modules.xml
+.idea/*.iml
+.idea/inspectionProfiles/
+.idea/workspace.xml
+.idea/tasks.xml
+.idea/dataSources.local.xml
+.idea/dataSources/
+
+# Environment variables
+.env
+.venv
+.env.local
+.env.*.local
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+*.db-journal
+
+# Logs
+logs/
+*.log
+logfile-*
+access.log
+error.log
+uvicorn.log
+gunicorn.log
+
+# Testing
+.pytest_cache/
+.tox/
+htmlcov/
+.coverage
+coverage.xml
+*.cover
+.hypothesis/
+
+# Docker
+*.pid
+docker-compose.override.yml
+docker-compose.*.yml
+!.dockerignore
+
+# Redis
+dump.rdb
+
+# Celery
+celerybeat-schedule
+celerybeat.pid
+celerybeat-schedule.db
+
+# Alembic
+alembic/versions/*.pyc
+alembic/__pycache__/
+
+# Static and Media files
+staticfiles/
+media/
+*.jpg
+*.jpeg
+*.png
+*.gif
+*.ico
+*.svg
+*.mp4
+*.mp3
+*.zip
+*.tar.gz
+*.rar
+
+# Uploads
+uploads/
+temp/
+tmp/
+
+# Secret keys / Certificates
+*.key
+*.pem
+*.crt
+*.p12
+.secret
+secret.key
+private.key
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Backup files
+*.bak
+*.backup
+*.tmp
+*.temp
+
+# Project specific
+*.pid
+*.log
+*.pot
+*.mo
+*.sql
+*.sql.gz
+
+# FastAPI specific
+app.db
+data.db
+test.db
+
+# Pydantic
+*.pydantic
+
+# Redis
+dump.rdb
+
+# JWT / Auth
+.jwt_secret
+.oauth_secret
+
+# Local development overrides
+*.local.py
+config.local.py
+settings.local.py
+
+# Profiling data
+*.prof
+*.lprof
+
+# Generated documentation
+docs/_build/
+site/
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# PyInstaller
+*.manifest
+*.spec
+
+# pipenv
+Pipfile.lock
+
+# poetry
+poetry.lock
+
+# pdm
+.pdm.toml
+
+# Rope project settings
+.ropeproject
+
+# mkdocs documentation
+site/
+
+# mypy
+.mypy_cache/
+.mypy_cache
+
+# pyre type checker
+.pyre/
+
+# pytype static type analyzer
+.pytype/
+
+# profiling data
+.prof
+
+# Cython debug symbols
+cython_debug/
+
+# Ruff
+.ruff_cache/
+
+# Vite (if using FastAPI with React frontend)
+node_modules/
+dist/
+dist-ssr/
+*.local
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Environment specific
+.env.production
+.env.staging
+.env.development
+
+# System
+.DS_Store
