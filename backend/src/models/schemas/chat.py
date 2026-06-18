@@ -34,11 +34,16 @@ class SchemaSnapshot(BaseModel):
     relationships: List[Dict[str, Any]]
 
 class DraftRead(BaseModel):
-    metrics: List[str]
-    dimensions: List[str]
-    filters: List[Dict[str, Any]]
+    metrics: List[str] = []
+    dimensions: List[str] = []
+    filters: List[Dict[str, Any]] = []
     sql: Optional[str] = None
     status: str
+    message: Optional[str] = None
+    question: Optional[str] = None
+    explanation: Optional[str] = None
+    headers: Optional[List[str]] = None
+    data: Optional[List[Dict[str, Any]]] = None
 
 class ClarificationQuestion(BaseModel):
     id: str
