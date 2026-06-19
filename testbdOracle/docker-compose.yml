@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  oracle-db:
+    image: gvenzl/oracle-xe:21-slim
+    container_name: hospital_db
+    ports:
+      - "1521:1521"
+      - "5500:5500"
+    environment:
+      ORACLE_PASSWORD: HospitalDB_2024
+      ORACLE_DATABASE: HOSPITAL
+      APP_USER: hospital_user
+      APP_USER_PASSWORD: HospitalUser_2024
+    volumes:
+      - oracle_data:/opt/oracle/oradata
+      - ./01_create_tables.sql:/container-entrypoint-initdb.d/01_create_tables.sql
+      - ./02_insert_doctors.sql:/container-entrypoint-initdb.d/02_insert_doctors.sql
+      - ./03_insert_patients.sql:/container-entrypoint-initdb.d/03_insert_patients.sql
+      - ./04_insert_appointments.sql:/container-entrypoint-initdb.d/04_insert_appointments.sql
+      - ./05_insert_prescriptions.sql:/container-entrypoint-initdb.d/05_insert_prescriptions.sql
+      - ./06_indexes_and_views.sql:/container-entrypoint-initdb.d/06_indexes_and_views.sql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh"]
+      interval: 30s
+      timeout: 10s
+      retries: 20
+      start_period: 180s
+    restart: unless-stopped
+
+volumes:
+  oracle_data:
