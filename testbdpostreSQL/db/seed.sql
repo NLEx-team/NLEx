@@ -2,15 +2,12 @@
 -- PostgreSQL database dump
 --
 
-\restrict DMuSEPvlsv5KClxSeFgB7i8VSsI5Fcp3Wy4qCDI7szzt3WBLFOzF8buuZMPTKPZ
-
 -- Dumped from database version 18.4
 -- Dumped by pg_dump version 18.4
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
 SET idle_in_transaction_session_timeout = 0;
-SET transaction_timeout = 0;
 SET client_encoding = 'UTF8';
 SET standard_conforming_strings = on;
 SELECT pg_catalog.set_config('search_path', '', false);
@@ -6180,6 +6177,4 @@ SELECT pg_catalog.setval('public.vacations_id_seq', 1683, true);
 --
 -- PostgreSQL database dump complete
 --
-
-\unrestrict DMuSEPvlsv5KClxSeFgB7i8VSsI5Fcp3Wy4qCDI7szzt3WBLFOzF8buuZMPTKPZ
 
