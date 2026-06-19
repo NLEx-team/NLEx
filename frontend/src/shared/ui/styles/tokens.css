@@ -1,0 +1,69 @@
+:root {
+  /* colors */
+  --color-accent: #217346;
+  --color-accent-dark: #185C37;
+  --color-back-main: #ffffff;
+  --color-back-components: #f5f5f5;
+  --color-back-active: #d2d7dd;
+  --color-text-secondary: #7f8892;
+  --color-text-primary: #4d5966;
+  --color-border: #4d5966;
+  --color-error: #991b1b;
+  --color-error-border: #dc2626;
+  --color-on-accent: #ffffff;
+
+  /* spacing */
+  --spacing-sm: 10px;
+  --spacing-md: 16px;
+  --spacing-lg: 25px;
+
+  /* radius */
+  --radius: 6px;
+  --input-radius: 6px;
+  --button-radius: 12px;
+  --chat-input-radius: 12px;
+  --chat-input-max-height: 20vh;
+  --chat-input-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.06);
+  --shadow-elevated: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --chat-message-user-shadow: var(--shadow-elevated);
+  --overlay-backdrop: rgba(0, 0, 0, 0.4);
+
+  /* sizing */
+  --button-max-width: 120px;
+  --components-height: 44px;
+  --border-width: 1px;
+  --input-gap: 6px;
+  --icon-size: 24px;
+  --checkbox-size: 16px;
+  --avatar-size-lg: 90px;
+  --avatar-size-md: 50px;
+  --avatar-size-sm: 32px;
+  --avatar-size: var(--avatar-size-md);
+  --modal-min-width: 300px;
+  --modal-max-width: 90vw;
+  --sidebar-width: 320px;
+
+  /* layering */
+  --z-index-field-icon: 1;
+  --z-index-dropdown: 100;
+  --z-index-modal: 1000;
+
+  /* focus */
+  --focus-outline-width: 2px;
+  --focus-outline-offset: 2px;
+
+  /* typography */
+  --font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-size-main: 16px;
+  --font-size-title: 20px;
+  --font-size-error: 12px;
+}
+
+[data-theme="dark"] {
+  --color-back-main: #1e1e1e;
+  --color-back-components: #2b2b2b;
+  --color-back-active: #3a3a3a;
+  --color-text-primary: #ffffff;
+  --color-text-secondary: #b0b0b0;
+  --color-border: #4d5966;
+}

@@ -1,0 +1,111 @@
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--input-gap);
+  width: 100%;
+}
+
+.field__label {
+  font: inherit;
+  color: var(--color-text-primary);
+}
+
+.field__input-wrapper {
+  position: relative;
+  width: 100%;
+  border: var(--border-width) solid var(--color-back-active);
+  border-radius: var(--input-radius);
+  background: var(--color-back-main);
+  transition: border-color 0.2s;
+}
+
+.field__input-wrapper:focus-within {
+  border-color: var(--color-accent);
+}
+
+.field--error .field__input-wrapper {
+  border-color: var(--color-error-border);
+}
+
+.field--error .field__input-wrapper:focus-within {
+  border-color: var(--color-error-border);
+}
+
+.field__input {
+  display: block;
+  width: 100%;
+  height: var(--components-height);
+  padding: 0 var(--spacing-sm);
+  border: none;
+  border-radius: var(--input-radius);
+  background: transparent;
+  color: var(--color-text-primary);
+  font: inherit;
+  outline: none;
+}
+
+.field__input--has-left-icon {
+  padding-left: calc(var(--spacing-sm) + var(--icon-size) + var(--spacing-sm));
+}
+
+.field__input--has-right-icon {
+  padding-right: calc(var(--spacing-sm) + var(--icon-size) + var(--spacing-sm));
+}
+
+.field__input::placeholder {
+  color: var(--color-text-secondary);
+}
+
+.field__input:disabled {
+  cursor: not-allowed;
+}
+
+.field__input-wrapper:has(.field__input:disabled) {
+  background: var(--color-back-components);
+  cursor: not-allowed;
+}
+
+.field__icon {
+  position: absolute;
+  top: 50%;
+  z-index: var(--z-index-field-icon);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--icon-size);
+  height: var(--icon-size);
+  transform: translateY(-50%);
+  pointer-events: auto;
+}
+
+.field__icon--left {
+  left: var(--spacing-sm);
+}
+
+.field__icon--right {
+  right: var(--spacing-sm);
+}
+
+.field__readonly {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: var(--components-height);
+  padding: 0 var(--spacing-sm);
+  border: var(--border-width) solid var(--color-back-active);
+  border-radius: var(--input-radius);
+  background: var(--color-back-components);
+  color: var(--color-text-primary);
+  font: inherit;
+  cursor: default;
+}
+
+.field__placeholder {
+  color: var(--color-text-secondary);
+}
+
+.field__error {
+  font: inherit;
+  font-size: var(--font-size-error);
+  color: var(--color-error);
+}
