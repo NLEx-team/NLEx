@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+import { config } from '../../utils/config';
+
+const API_BASE = config.apiUrl
 
 function App() {
   const [activeTab, setActiveTab] = useState<'login' | 'signup'>('login');

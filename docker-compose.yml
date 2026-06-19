@@ -38,6 +38,8 @@ services:
     build:
       context: ./backend
       target: development
+      # args:
+      #   - API_URL=${API_URL}
     ports:
       - "${BACKEND_PORT}:8000"
     volumes:
@@ -56,6 +58,8 @@ services:
     build:
       context: ./frontend
       target: development
+      # args:
+      #   - VITE_API_URL=${VITE_API_URL}
     ports:
       - "${FRONTEND_PORT}:5173"
     volumes:
