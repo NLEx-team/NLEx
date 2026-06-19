@@ -3,14 +3,17 @@ import type { ButtonProps } from "./Button.types";
 
 export function Button({
   children,
+  type = "button",
   onClick,
   disabled,
   variant = "primary",
-  className = ""
+  className = "",
+  style
 }: ButtonProps) {
   return (
     <button
-      type="button"
+      type={type}
+      style={style}
       className={`button button--${variant} ${className}`}
       onClick={onClick}
       disabled={disabled}

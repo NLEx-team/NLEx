@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Field } from "../field";
 import { IconWrapper } from "../icon";
 import type { PasswordFieldProps } from "./PasswordField.types";
+import { Icon } from "@iconify/react";
 
 function EyeIcon() {
   return (
@@ -54,7 +55,7 @@ export function PasswordField({ mode = "default", ...props }: PasswordFieldProps
           onClick={() => setVisible((current) => !current)}
           aria-label={visible ? "Hide password" : "Show password"}
         >
-          {visible ? <EyeOffIcon /> : <EyeIcon />}
+          {visible ? <Icon icon='mdi:hide-outline' /> : <Icon icon='mdi:eye-outline' />}
         </IconWrapper>
       }
     />
