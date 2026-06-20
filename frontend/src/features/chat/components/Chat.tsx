@@ -1,25 +1,28 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { Icon } from '@iconify/react';
 import { Button } from '../../../shared/ui/button';
 import { ChatInput } from '../../../shared/ui/chat-input';
 import { ChatMessage } from '../../../shared/ui/chat-message';
-import { ChatSidebar } from './ChatSidebar';
-import { useChat } from '../hooks/useChat';
+import type { ChatMessage as ChatMessageType } from '../types';
 import './Chat.css';
 
-export function Chat() {
-  const {
-    sessions,
-    activeSessionId,
-    activeSession,
-    messages,
-    inputValue,
-    setInputValue,
-    setActiveSessionId,
-    handleSendMessage,
-  } = useChat();
+interface ChatProps {
+  activeSessionTitle?: string;
+  messages: ChatMessageType[];
+  inputValue: string;
+  setInputValue: (value: string) => void;
+  handleSendMessage: () => void;
+  onToggleSidebar: () => void;
+}
 
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+export function Chat({
+  activeSessionTitle,
+  messages,
+  inputValue,
+  setInputValue,
+  handleSendMessage,
+  onToggleSidebar,
+}: ChatProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -28,25 +31,17 @@ export function Chat() {
 
   return (
     <div className="chat">
-      <ChatSidebar
-        isOpen={isSidebarOpen}
-        sessions={sessions}
-        activeSessionId={activeSessionId}
-        onSelectSession={setActiveSessionId}
-        onClose={() => setIsSidebarOpen(false)}
-      />
-
       <div className="chat__layout">
         <header className="chat__header">
           <button
             className="chat__menu-btn"
-            onClick={() => setIsSidebarOpen(true)}
+            onClick={onToggleSidebar}
             aria-label="Open sidebar"
           >
             <Icon icon="mdi:menu" />
           </button>
           <h1 className="chat__title">
-            {activeSession?.title ?? 'Chat'}
+            {activeSessionTitle ?? 'Chat'}
           </h1>
           <div className="chat__header-actions">
             <Button variant="secondary">

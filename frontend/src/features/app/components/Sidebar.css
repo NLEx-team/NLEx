@@ -1,4 +1,4 @@
-.chat-sidebar {
+.sidebar {
   display: flex;
   flex-direction: column;
   width: var(--sidebar-width, 320px);
@@ -10,14 +10,14 @@
   flex-shrink: 0;
 }
 
-.chat-sidebar--closed {
+.sidebar--closed {
   width: 0;
   border-right: none;
   padding: 0;
   overflow: hidden;
 }
 
-.chat-sidebar__header {
+.sidebar__header {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -26,14 +26,14 @@
   flex-shrink: 0;
 }
 
-.chat-sidebar__title {
+.sidebar__title {
   margin: 0;
   font-size: var(--font-size-title);
   font-weight: 600;
   color: var(--color-accent);
 }
 
-.chat-sidebar__content {
+.sidebar__content {
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -43,33 +43,19 @@
   min-height: 0;
 }
 
-.chat-sidebar__new-chat-btn {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  width: 100%;
-  justify-content: center;
-}
-
-.chat-sidebar__sessions {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.chat-sidebar__footer {
+.sidebar__footer {
   padding: var(--spacing-md);
   border-top: var(--border-width) solid var(--color-back-active);
   flex-shrink: 0;
 }
 
-.chat-sidebar__user {
+.sidebar__user {
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
 }
 
-.chat-sidebar__user-email {
+.sidebar__user-email {
   font-size: 14px;
   color: var(--color-text-secondary);
   overflow: hidden;
