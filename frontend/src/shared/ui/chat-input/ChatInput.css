@@ -2,7 +2,6 @@
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
-  width: 100%;
   padding: 0 var(--spacing-sm) 0 var(--spacing-md);
   border: var(--border-width) solid var(--color-back-active);
   border-radius: var(--chat-input-radius);

@@ -220,3 +220,6 @@ __marimo__/
 
 # System
 .DS_Store
+
+# Other
+opencode.json

@@ -1,9 +1,10 @@
-import { AuthForm } from '../auth/components';
+import { Chat } from '../chat';
+import './App.css';
 
-function App() {
-  return(
-    <AuthForm />
+export default function App() {
+  return (
+    <div className="app-container">
+      <Chat />
+    </div>
   );
 }
-
-export default App;
