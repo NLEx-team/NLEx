@@ -35,39 +35,53 @@ function OptionsBlockView({ block, onClarify }: { block: OptionsBlock; onClarify
   );
 }
 
-function TableBlockView({ block }: { block: TableBlock }) {
+function TableBlockView({ block, exportUrl, onExport }: { block: TableBlock; exportUrl?: string; onExport?: (exportUrl: string) => void }) {
   return (
-    <div className="chat-message__table-wrapper">
-      <div className="chat-message__table-scroll">
-        <table className="chat-message__table">
-          <thead>
-            <tr>
-              {block.headers.map(header => (
-                <th key={header}>{header}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {block.rows.map((row, ri) => (
-              <tr key={ri}>
-                {row.map((cell: any, ci: number) => (
-                  <td key={ci}>{cell == null ? 'NULL' : String(cell)}</td>
+    <>
+      <div className="chat-message__table-wrapper">
+        <div className="chat-message__table-scroll">
+          <table className="chat-message__table">
+            <thead>
+              <tr>
+                {block.headers.map(header => (
+                  <th key={header}>{header}</th>
                 ))}
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {block.rows.map((row, ri) => (
+                <tr key={ri}>
+                  {row.map((cell: any, ci: number) => (
+                    <td key={ci}>{cell == null ? 'NULL' : String(cell)}</td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <div className="chat-message__table-actions">
+          {block.sql && (
+            <details className="chat-message__sql-details">
+              <summary className="chat-message__sql-summary">
+                <Icon icon="mdi:code-tags" />
+                <span>View SQL</span>
+              </summary>
+              <pre className="chat-message__sql">{block.sql}</pre>
+            </details>
+          )}
+        </div>
       </div>
-      {block.sql && (
-        <details className="chat-message__sql-details">
-          <summary className="chat-message__sql-summary">
-            <Icon icon="mdi:code-tags" />
-            <span>View SQL</span>
-          </summary>
-          <pre className="chat-message__sql">{block.sql}</pre>
-        </details>
+      {exportUrl && (
+        <button
+          className="chat-message__export-btn"
+          onClick={() => onExport?.(exportUrl)}
+          type="button"
+        >
+          <Icon icon="mdi:file-download-outline" />
+          <span>Export to Excel</span>
+        </button>
       )}
-    </div>
+    </>
   );
 }
 
@@ -89,7 +103,7 @@ function ErrorBlockView({ block }: { block: ErrorBlock }) {
   );
 }
 
-export function ChatMessage({ role, blocks, onClarify }: ChatMessageProps) {
+export function ChatMessage({ role, blocks, exportUrl, onClarify, onExport }: ChatMessageProps) {
   return (
     <div className={`chat-message chat-message--${role}`}>
       <div className="chat-message__bubble">
@@ -100,7 +114,7 @@ export function ChatMessage({ role, blocks, onClarify }: ChatMessageProps) {
             case 'options':
               return <OptionsBlockView key={idx} block={block} onClarify={onClarify} />;
             case 'table':
-              return <TableBlockView key={idx} block={block} />;
+              return <TableBlockView key={idx} block={block} exportUrl={exportUrl} onExport={onExport} />;
             case 'error':
               return <ErrorBlockView key={idx} block={block} />;
           }

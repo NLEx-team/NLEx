@@ -15,7 +15,7 @@
   max-width: 90%;
   min-width: 0;
   padding: var(--spacing-sm) var(--spacing-md);
-  border-radius: var(--radius);
+  border-radius: var(--user-message-radius);
   font: inherit;
   color: inherit;
   white-space: pre-wrap;
@@ -27,7 +27,6 @@
 
 .chat-message--user .chat-message__bubble {
   background: var(--color-back-active);
-  border: var(--border-width) solid var(--color-text-secondary);
   box-shadow: var(--chat-message-user-shadow);
 }
 
@@ -128,19 +127,25 @@
 }
 
 .chat-message__export-btn {
-  display: flex;
+  display: inline-flex;
+  align-self: flex-start;
   align-items: center;
-  gap: var(--spacing-xs);
-  padding: var(--spacing-xs) var(--spacing-sm);
+  gap: 7px;
+  padding: var(--spacing-sm);
   border: var(--border-width) solid var(--color-accent);
   border-radius: var(--radius);
   background: transparent;
   color: var(--color-accent);
   cursor: pointer;
   font: inherit;
-  font-size: 12px;
+  font-size: 13px;
+  font-weight: 700;
   white-space: nowrap;
   transition: background 0.15s;
+}
+
+.chat-message__export-btn > span {
+  color: var(--color-text-primary);
 }
 
 .chat-message__export-btn:hover {
@@ -180,8 +185,8 @@
 
 .chat-message__error {
   display: flex;
-  align-items: flex-start;
-  gap: var(--spacing-xs);
+  align-items: center;
+  gap: var(--spacing-sm);
   color: var(--color-error);
   font-size: 14px;
 }

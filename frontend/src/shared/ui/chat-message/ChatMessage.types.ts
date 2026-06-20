@@ -31,5 +31,7 @@ export type ContentBlock = TextBlock | OptionsBlock | TableBlock | ErrorBlock;
 export interface ChatMessageProps {
   role: ChatMessageRole;
   blocks: ContentBlock[];
+  exportUrl?: string;
   onClarify?: (questionId: string, selectedOptions: string[]) => void;
+  onExport?: (exportUrl: string) => void;
 }
