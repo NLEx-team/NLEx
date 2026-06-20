@@ -90,7 +90,7 @@ class SQLGenerationService:
             "SQL generation completed in %dms | status=%s | prompt_len=%d",
             llm_time_ms,
             result.get("status", "unknown") if isinstance(result, dict) else "invalid",
-            len(user_prompt),
+            len(user_prompt) if user_prompt else 0,
         )
 
         return result
