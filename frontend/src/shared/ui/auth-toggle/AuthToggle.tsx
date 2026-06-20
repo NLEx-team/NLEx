@@ -3,16 +3,13 @@ import type { AuthToggleProps } from "./AuthToggle.types";
 
 export function AuthToggle({ value, onChange, className = "" }: AuthToggleProps) {
   const classNames = ["auth-toggle", className].filter(Boolean).join(" ");
-  const sliderClassName = [
-    "auth-toggle__slider",
-    value === "register" ? "auth-toggle__slider--register" : "",
-  ]
-    .filter(Boolean)
-    .join(" ");
-
   return (
     <div className={classNames} role="group" aria-label="Authentication mode">
-      <div className={sliderClassName} aria-hidden="true" />
+      <div
+        className="auth-toggle__slider"
+        style={{ left: value === "register" ? "50%" : "0%" }}
+        aria-hidden="true"
+      />
 
       <button
         type="button"
