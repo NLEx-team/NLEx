@@ -1,7 +1,7 @@
 import { useEffect, useRef, type ReactNode } from 'react';
 import { useAuth } from '../../auth/hooks/useAuth';
+import { Logo } from '../../../shared/ui';
 import { Avatar } from '../../../shared/ui/avatar';
-import { Button } from '../../../shared/ui/button';
 import { Icon } from '@iconify/react';
 import './Sidebar.css';
 
@@ -30,10 +30,15 @@ export function Sidebar({ isOpen, onClose, children }: SidebarProps) {
       className={`sidebar ${isOpen ? 'sidebar--open' : 'sidebar--closed'}`}
     >
       <div className="sidebar__header">
-        <h2 className="sidebar__title">NLEx</h2>
-        <Button variant="secondary" onClick={onClose}>
-          <Icon icon="mdi:menu-close" />
-        </Button>
+        <Logo variant="compact" />
+        <button
+          type="button"
+          className="sidebar__menu-btn"
+          onClick={onClose}
+          aria-label="Close sidebar"
+        >
+          <Icon icon="mdi:menu" />
+        </button>
       </div>
 
       <div className="sidebar__content">

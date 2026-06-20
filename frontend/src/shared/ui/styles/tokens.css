@@ -33,7 +33,7 @@
   --components-height: 44px;
   --border-width: 1px;
   --input-gap: 6px;
-  --icon-size: 24px;
+  --icon-size: 20px;
   --checkbox-size: 16px;
   --avatar-size-lg: 90px;
   --avatar-size-md: 50px;
@@ -60,10 +60,15 @@
 }
 
 [data-theme="dark"] {
-  --color-back-main: #1e1e1e;
-  --color-back-components: #2b2b2b;
-  --color-back-active: #3a3a3a;
-  --color-text-primary: #ffffff;
-  --color-text-secondary: #b0b0b0;
-  --color-border: #4d5966;
+  --color-accent: #217346;
+  --color-accent-dark: #185C37;
+  --color-back-main: #202124;
+  --color-back-components: #2d2e30;
+  --color-back-active: #3c4043;
+  --color-text-primary: #9ca2ad;
+  --color-text-secondary: #9aa0a6;
+  --color-border: #5f6368;
+  --color-error: #d97b72;
+  --color-error-border: #a54a44;
+  --color-on-accent: #c7d5bd;
 }

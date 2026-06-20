@@ -25,6 +25,9 @@ export type { FieldMode, FieldProps } from "./field";
 export { IconWrapper } from "./icon";
 export type { IconWrapperProps } from "./icon";
 
+export { Logo } from "./logo";
+export type { LogoProps, LogoVariant } from "./logo";
+
 export { Modal } from "./modal";
 export type { ModalProps } from "./modal";
 
@@ -39,3 +42,6 @@ export type { NavSelectItemProps } from "./nav-select-item";
 
 export { PasswordField } from "./password-field";
 export type { PasswordFieldProps } from "./password-field";
+
+export { ThemeIconButton } from "./theme-icon-button";
+export type { ThemeIconButtonProps, ThemeIconButtonTheme } from "./theme-icon-button";

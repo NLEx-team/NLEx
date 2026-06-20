@@ -1,8 +1,8 @@
 import { useEffect, useRef } from 'react';
 import { Icon } from '@iconify/react';
-import { Button } from '../../../shared/ui/button';
 import { ChatInput } from '../../../shared/ui/chat-input';
 import { ChatMessage } from '../../../shared/ui/chat-message';
+import { ThemeToggle } from '../../app/components/ThemeToggle';
 import type { ChatMessage as ChatMessageType } from '../types';
 import './Chat.css';
 
@@ -48,9 +48,10 @@ export function Chat({
             {activeSessionTitle ?? 'Chat'}
           </h1>
           <div className="chat__header-actions">
-            <Button variant="secondary">
+            <button type="button" className="chat__menu-btn" aria-label="Share chat">
               <Icon icon="mdi:share-outline" />
-            </Button>
+            </button>
+            <ThemeToggle className="chat__menu-btn" />
           </div>
         </header>
 

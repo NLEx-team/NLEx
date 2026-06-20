@@ -28,7 +28,7 @@ export const LoginForm: React.FC = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-md)' }}>
+    <form onSubmit={handleSubmit} className="auth-form">
       <Field
         label="Email"
         type="email"
@@ -47,11 +47,7 @@ export const LoginForm: React.FC = () => {
         errorText={error || undefined}
         disabled={loading}
       />
-      <Button 
-        type="submit" 
-        disabled={loading} 
-        style={{ width: '100%', marginTop: 'var(--spacing-sm)' }}
-      >
+      <Button type="submit" disabled={loading}>
         {loading ? 'Wait...' : 'Continue'}
       </Button>
     </form>

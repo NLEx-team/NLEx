@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { AuthToggle, type AuthToggleValue } from '../../../shared/ui';
+import { AuthToggle, Logo, type AuthToggleValue } from '../../../shared/ui';
 import { LoginForm } from './LoginForm';
 import { RegisterForm } from './RegisterForm';
 import { ProfileForm } from './ProfileForm';
@@ -21,8 +21,7 @@ export const AuthForm: React.FC = () => {
   return (
     <div className="auth-container">
       <header className="auth-header">
-        <h1 className="auth-logo">NLEx</h1>
-        <p className="auth-subtitle">Natural Language to Excel</p>
+        <Logo variant="full" />
       </header>
 
       {!isProfileSetupMode && (

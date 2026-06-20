@@ -46,8 +46,8 @@
   position: absolute;
   background-color: var(--color-back-main);
   border-radius: 50%;
-  width: 25px;
-  height: 25px;
+  width: calc(var(--icon-size) + var(--spacing-sm));
+  height: calc(var(--icon-size) + var(--spacing-sm));
   border: 1px solid var(--color-back-active);
   right: 0;
   bottom: 0;

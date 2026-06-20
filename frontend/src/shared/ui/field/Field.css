@@ -13,6 +13,7 @@
 .field__input-wrapper {
   position: relative;
   width: 100%;
+  overflow: hidden;
   border: var(--border-width) solid var(--color-back-active);
   border-radius: var(--input-radius);
   background: var(--color-back-main);
@@ -33,7 +34,10 @@
 
 .field__input {
   display: block;
+  box-sizing: border-box;
   width: 100%;
+  min-width: 0;
+  max-width: 100%;
   height: var(--components-height);
   padding: 0 var(--spacing-sm);
   border: none;
@@ -44,12 +48,85 @@
   outline: none;
 }
 
+.field__input[type="password"]::-webkit-credentials-auto-fill-button,
+.field__input[type="password"]::-webkit-strong-password-auto-fill-button {
+  visibility: hidden;
+  display: block;
+  width: 0;
+  height: 0;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  pointer-events: none;
+  position: absolute;
+  right: 0;
+}
+
 .field__input--has-left-icon {
-  padding-left: calc(var(--spacing-sm) + var(--icon-size) + var(--spacing-sm));
+  padding: 0 var(--spacing-sm) 0 calc(var(--spacing-sm) + var(--icon-size) + var(--spacing-sm));
 }
 
 .field__input--has-right-icon {
-  padding-right: calc(var(--spacing-sm) + var(--icon-size) + var(--spacing-sm));
+  padding: 0 calc(var(--spacing-sm) + var(--icon-size) + var(--spacing-sm)) 0 var(--spacing-sm);
+}
+
+.field__input--has-left-icon.field__input--has-right-icon {
+  padding: 0 calc(var(--spacing-sm) + var(--icon-size) + var(--spacing-sm)) 0 calc(var(--spacing-sm) + var(--icon-size) + var(--spacing-sm));
+}
+
+.field__input:-webkit-autofill,
+.field__input:-webkit-autofill:hover,
+.field__input:-webkit-autofill:focus,
+.field__input:-webkit-autofill:active,
+.field__input:autofill,
+.field__input:autofill:hover,
+.field__input:autofill:focus,
+.field__input:autofill:active {
+  appearance: none;
+  box-sizing: border-box;
+  width: 100% !important;
+  max-width: 100% !important;
+  height: var(--components-height) !important;
+  -webkit-text-fill-color: var(--color-text-primary);
+  caret-color: var(--color-text-primary);
+  box-shadow: 0 0 0 1000px var(--color-back-components) inset;
+  -webkit-box-shadow: 0 0 0 1000px var(--color-back-components) inset;
+  transition: background-color 9999s ease-out 0s;
+  padding: 0 var(--spacing-sm) !important;
+}
+
+.field__input.field__input--has-left-icon:-webkit-autofill,
+.field__input.field__input--has-left-icon:-webkit-autofill:hover,
+.field__input.field__input--has-left-icon:-webkit-autofill:focus,
+.field__input.field__input--has-left-icon:-webkit-autofill:active,
+.field__input.field__input--has-left-icon:autofill,
+.field__input.field__input--has-left-icon:autofill:hover,
+.field__input.field__input--has-left-icon:autofill:focus,
+.field__input.field__input--has-left-icon:autofill:active {
+  padding: 0 var(--spacing-sm) 0 calc(var(--spacing-sm) + var(--icon-size) + var(--spacing-sm)) !important;
+}
+
+.field__input.field__input--has-right-icon:-webkit-autofill,
+.field__input.field__input--has-right-icon:-webkit-autofill:hover,
+.field__input.field__input--has-right-icon:-webkit-autofill:focus,
+.field__input.field__input--has-right-icon:-webkit-autofill:active,
+.field__input.field__input--has-right-icon:autofill,
+.field__input.field__input--has-right-icon:autofill:hover,
+.field__input.field__input--has-right-icon:autofill:focus,
+.field__input.field__input--has-right-icon:autofill:active {
+  padding: 0 calc(var(--spacing-sm) + var(--icon-size) + var(--spacing-sm)) 0 var(--spacing-sm) !important;
+}
+
+.field__input.field__input--has-left-icon.field__input--has-right-icon:-webkit-autofill,
+.field__input.field__input--has-left-icon.field__input--has-right-icon:-webkit-autofill:hover,
+.field__input.field__input--has-left-icon.field__input--has-right-icon:-webkit-autofill:focus,
+.field__input.field__input--has-left-icon.field__input--has-right-icon:-webkit-autofill:active,
+.field__input.field__input--has-left-icon.field__input--has-right-icon:autofill,
+.field__input.field__input--has-left-icon.field__input--has-right-icon:autofill:hover,
+.field__input.field__input--has-left-icon.field__input--has-right-icon:autofill:focus,
+.field__input.field__input--has-left-icon.field__input--has-right-icon:autofill:active {
+  padding: 0 calc(var(--spacing-sm) + var(--icon-size) + var(--spacing-sm)) 0 calc(var(--spacing-sm) + var(--icon-size) + var(--spacing-sm)) !important;
 }
 
 .field__input::placeholder {
