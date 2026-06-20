@@ -4,7 +4,6 @@ from src.routers.auth import router as auth_router
 from src.routers.users import router as users_router
 from src.routers.chats import router as chats_router
 from src.routers.catalogs import router as catalogs_router
-from src.routers.export import router as export_router
 from src.middleware.auth import AuthMiddleware
 from src.database.session import engine, Base
 from rich.traceback import install
@@ -86,7 +85,6 @@ app.include_router(auth_router, prefix="/auth", tags=["auth"])
 app.include_router(users_router, prefix="/users", tags=["users"])
 app.include_router(chats_router, prefix="/chats", tags=["chats"])
 app.include_router(catalogs_router, prefix="/catalogs", tags=["catalogs"])
-app.include_router(export_router, prefix="/export", tags=["export"])
 
 @app.get("/")
 async def root() -> dict[str, str]:
