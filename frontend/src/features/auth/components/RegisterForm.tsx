@@ -2,7 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { Field, PasswordField, Button } from '../../../shared/ui';
 
-export const RegisterForm: React.FC = () => {
+interface RegisterFormProps {
+  onSuccess?: () => void;
+}
+
+export const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
   const { register } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -24,6 +28,9 @@ export const RegisterForm: React.FC = () => {
         email,
         password,
       });
+      if (onSuccess) {
+        onSuccess();
+      }
     } catch (err: any) {
       setError('Failed to register. Please try again.');
     } finally {

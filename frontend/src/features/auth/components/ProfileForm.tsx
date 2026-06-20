@@ -1,9 +1,14 @@
 import React, { useState } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { Field, Button, Avatar } from '../../../shared/ui';
+import { Icon } from "@iconify/react";
 import './ProfileForm.css';
 
-export const ProfileForm: React.FC = () => {
+interface ProfileFormProps {
+  onSuccess?: () => void;
+}
+
+export const ProfileForm: React.FC<ProfileFormProps> = ({ onSuccess }) => {
   const { updateProfile, user } = useAuth();
   const [firstName, setFirstName] = useState(user?.profile?.first_name || '');
   const [lastName, setLastName] = useState(user?.profile?.last_name || '');
@@ -31,6 +36,9 @@ export const ProfileForm: React.FC = () => {
       });
       // Ideally we would redirect or show success here
       console.log('Profile updated successfully');
+      if (onSuccess) {
+        onSuccess();
+      }
     } catch (err) {
       console.error('Failed to update profile:', err);
     } finally {
@@ -42,20 +50,25 @@ export const ProfileForm: React.FC = () => {
     // Allow user to skip this form
     console.log('Profile setup skipped');
     // Implement navigation to main app here
+    if (onSuccess) {
+      onSuccess();
+    }
   };
 
   return (
     <div className="profile-form-container">
       <header className="profile-header">
         <h2>Complete Your Profile</h2>
-        <p>Add some details to personalize your experience. You can always change this later.</p>
       </header>
 
       <form onSubmit={handleSubmit} className="profile-form">
         <div className="avatar-upload">
           <label className="avatar-label">
-            <Avatar src={avatarUrl} />
+            <Avatar src={avatarUrl} size="lg" />
             <input type="file" accept="image/*" onChange={handleAvatarChange} style={{ display: 'none' }} />
+            <div className="avatar-edit-icon">
+              <Icon icon="mdi:pencil" aria-hidden="true" />
+            </div>
           </label>
         </div>
 
