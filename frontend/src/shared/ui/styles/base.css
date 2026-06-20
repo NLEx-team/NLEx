@@ -20,3 +20,9 @@ textarea,
 select {
   font: inherit;
 }
+
+svg.iconify {
+  width: var(--icon-size);
+  height: var(--icon-size);
+  flex-shrink: 0;
+}

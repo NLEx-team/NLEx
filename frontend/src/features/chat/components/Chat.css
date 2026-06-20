@@ -47,8 +47,6 @@
 }
 
 .chat__header-actions .chat__menu-btn.icon {
-  width: 36px;
-  height: 36px;
   color: var(--color-text-primary);
 }
 
@@ -115,7 +113,6 @@
 
 .chat-message__pending-icon {
   animation: chat-message-spin 1s linear infinite;
-  font-size: 18px;
 }
 
 @keyframes chat-message-spin {

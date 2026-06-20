@@ -24,15 +24,14 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 24px;
-  height: 24px;
+  width: var(--icon-size);
+  height: var(--icon-size);
   padding: 0;
   border: none;
   border-radius: var(--radius);
   background: transparent;
   color: var(--color-text-secondary);
   cursor: pointer;
-  font-size: 18px;
 }
 
 .catalog-manager__add-btn:hover {

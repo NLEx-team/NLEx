@@ -110,11 +110,12 @@
   text-align: left;
   padding: var(--spacing-sm) var(--spacing-sm);
   white-space: nowrap;
+  border: var(--border-width) solid var(--color-border);
 }
 
 .chat-message__table td {
   padding: var(--spacing-sm) var(--spacing-sm);
-  border-top: var(--border-width) solid var(--color-back-active);
+  border: var(--border-width) solid var(--color-border);
   white-space: nowrap;
 }
 
