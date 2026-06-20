@@ -19,6 +19,7 @@
 
   /* radius */
   --radius: 6px;
+  --user-message-radius: 12px;
   --input-radius: 6px;
   --button-radius: 12px;
   --chat-input-radius: 12px;

@@ -1,8 +1,9 @@
-import { useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { Icon } from '@iconify/react';
 import { ChatInput } from '../../../shared/ui/chat-input';
 import { ChatMessage } from '../../../shared/ui/chat-message';
 import { ThemeToggle } from '../../app/components/ThemeToggle';
+import { chatApi } from '../api';
 import type { ChatMessage as ChatMessageType } from '../types';
 import './Chat.css';
 
@@ -27,6 +28,9 @@ export function Chat({
   pending,
   onToggleSidebar,
 }: ChatProps) {
+  const handleExport = useCallback((exportUrl: string) => {
+    chatApi.downloadExport(exportUrl);
+  }, []);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -48,9 +52,6 @@ export function Chat({
             {activeSessionTitle ?? 'Chat'}
           </h1>
           <div className="chat__header-actions">
-            <button type="button" className="chat__menu-btn" aria-label="Share chat">
-              <Icon icon="mdi:share-outline" />
-            </button>
             <ThemeToggle className="chat__menu-btn" />
           </div>
         </header>
@@ -66,7 +67,9 @@ export function Chat({
               key={msg.id}
               role={msg.role}
               blocks={msg.blocks}
+              exportUrl={msg.exportUrl}
               onClarify={handleClarification}
+              onExport={handleExport}
             />
           ))}
           {pending && (

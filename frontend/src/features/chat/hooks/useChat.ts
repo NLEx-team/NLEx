@@ -93,6 +93,7 @@ export function useChat() {
         role: 'assistant',
         blocks,
         timestamp: new Date().toISOString(),
+        exportUrl: response.export_url,
       };
       setMessages(prev => [...prev, assistantMsg]);
     } catch (err: any) {
@@ -121,6 +122,7 @@ export function useChat() {
         role: 'assistant',
         blocks,
         timestamp: new Date().toISOString(),
+        exportUrl: response.export_url,
       };
       setMessages(prev => [...prev, assistantMsg]);
     } catch (err: any) {

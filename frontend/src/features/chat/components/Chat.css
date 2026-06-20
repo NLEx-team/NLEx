@@ -98,7 +98,6 @@
 
 .chat__footer {
   padding: var(--spacing-md);
-  border-top: var(--border-width) solid var(--color-back-active);
   background: var(--color-back-main);
   flex-shrink: 0;
 }

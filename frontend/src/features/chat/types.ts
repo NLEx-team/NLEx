@@ -33,6 +33,7 @@ export interface ChatMessage {
   role: MessageRole;
   blocks: ContentBlock[];
   timestamp: string;
+  exportUrl?: string;
 }
 
 export interface ChatSession {
