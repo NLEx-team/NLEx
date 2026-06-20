@@ -12,6 +12,8 @@ interface ChatProps {
   inputValue: string;
   setInputValue: (value: string) => void;
   handleSendMessage: () => void;
+  handleClarification: (questionId: string, selectedOptions: string[]) => void;
+  pending: boolean;
   onToggleSidebar: () => void;
 }
 
@@ -21,6 +23,8 @@ export function Chat({
   inputValue,
   setInputValue,
   handleSendMessage,
+  handleClarification,
+  pending,
   onToggleSidebar,
 }: ChatProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -56,9 +60,24 @@ export function Chat({
               Start a conversation by typing a message below.
             </div>
           )}
-          {messages.map((msg, idx) => (
-            <ChatMessage key={idx} role={msg.role} content={msg.content} />
+          {messages.map((msg) => (
+            <ChatMessage
+              key={msg.id}
+              role={msg.role}
+              blocks={msg.blocks}
+              onClarify={handleClarification}
+            />
           ))}
+          {pending && (
+            <div className="chat-message chat-message--assistant">
+              <div className="chat-message__bubble">
+                <div className="chat-message__pending">
+                  <Icon icon="mdi:loading" className="chat-message__pending-icon" />
+                  <span>Processing...</span>
+                </div>
+              </div>
+            </div>
+          )}
           <div ref={messagesEndRef} />
         </div>
 

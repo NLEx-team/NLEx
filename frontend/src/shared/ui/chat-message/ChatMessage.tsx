@@ -1,10 +1,111 @@
-import type { ChatMessageProps } from "./ChatMessage.types";
-import "./ChatMessage.css";
+import { useState } from 'react';
+import { Icon } from '@iconify/react';
+import type { ChatMessageProps, OptionsBlock, TableBlock, ErrorBlock } from './ChatMessage.types';
+import './ChatMessage.css';
 
-export function ChatMessage({ role, content }: ChatMessageProps) {
+function TextBlockView({ text }: { text: string }) {
+  return <div className="chat-message__text">{text}</div>;
+}
+
+function OptionsBlockView({ block, onClarify }: { block: OptionsBlock; onClarify?: (questionId: string, selectedOptions: string[]) => void }) {
+  const [selected, setSelected] = useState<string | null>(null);
+
+  const handleSelect = (option: string) => {
+    setSelected(option);
+    onClarify?.(block.questionId, [option]);
+  };
+
+  return (
+    <div className="chat-message__options">
+      <div className="chat-message__question">{block.question}</div>
+      <div className="chat-message__options-list">
+        {block.options.map(option => (
+          <button
+            key={option}
+            className={`chat-message__option-btn ${selected === option ? 'chat-message__option-btn--selected' : ''}`}
+            onClick={() => handleSelect(option)}
+            disabled={selected !== null}
+            type="button"
+          >
+            {option}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function TableBlockView({ block }: { block: TableBlock }) {
+  return (
+    <div className="chat-message__table-wrapper">
+      <div className="chat-message__table-scroll">
+        <table className="chat-message__table">
+          <thead>
+            <tr>
+              {block.headers.map(header => (
+                <th key={header}>{header}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {block.rows.map((row, ri) => (
+              <tr key={ri}>
+                {row.map((cell: any, ci: number) => (
+                  <td key={ci}>{cell == null ? 'NULL' : String(cell)}</td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      {block.sql && (
+        <details className="chat-message__sql-details">
+          <summary className="chat-message__sql-summary">
+            <Icon icon="mdi:code-tags" />
+            <span>View SQL</span>
+          </summary>
+          <pre className="chat-message__sql">{block.sql}</pre>
+        </details>
+      )}
+    </div>
+  );
+}
+
+function ErrorBlockView({ block }: { block: ErrorBlock }) {
+  return (
+    <div className="chat-message__error">
+      <Icon icon="mdi:alert-circle-outline" />
+      <span>{block.message}</span>
+      {block.sql && (
+        <details className="chat-message__sql-details">
+          <summary className="chat-message__sql-summary">
+            <Icon icon="mdi:code-tags" />
+            <span>SQL attempted</span>
+          </summary>
+          <pre className="chat-message__sql">{block.sql}</pre>
+        </details>
+      )}
+    </div>
+  );
+}
+
+export function ChatMessage({ role, blocks, onClarify }: ChatMessageProps) {
   return (
     <div className={`chat-message chat-message--${role}`}>
-      <div className="chat-message__bubble">{content}</div>
+      <div className="chat-message__bubble">
+        {blocks.map((block, idx) => {
+          switch (block.type) {
+            case 'text':
+              return <TextBlockView key={idx} text={block.text} />;
+            case 'options':
+              return <OptionsBlockView key={idx} block={block} onClarify={onClarify} />;
+            case 'table':
+              return <TableBlockView key={idx} block={block} />;
+            case 'error':
+              return <ErrorBlockView key={idx} block={block} />;
+          }
+        })}
+      </div>
     </div>
   );
 }

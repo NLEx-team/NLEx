@@ -1,32 +1,140 @@
-import { useState, useCallback } from 'react';
-import type { ChatMessage, ChatSession } from '../types';
+import { useState, useCallback, useEffect, useRef } from 'react';
+import { chatApi } from '../api';
+import type { ChatMessage, ChatSession, ContentBlock } from '../types';
 
-const MOCK_SESSIONS: ChatSession[] = [
-  { id: '1', title: 'Data Analysis - Sales 2023' },
-  { id: '2', title: 'Inventory Report' },
-  { id: '3', title: 'User Feedback Summary' },
-];
+function generateId() {
+  return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+}
 
-const INITIAL_MESSAGES: ChatMessage[] = [
-  { role: 'assistant', content: 'Hello! How can I help you with your data today?' },
-];
+function parseBlocks(response: { result: { status: string; question?: string; options?: string[]; data?: any[][]; headers?: string[]; explanation?: string; sql?: string; message?: string } }): ContentBlock[] {
+  const r = response.result;
+  const blocks: ContentBlock[] = [];
+
+  if (r.status === 'clarification') {
+    blocks.push({
+      type: 'options',
+      questionId: generateId(),
+      question: r.question || '',
+      options: r.options || [],
+    });
+  } else if (r.status === 'success') {
+    if (r.explanation) {
+      blocks.push({ type: 'text', text: r.explanation });
+    }
+    if (r.data && r.headers) {
+      blocks.push({
+        type: 'table',
+        headers: r.headers,
+        rows: r.data,
+        sql: r.sql,
+        explanation: r.explanation,
+      });
+    }
+    if (!r.explanation && !r.data) {
+      blocks.push({ type: 'text', text: 'Request completed successfully.' });
+    }
+  } else if (r.status === 'error') {
+    blocks.push({
+      type: 'error',
+      message: r.message || 'An error occurred',
+      sql: r.sql,
+    });
+  }
+
+  return blocks;
+}
+
+const WELCOME_MESSAGE: ChatMessage = {
+  id: 'welcome',
+  role: 'assistant',
+  blocks: [{ type: 'text', text: 'Hello! How can I help you with your data today?' }],
+  timestamp: new Date().toISOString(),
+};
 
 export function useChat() {
-  const [sessions] = useState<ChatSession[]>(MOCK_SESSIONS);
-  const [activeSessionId, setActiveSessionId] = useState<string>(MOCK_SESSIONS[0]?.id ?? '');
-  const [messages, setMessages] = useState<ChatMessage[]>(INITIAL_MESSAGES);
+  const [sessions, setSessions] = useState<ChatSession[]>([]);
+  const [activeSessionId, setActiveSessionId] = useState<string>('');
+  const [messages, setMessages] = useState<ChatMessage[]>([WELCOME_MESSAGE]);
   const [inputValue, setInputValue] = useState('');
+  const [pending, setPending] = useState(false);
+  const chatIdRef = useRef<string | null>(null);
 
-  const handleSendMessage = useCallback(() => {
+  useEffect(() => {
+    chatApi.create().then(chat => {
+      chatIdRef.current = chat.id;
+      const session: ChatSession = { id: chat.id, title: chat.name };
+      setSessions([session]);
+      setActiveSessionId(chat.id);
+    }).catch(() => {
+      // fallback: keep welcome message only
+    });
+  }, []);
+
+  const handleSendMessage = useCallback(async () => {
     const text = inputValue.trim();
-    if (!text) return;
+    if (!text || pending || !chatIdRef.current) return;
 
-    const userMessage: ChatMessage = { role: 'user', content: text };
-    const assistantMessage: ChatMessage = { role: 'assistant', content: `This is a mock response to: ${text}` };
-
-    setMessages(prev => [...prev, userMessage, assistantMessage]);
     setInputValue('');
-  }, [inputValue]);
+
+    const userMsg: ChatMessage = {
+      id: generateId(),
+      role: 'user',
+      blocks: [{ type: 'text', text }],
+      timestamp: new Date().toISOString(),
+    };
+    setMessages(prev => [...prev, userMsg]);
+    setPending(true);
+
+    try {
+      const response = await chatApi.sendPrompt(chatIdRef.current, text);
+      const blocks = parseBlocks(response);
+      const assistantMsg: ChatMessage = {
+        id: generateId(),
+        role: 'assistant',
+        blocks,
+        timestamp: new Date().toISOString(),
+      };
+      setMessages(prev => [...prev, assistantMsg]);
+    } catch (err: any) {
+      const errorMsg: ChatMessage = {
+        id: generateId(),
+        role: 'assistant',
+        blocks: [{ type: 'error', message: err.message || 'Something went wrong' }],
+        timestamp: new Date().toISOString(),
+      };
+      setMessages(prev => [...prev, errorMsg]);
+    } finally {
+      setPending(false);
+    }
+  }, [inputValue, pending]);
+
+  const handleClarification = useCallback(async (questionId: string, selectedOptions: string[]) => {
+    if (!chatIdRef.current || pending) return;
+
+    setPending(true);
+
+    try {
+      const response = await chatApi.sendClarification(chatIdRef.current, questionId, selectedOptions);
+      const blocks = parseBlocks(response);
+      const assistantMsg: ChatMessage = {
+        id: generateId(),
+        role: 'assistant',
+        blocks,
+        timestamp: new Date().toISOString(),
+      };
+      setMessages(prev => [...prev, assistantMsg]);
+    } catch (err: any) {
+      const errorMsg: ChatMessage = {
+        id: generateId(),
+        role: 'assistant',
+        blocks: [{ type: 'error', message: err.message || 'Something went wrong' }],
+        timestamp: new Date().toISOString(),
+      };
+      setMessages(prev => [...prev, errorMsg]);
+    } finally {
+      setPending(false);
+    }
+  }, [pending]);
 
   const activeSession = sessions.find(s => s.id === activeSessionId);
 
@@ -36,8 +144,10 @@ export function useChat() {
     activeSession,
     messages,
     inputValue,
+    pending,
     setInputValue,
     setActiveSessionId,
     handleSendMessage,
+    handleClarification,
   };
 }
