@@ -3,6 +3,7 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 import { useAuth } from '../auth';
 import { AuthForm } from '../auth/components/AuthForm';
 import { Chat, ChatHistory, useChat } from '../chat';
+import { CatalogManager } from '../catalog';
 import { Sidebar } from './components/Sidebar';
 import './App.css';
 
@@ -36,6 +37,7 @@ export default function App() {
                   activeSessionId={chat.activeSessionId}
                   onSelectSession={chat.setActiveSessionId}
                 />
+                <CatalogManager />
               </Sidebar>
               <Chat
                 {...chat}
