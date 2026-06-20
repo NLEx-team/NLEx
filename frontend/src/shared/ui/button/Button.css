@@ -5,6 +5,7 @@
   border: var(--border-width) solid var(--color-accent-dark);
   cursor: pointer;
   transition: 0.2s;
+  width: 120px;
 }
 
 .button--primary {
@@ -33,4 +34,29 @@
 .button:focus-visible {
   outline: var(--focus-outline-width) solid var(--color-accent-dark);
   outline-offset: var(--focus-outline-offset);
+}
+
+.button--field {
+  width: 100%;
+  max-width: none;
+  height: var(--components-height);
+  padding: 0 var(--spacing-sm);
+  border-radius: var(--input-radius);
+  border-color: var(--color-back-active);
+  background: var(--color-back-main);
+  color: var(--color-text-primary);
+}
+
+.button--field:hover {
+  opacity: 1;
+  border-color: var(--color-accent);
+}
+
+.button--field:focus-visible {
+  outline: none;
+  border-color: var(--color-accent);
+}
+
+.button--field:active {
+  transform: none;
 }

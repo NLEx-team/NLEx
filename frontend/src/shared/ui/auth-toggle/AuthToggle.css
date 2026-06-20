@@ -17,7 +17,7 @@
   z-index: 1;
   width: 50%;
   height: 100%;
-  border: var(--border-width) solid var(--color-text-primary);
+  border: none;
   border-radius: var(--button-radius);
   background: var(--color-back-active);
   transition: left 250ms ease;

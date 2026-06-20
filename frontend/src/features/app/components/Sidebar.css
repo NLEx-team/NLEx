@@ -26,11 +26,22 @@
   flex-shrink: 0;
 }
 
-.sidebar__title {
-  margin: 0;
-  font-size: var(--font-size-title);
-  font-weight: 600;
-  color: var(--color-accent);
+.sidebar__menu-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: none;
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--color-text-primary);
+  cursor: pointer;
+}
+
+.sidebar__menu-btn:hover {
+  background: var(--color-back-components);
 }
 
 .sidebar__content {

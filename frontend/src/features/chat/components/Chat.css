@@ -1,6 +1,8 @@
 .chat {
   display: flex;
-  width: 100%;
+  flex: 1;
+  min-width: 0;
+  justify-content: center;
   height: 100vh;
   overflow: hidden;
   background: var(--color-back-main);
@@ -9,8 +11,8 @@
 .chat__layout {
   display: flex;
   flex-direction: column;
-  flex: 1;
-  min-width: 0;
+  width: 100%;
+  max-width: 720px;
   height: 100vh;
 }
 
@@ -37,10 +39,25 @@
   background: transparent;
   color: var(--color-text-primary);
   cursor: pointer;
+  flex-shrink: 0;
 }
 
 .chat__menu-btn:hover {
   background: var(--color-back-components);
+}
+
+.chat__header-actions .chat__menu-btn.icon {
+  width: 36px;
+  height: 36px;
+  color: var(--color-text-primary);
+}
+
+.chat__header-actions .theme-icon-button {
+  opacity: 1;
+}
+
+.chat__header-actions .theme-icon-button:hover {
+  opacity: 1;
 }
 
 .chat__title {
@@ -58,6 +75,7 @@
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
+  flex-shrink: 0;
 }
 
 .chat__messages {
