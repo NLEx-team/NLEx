@@ -55,8 +55,9 @@
 
 .chat-message__options-list {
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
   gap: var(--spacing-sm);
+  flex-wrap: wrap;
 }
 
 .chat-message__option-btn {
@@ -108,19 +109,47 @@
   color: var(--color-text-primary);
   font-weight: 600;
   text-align: left;
-  padding: var(--spacing-sm) var(--spacing-sm);
+  padding: var(--spacing-sm);
   white-space: nowrap;
-  border: var(--border-width) solid var(--color-border);
 }
 
 .chat-message__table td {
-  padding: var(--spacing-sm) var(--spacing-sm);
-  border: var(--border-width) solid var(--color-border);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-top: var(--border-width) solid var(--color-back-active);
+  padding: var(--spacing-sm);
   white-space: nowrap;
+}
+
+.chat-message__table-actions {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm);
+}
+
+.chat-message__export-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border: var(--border-width) solid var(--color-accent);
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--color-accent);
+  cursor: pointer;
+  font: inherit;
+  font-size: 12px;
+  white-space: nowrap;
+  transition: background 0.15s;
+}
+
+.chat-message__export-btn:hover {
+  background: var(--color-back-active);
 }
 
 .chat-message__sql-details {
   margin-top: var(--spacing-sm);
+  width: 100%;
 }
 
 .chat-message__sql-summary {
@@ -152,7 +181,7 @@
 .chat-message__error {
   display: flex;
   align-items: flex-start;
-  gap: var(--spacing-sm);
+  gap: var(--spacing-xs);
   color: var(--color-error);
   font-size: 14px;
 }
