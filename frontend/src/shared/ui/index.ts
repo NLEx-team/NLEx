@@ -7,6 +7,9 @@ export type { AuthToggleProps, AuthToggleValue } from "./auth-toggle";
 export { Button } from "./button";
 export type { ButtonProps, ButtonVariant } from "./button";
 
+export { Confirm, useConfirm } from "./confirm";
+export type { ConfirmProps } from "./confirm";
+
 export { ChatInput } from "./chat-input";
 export type { ChatInputProps } from "./chat-input";
 

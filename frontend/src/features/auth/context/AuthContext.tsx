@@ -12,6 +12,7 @@ export interface AuthContextType {
   register: (data: RegisterData) => Promise<void>;
   logout: () => void;
   refreshUser: () => Promise<void>;
+  updateProfile: (data: any) => Promise<void>;
 }
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -78,6 +79,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
+  const updateProfile = async (data: any) => {
+    try {
+      const updatedUser = await api.patch<User>('/users/me', data);
+      setUser(updatedUser);
+    } catch (error) {
+      throw error;
+    }
+  };
+
   const value = {
     user,
     token,
@@ -85,6 +95,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     isLoading,
     login,
     register,
+    updateProfile,
     logout,
     refreshUser,
   };

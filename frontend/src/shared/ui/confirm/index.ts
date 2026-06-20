@@ -1,0 +1,3 @@
+export { Confirm } from './Confirm';
+export type { ConfirmProps } from './Confirm.types';
+export { useConfirm } from './useConfirm';

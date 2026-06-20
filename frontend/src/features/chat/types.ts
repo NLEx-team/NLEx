@@ -1,4 +1,4 @@
-export type ChatMessageRole = 'user' | 'assistant';
+export type MessageRole = 'user' | 'assistant';
 
 export interface TextBlock {
   type: 'text';
@@ -28,8 +28,14 @@ export interface ErrorBlock {
 
 export type ContentBlock = TextBlock | OptionsBlock | TableBlock | ErrorBlock;
 
-export interface ChatMessageProps {
-  role: ChatMessageRole;
+export interface ChatMessage {
+  id: string;
+  role: MessageRole;
   blocks: ContentBlock[];
-  onClarify?: (questionId: string, selectedOptions: string[]) => void;
+  timestamp: string;
+}
+
+export interface ChatSession {
+  id: string;
+  title: string;
 }
