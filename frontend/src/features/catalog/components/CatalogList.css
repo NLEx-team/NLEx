@@ -102,6 +102,21 @@
   color: var(--color-accent);
 }
 
+.catalog-item__action-btn--loading > svg {
+  color: var(--color-accent);
+  cursor: wait;
+  animation: rotate 1s linear infinite;
+}
+
 .catalog-item__action-btn--delete:hover {
   color: #ef4444;
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }

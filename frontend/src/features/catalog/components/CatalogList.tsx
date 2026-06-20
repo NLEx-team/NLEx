@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Icon } from '@iconify/react';
 import { useAuth } from '../../auth/hooks/useAuth';
 import type { CatalogRead } from '../types';
@@ -17,6 +18,7 @@ const STATUS_LABELS: Record<string, string> = {
 };
 
 export function CatalogList({ catalogs, loading, onTest, onDelete }: CatalogListProps) {
+  const [isTesting, setIsTesting] = useState<boolean>(false);
   const { user } = useAuth();
   const isAdmin = user?.role === 'admin';
 
@@ -28,6 +30,16 @@ export function CatalogList({ catalogs, loading, onTest, onDelete }: CatalogList
     return <div className="catalog-list__empty">No catalogs connected</div>;
   }
 
+  const handleTest = async (id: string) => {
+    setIsTesting(true);
+    await onTest(id);
+    setIsTesting(false);
+  };
+
+  const handleDelete = (id: string) => {
+    onDelete(id);
+  };
+
   return (
     <div className="catalog-list">
       {catalogs.map(catalog => (
@@ -35,20 +47,25 @@ export function CatalogList({ catalogs, loading, onTest, onDelete }: CatalogList
           <span className={`catalog-item__status catalog-item__status--${catalog.status}`} />
           <div className="catalog-item__info">
             <div className="catalog-item__name">{catalog.name}</div>
-            <div className="catalog-item__meta">{STATUS_LABELS[catalog.status]}</div>
+            <div className="catalog-item__meta">{
+              isTesting ? 'Testing...' : STATUS_LABELS[catalog.status]
+            }</div>
           </div>
           {isAdmin && (
             <div className="catalog-item__actions">
               <button
-                className="catalog-item__action-btn catalog-item__action-btn--test"
-                onClick={() => onTest(catalog.id)}
+                className={
+                  "catalog-item__action-btn catalog-item__action-btn--test" + 
+                  (isTesting ? " catalog-item__action-btn--loading" : "")
+                }
+                onClick={() => handleTest(catalog.id)}
                 title="Test connection"
               >
                 <Icon icon="mdi:refresh" />
               </button>
               <button
                 className="catalog-item__action-btn catalog-item__action-btn--delete"
-                onClick={() => onDelete(catalog.id)}
+                onClick={() => handleDelete(catalog.id)}
                 title="Remove catalog"
               >
                 <Icon icon="mdi:delete-outline" />
