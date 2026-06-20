@@ -44,6 +44,7 @@ services:
       - "${BACKEND_PORT}:8000"
     volumes:
       - ./backend/src:/app/src
+      - exports_data:/app/exports
     env_file:
       - .env.secret
     depends_on:
@@ -171,8 +172,35 @@ services:
       - shared-net
       - app-net
 
+  # --- Test Company Database ---
+  # Populated with 1000 employees, projects, salaries, vacations
+  testbd-postgres:
+    profiles: ["dev"]
+    image: postgres:16-alpine
+    container_name: testbd_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: testbd
+    ports:
+      - "5434:5432"
+    volumes:
+      - testbd_data:/var/lib/postgresql/data
+      - ./testbdpostreSQL/db/schema.sql:/docker-entrypoint-initdb.d/01_schema.sql
+      - ./testbdpostreSQL/db/seed.sql:/docker-entrypoint-initdb.d/02_seed.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d testbd"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - app-net
+
 volumes:
   postgres_data:
+  testbd_data:
+  exports_data:
 
 networks:
   app-net:

@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.responses import FileResponse
 from uuid import UUID, uuid4
 from datetime import datetime
 from typing import List, Dict, Any
@@ -66,6 +67,31 @@ async def submit_clarification(
 
     try:
         return await controller.process_clarification(chat_id, clarification_text)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/{chat_id}/export")
+async def export_chat_to_excel(
+    chat_id: UUID,
+    controller: ChatController = Depends(get_chat_controller),
+    user = Depends(get_current_user)
+):
+    """
+    Export the last query result of a chat as a downloadable Excel file.
+    Returns a cached file if available, otherwise generates a new one.
+    """
+    try:
+        file_path = await controller.export_chat_result(chat_id)
+        return FileResponse(
+            path=file_path,
+            media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            filename=f"export_{chat_id.hex[:8]}.xlsx",
+            headers={
+                "Access-Control-Expose-Headers": "Content-Disposition",
+            },
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

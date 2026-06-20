@@ -43,6 +43,7 @@ class OrchestratorService:
         self.state = OrchestratorState.IDLE
         self.chat_history: List[Dict[str, str]] = []
         self.full_schema: Optional[Dict[str, Any]] = None
+        self.last_result: Optional[Dict[str, Any]] = None
         self.max_retries = settings.MAX_SQL_RETRIES
         self.active_catalogs: List[str] = []
 
@@ -104,8 +105,9 @@ class OrchestratorService:
         if not self.full_schema:
             await self.infer_relationships()
         
-        # Reset chat history for a new query
+        # Reset chat history and cached result for a new query
         self.chat_history = []
+        self.last_result = None
         
         self._transition(OrchestratorState.GENERATING_SQL)
         return await self._processing_loop(query)
@@ -169,7 +171,7 @@ class OrchestratorService:
             try:
                 data = await self.db_service.execute_query_async(sql)
                 self._transition(OrchestratorState.COMPLETED)
-                return {
+                success_result = {
                     "status": "success",
                     "data": data,
                     "headers": result.get("headers"),
@@ -177,6 +179,8 @@ class OrchestratorService:
                     "sql": sql,
                     "attempts": attempts + 1
                 }
+                self.last_result = success_result
+                return success_result
             except Exception as e:
                 attempts += 1
                 if attempts > self.max_retries:

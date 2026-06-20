@@ -32,3 +32,4 @@ asyncpg==0.29.0
 aiosqlite==0.20.0
 trino==0.337.0
 openai==2.41.1
+openpyxl==3.1.5
