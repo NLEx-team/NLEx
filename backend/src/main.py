@@ -51,6 +51,32 @@ async def create_default_admin():
                 await user_repo.create(db_admin)
                 print("Default admin created successfully.")
 
+async def sync_catalogs_on_startup():
+    """
+    Synchronizes all existing catalogs from the database to Trino on startup.
+    This ensures Trino knows about dynamic catalogs even after container restart.
+    """
+    async with engine.begin() as conn:
+        from src.database.session import AsyncSessionLocal
+        from src.repositories.catalog_repo import CatalogRepository
+        from src.services.catalog_service import CatalogService
+        from src.services.distributed_db import DistributedDatabaseService
+        
+        async with AsyncSessionLocal() as session:
+            repo = CatalogRepository(session)
+            db_service = DistributedDatabaseService(
+                host="trino", # Should be settings.TRINO_HOST if exists, but we'll use "trino" to match catalogs router
+                port=settings.TRINO_PORT,
+                user="trino"
+            )
+            catalog_service = CatalogService(repo, db_service)
+            
+            catalogs = await catalog_service.list_catalogs()
+            for catalog in catalogs:
+                print(f"Syncing catalog '{catalog.name}' to Trino...")
+                await catalog_service.sync_catalog(catalog.id)
+            print("Catalog synchronization complete.")
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Create tables on startup
@@ -59,6 +85,12 @@ async def lifespan(app: FastAPI):
     
     # Create default admin if missing
     await create_default_admin()
+    
+    # Sync catalogs to Trino
+    try:
+        await sync_catalogs_on_startup()
+    except Exception as e:
+        print(f"Failed to sync catalogs on startup: {e}")
     
     yield
     # Clean up on shutdown if needed

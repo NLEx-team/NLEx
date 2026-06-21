@@ -105,8 +105,8 @@ class OrchestratorService:
         if not self.full_schema:
             await self.infer_relationships()
         
-        # Reset chat history and cached result for a new query
-        self.chat_history = []
+        # Keep chat history so LLM retains context across multiple queries
+        # self.chat_history = []
         self.last_result = None
         
         self._transition(OrchestratorState.GENERATING_SQL)
@@ -151,6 +151,11 @@ class OrchestratorService:
                 from src.utils.prompts import USER_PROMPT_TEMPLATE
                 initial_msg = USER_PROMPT_TEMPLATE.format(schema=schema_str, user_prompt=current_prompt)
                 self.chat_history.append({"role": "user", "content": initial_msg})
+                current_prompt = None
+            elif current_prompt:
+                # Store subsequent user prompts in history
+                self.chat_history.append({"role": "user", "content": current_prompt})
+                current_prompt = None
 
             if result["status"] == "clarification":
                 self._transition(OrchestratorState.CLARIFICATION_REQUIRED)
