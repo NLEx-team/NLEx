@@ -1,3 +1,3 @@
-export { Chat, ChatHistory } from './components';
+export { Chat, ChatHistory, NewChatButton } from './components';
 export { useChat } from './hooks/useChat';
 export type { ChatMessage, ChatSession, MessageRole, ContentBlock } from './types';
