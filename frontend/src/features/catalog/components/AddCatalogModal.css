@@ -1,0 +1,42 @@
+.add-catalog-modal {
+  width: 420px;
+  max-width: calc(100vw - 32px);
+}
+
+.add-catalog-modal__title {
+  margin: 0 0 var(--spacing-lg);
+  font-size: var(--font-size-title);
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.add-catalog-modal__form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.add-catalog-modal__actions {
+  display: flex;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-sm);
+}
+
+.add-catalog-modal__actions-right {
+  display: flex;
+  gap: var(--spacing-sm);
+  margin-left: auto;
+}
+
+.add-catalog-modal__field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--input-gap);
+  width: 100%;
+}
+
+.add-catalog-modal__label {
+  font: inherit;
+  color: var(--color-text-primary);
+}

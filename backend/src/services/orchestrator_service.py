@@ -43,6 +43,7 @@ class OrchestratorService:
         self.state = OrchestratorState.IDLE
         self.chat_history: List[Dict[str, str]] = []
         self.full_schema: Optional[Dict[str, Any]] = None
+        self.last_result: Optional[Dict[str, Any]] = None
         self.max_retries = settings.MAX_SQL_RETRIES
         self.active_catalogs: List[str] = []
 
@@ -50,9 +51,9 @@ class OrchestratorService:
         logger.info(f"Orchestrator transition: {self.state.value} -> {to_state.value}")
         self.state = to_state
 
-    async def initialize_session(self, active_catalogs: List[str]):
+    async def initialize_session(self, active_catalogs: Dict[str, str]):
         """
-        Set up the session with the provided active catalogs.
+        Set up the session with the provided active catalogs (dict mapping cat_id to alias).
         """
         self.active_catalogs = active_catalogs
         if not self.active_catalogs:
@@ -71,7 +72,7 @@ class OrchestratorService:
             combined_schemas = []
             all_relationships = []
             
-            for catalog_name in self.active_catalogs:
+            for catalog_name, catalog_alias in self.active_catalogs.items():
                 # RelationshipInferenceService.get_augmented_schema returns full schema for ONE catalog
                 catalog_schema = await self.inference_service.get_augmented_schema(catalog_name)
                 
@@ -80,12 +81,13 @@ class OrchestratorService:
                 for schema in catalog_schema["schemas"]:
                     combined_schemas.append({
                         **schema,
-                        "catalog": catalog_name
+                        "catalog": catalog_name,
+                        "catalog_alias": catalog_alias
                     })
                 all_relationships.extend(catalog_schema.get("relationships", []))
             
             self.full_schema = {
-                "catalogs": self.active_catalogs,
+                "catalogs": list(self.active_catalogs.keys()),
                 "schemas": combined_schemas,
                 "relationships": all_relationships
             }
@@ -104,8 +106,9 @@ class OrchestratorService:
         if not self.full_schema:
             await self.infer_relationships()
         
-        # Reset chat history for a new query
-        self.chat_history = []
+        # Keep chat history so LLM retains context across multiple queries
+        # self.chat_history = []
+        self.last_result = None
         
         self._transition(OrchestratorState.GENERATING_SQL)
         return await self._processing_loop(query)
@@ -149,6 +152,11 @@ class OrchestratorService:
                 from src.utils.prompts import USER_PROMPT_TEMPLATE
                 initial_msg = USER_PROMPT_TEMPLATE.format(schema=schema_str, user_prompt=current_prompt)
                 self.chat_history.append({"role": "user", "content": initial_msg})
+                current_prompt = None
+            elif current_prompt:
+                # Store subsequent user prompts in history
+                self.chat_history.append({"role": "user", "content": current_prompt})
+                current_prompt = None
 
             if result["status"] == "clarification":
                 self._transition(OrchestratorState.CLARIFICATION_REQUIRED)
@@ -169,7 +177,7 @@ class OrchestratorService:
             try:
                 data = await self.db_service.execute_query_async(sql)
                 self._transition(OrchestratorState.COMPLETED)
-                return {
+                success_result = {
                     "status": "success",
                     "data": data,
                     "headers": result.get("headers"),
@@ -177,6 +185,8 @@ class OrchestratorService:
                     "sql": sql,
                     "attempts": attempts + 1
                 }
+                self.last_result = success_result
+                return success_result
             except Exception as e:
                 attempts += 1
                 if attempts > self.max_retries:

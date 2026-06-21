@@ -1,0 +1,87 @@
+import React, { useState, useEffect } from 'react';
+import { useAuth } from '../hooks/useAuth';
+import { Field, PasswordField, Button } from '../../../shared/ui';
+
+interface RegisterFormProps {
+  onSuccess?: (email: string, password: string) => void;
+}
+
+export const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
+  const { register } = useAuth();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [passwordRepeat, setPasswordRepeat] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email || !password) {
+      setError('Email and password are required');
+      return;
+    }
+    if (password !== passwordRepeat) {
+      setError('Passwords do not match');
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+    try {
+      await register({
+        email,
+        password,
+      });
+      if (onSuccess) {
+        onSuccess(email, password);
+      }
+    } catch (err: any) {
+      setError('Failed to register. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (password !== passwordRepeat && passwordRepeat.length && password.length) {
+      setError('Passwords do not match');
+    } else {
+      setError(null);
+    }
+  }, [password, passwordRepeat]);
+
+  return (
+    <form onSubmit={handleSubmit} className="auth-form">
+      <Field
+        label="Email"
+        type="email"
+        placeholder="Email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        mode={error && error !== 'Passwords do not match' ? 'error' : 'default'}
+        disabled={loading}
+      />
+      <PasswordField
+        label="Password"
+        placeholder="Password"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        mode={error ? 'error' : 'default'}
+        errorText={error || undefined}
+        disabled={loading}
+      />
+      <PasswordField
+        label="Repeat password"
+        placeholder="Repeat password"
+        value={passwordRepeat}
+        onChange={(e) => setPasswordRepeat(e.target.value)}
+        mode={error ? 'error' : 'default'}
+        errorText={error || undefined}
+        disabled={loading}
+      />
+      <Button type="submit" disabled={loading}>
+        {loading ? 'Wait...' : 'Continue'}
+      </Button>
+    </form>
+  );
+};

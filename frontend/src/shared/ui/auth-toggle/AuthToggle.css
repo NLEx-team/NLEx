@@ -1,0 +1,54 @@
+.auth-toggle {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  width: 100%;
+  height: var(--components-height);
+  overflow: hidden;
+  border: var(--border-width) solid var(--color-text-primary);
+  border-radius: var(--button-radius);
+  background: var(--color-back-components);
+}
+
+.auth-toggle__slider {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  width: 50%;
+  height: 100%;
+  border: none;
+  border-radius: var(--button-radius);
+  background: var(--color-back-active);
+  transition: left 250ms ease;
+  pointer-events: none;
+}
+
+.auth-toggle__segment {
+  position: relative;
+  z-index: 2;
+  flex: 1;
+  width: 50%;
+  padding: 0;
+  border: none;
+  background: transparent;
+  background-color: transparent;
+  color: var(--color-text-primary);
+  font: inherit;
+  text-align: center;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.auth-toggle__segment:hover,
+.auth-toggle__segment:focus,
+.auth-toggle__segment:active {
+  background: transparent;
+  background-color: transparent;
+}
+
+.auth-toggle__segment:focus-visible {
+  outline: var(--focus-outline-width) solid var(--color-accent);
+  outline-offset: calc(-1 * var(--focus-outline-offset));
+}

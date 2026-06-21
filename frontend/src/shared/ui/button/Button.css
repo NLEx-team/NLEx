@@ -1,0 +1,65 @@
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: var(--components-height);
+  border-radius: var(--button-radius);
+  padding: 0 var(--spacing-sm);
+  border: var(--border-width) solid var(--color-accent-dark);
+  cursor: pointer;
+  transition: 0.2s;
+  width: 120px;
+}
+
+.button--primary {
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+}
+
+.button--secondary {
+  background: var(--color-back-main);
+  color: var(--color-accent);
+}
+
+.button:hover {
+  opacity: 0.9;
+}
+
+.button:active {
+  transform: scale(0.98);
+}
+
+.button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.button:focus-visible {
+  outline: var(--focus-outline-width) solid var(--color-accent-dark);
+  outline-offset: var(--focus-outline-offset);
+}
+
+.button--field {
+  width: 100%;
+  max-width: none;
+  height: var(--components-height);
+  padding: 0 var(--spacing-sm);
+  border-radius: var(--input-radius);
+  border-color: var(--color-back-active);
+  background: var(--color-back-main);
+  color: var(--color-text-primary);
+}
+
+.button--field:hover {
+  opacity: 1;
+  border-color: var(--color-accent);
+}
+
+.button--field:focus-visible {
+  outline: none;
+  border-color: var(--color-accent);
+}
+
+.button--field:active {
+  transform: none;
+}

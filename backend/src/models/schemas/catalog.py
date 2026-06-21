@@ -32,3 +32,8 @@ class CatalogRead(CatalogCreate):
     
     model_config = ConfigDict(from_attributes=True)
 
+class CatalogTestResult(BaseModel):
+    success: bool
+    latency_ms: Optional[int] = None
+    error: Optional[str] = None
+
