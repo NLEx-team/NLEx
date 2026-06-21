@@ -175,9 +175,11 @@ export function AddCatalogModal({ isOpen, onClose, onSubmit, initialData, onDele
                   Delete
                 </Button>
               )}
+              {/*
               <Button type="button" onClick={handleEditStart}>
                 Edit
               </Button>
+              */}
             </div>
           </div>
         </div>
