@@ -16,7 +16,7 @@ Due to the customer's sudden emergency relocation to Moscow, a full end-of-sprin
 ---
 
 ## 3. Product Backlog Metrics & Methodology
-* **Total Product Backlog Size:** `[Insert Total Story Points of all 18 PBIs here, e.g., 95]` Story Points
+* **Total Product Backlog Size:** 95 Story Points
 * **Total Current Sprint Size:** 61 Story Points
 * **Backlog Management & Tracking Rules:**
   * **PBI Decompositions:** User stories are converted into technical Product Backlog Items (PBIs) and annotated with strict, testable acceptance criteria before execution.
@@ -141,12 +141,14 @@ Due to the customer's sudden emergency relocation to Moscow, a full end-of-sprin
 * **Sprint Milestone Containers:** Tracked dynamically using GitHub Milestones.
 
 ### Team Contribution Traceability Blueprint
-| Team Member Name | GitHub Username | Assigned PBIs | Created PRs | Review / Comments Left |
-|---|---|---|---|---|
-| `[Developer 1 Name]` | `[Username 1]` | PBI-001, PBI-003 | `[PR Link 1]` | `[PR Link 2 Code Review Comment]` |
-| `[Developer 2 Name]` | `[Username 2]` | PBI-002, PBI-006 | `[PR Link 2]` | `[PR Link 1 Code Review Comment]` |
-| `[Developer 3 Name]` | `[Username 3]` | PBI-011, PBI-008 | `[PR Link 3]` | `[PR Link 4 Code Review Comment]` |
-| `[Developer 4 Name]` | `[Username 4]` | PBI-004, PBI-005 | `[PR Link 4]` | `[PR Link 3 Code Review Comment]` |
+| Team Member Name | GitHub Username | Assigned PBIs |
+|---|---|---|
+| Merkushev Maksim | MaksimMerkushev | PBI-006 |
+| Maltsev Maksim | Maksim-1307 | PBI-001, PBI-002, PBI-005, PBI-008, PBI-010 |
+| Systerova Polina | plnsstrv | PBI-003 |
+| Ianturina Ramina | RaminaYanturina | PBI-007 |
+| Savchenko Liubov | NoName12299 | PBI-003, PBI-015 |
+| Serafim Soldatov | SerafimSoldatov | PBI-011 |
 
 ---
 
@@ -154,21 +156,21 @@ Due to the customer's sudden emergency relocation to Moscow, a full end-of-sprin
 
 ### Deployment & Access Context
 * **Live Deployment Target:** [https://nlex.tech](https://nlex.tech)
-* **Deployment Instructions:** Accessible via the core infrastructure directory at [NLEx App Root Setup](../../README.md)
+* **Deployment Instructions:** Accessible via the core infrastructure layout setup at [NLEx App Root Setup](../../README.md)
 * **Source Repository Address:** [https://github.com/NLEx-team/NLEx](https://github.com/NLEx-team/NLEx) (Tracking branch: `main`)
-* **Public Video Walkthrough Demonstration:** https://drive.google.com/file/d/1lYX10NJpp_ggTlxNltmux9hzM-Sh2hQz/view?usp=sharing
+* **Public Video Walkthrough Demonstration:** [Google Drive Shared Walkthrough Video](https://drive.google.com/file/d/1lYX10NJpp_ggTlxNltmux9hzM-Sh2hQz/view?usp=sharing)
 
 ### Configuration & Base Templates
-* **Issue Templates Directory:** [GitHub Issue Templates](../../.github/ISSUE_TEMPLATE/) *(or dynamic system tracking components)*
+* **Issue Templates Directory:** [GitHub Issue Templates](../../.github/ISSUE_TEMPLATE/) *(dynamic management component)*
 * **Extended PR/MR Template File:** [Pull Request Template](../week2/PR_Template.md)
-* **Semantic Version Release Mapping:** [NLEx Release v1.0.0-pre](https://github.com/NLEx-team/NLEx/releases)
+* **Semantic Version Release Mapping:** [NLEx Release Tracking Dashboard](https://github.com/NLEx-team/NLEx/releases)
 
 ### Execution Traceability Logs
 * **Historical User Stories Register (Week 2):** [reports/week2/user-stories.md](../week2/user-stories.md)
-* **Current Active User Stories Register (Week 3 Mapping Index):** [docs/user-stories.md](../../docs/user-stories.md)
-* **Shared Process Specification Guide:** [Process_Requirements.md](../../Process_Requirements.md)
-* **Product Vision & Roadmap Plan:** [roadmap.md](roadmap.md)
+* **Shared Process Specification Guide:** [Process_Requirements.md](../../Process_Requirements.md) *(Referenced tracking source)*
+* **Product Vision & Roadmap Plan:** [roadmap.md](../../docs/roadmap.md)
 * **Definition of Done Document:** [definition-of-done.md](definition-of-done.md)
+* **Customer Review Notes:** [customer-review-notes.md](customer-review-notes.md)
 * **Sprint Retrospective Evaluation:** [retrospective.md](retrospective.md)
 * **Sprint Performance Reflection:** [reflection.md](reflection.md)
 * **LLM Core Usage Documentation:** [llm-report.md](llm-report.md)
@@ -178,22 +180,13 @@ Due to the customer's sudden emergency relocation to Moscow, a full end-of-sprin
 ## 7. Operational Board & Environment Evidence (Screenshots)
 
 ### A. Product Backlog Overview View
-![Product Backlog Board](images/product_backlog_board.png)
+![Product Backlog Board](images/product_backlog_view.png)
 
-### B. Current Sprint Backlog Board
-![Sprint Backlog View](images/sprint_backlog_board.png)
+### B. Active Sprint Milestone Metrics & Current Sprint Backlog Board
+![Sprint Milestone and Backlog Container](images/Milestone_and_Sprint_Backlog.png)
 
-### C. Active Sprint Milestone Metrics & Boundaries
-![Sprint Milestone View](images/sprint_milestone.png)
+### C. Live Pre-MVP v1.0 Functional Verification
+![Pre-MVP 1.0 Deployment Verification](images/MVP1.0.png)
 
-### D. MVP Version Field Grouping Layout
-![MVP Field Grouped View](images/mvp_version_view.png)
-
-### E. Semantic Versioning Release Documentation Page
-![SemVer Release Version Page](images/semver_release.png)
-
-### F. Functional UI Live Demonstration Screen
-![Live Application UI Workspace](images/live_mvp_application.png)
-
-### G. Issue-Linked Peer Code Review & Verification Event
-![Reviewed Issue Linked Pull Request Workflow](images/reviewed_pull_request.png)
+### D. Issue-Linked Peer Code Review & Branch Workflow Verification
+![Reviewed Issue Linked Pull Request Workflow](images/PR-example.png)
