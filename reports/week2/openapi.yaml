@@ -1,0 +1,1193 @@
+openapi: "3.1.0"
+info:
+  title: NLEx
+  version: 1.0.0
+paths:
+  /auth/register:
+    post:
+      tags:
+      - auth
+      summary: Register
+      operationId: register_auth_register_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegisterResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /auth/login:
+    post:
+      tags:
+      - auth
+      summary: Login
+      operationId: login_auth_login_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /users/me:
+    get:
+      tags:
+      - users
+      summary: Me
+      operationId: me_users_me_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserRead'
+      security:
+      - HTTPBearer: []
+    delete:
+      tags:
+      - users
+      summary: Delete Me
+      operationId: delete_me_users_me_delete
+      responses:
+        '204':
+          description: Successful Response
+      security:
+      - HTTPBearer: []
+    patch:
+      tags:
+      - users
+      summary: Update Me
+      operationId: update_me_users_me_patch
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserUpdate'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserRead'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      security:
+      - HTTPBearer: []
+  /users/{id}:
+    get:
+      tags:
+      - users
+      summary: Get User
+      operationId: get_user_users__id__get
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserRead'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    patch:
+      tags:
+      - users
+      summary: Update User
+      operationId: update_user_users__id__patch
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserAdminUpdate'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserRead'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    delete:
+      tags:
+      - users
+      summary: Delete User
+      operationId: delete_user_users__id__delete
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Id
+      responses:
+        '204':
+          description: Successful Response
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /users:
+    get:
+      tags:
+      - users
+      summary: Get All Users
+      operationId: get_all_users_users_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/UserRead'
+                type: array
+                title: Response Get All Users Users Get
+      security:
+      - HTTPBearer: []
+  /chats:
+    post:
+      tags:
+      - chats
+      summary: Create Chat
+      operationId: create_chat_chats_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChatCreateRequest'
+        required: true
+      responses:
+        '201':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChatRead'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      security:
+      - HTTPBearer: []
+  /chats/{chat_id}:
+    get:
+      tags:
+      - chats
+      summary: Get Chat
+      operationId: get_chat_chats__chat_id__get
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: chat_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Chat Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChatRead'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    delete:
+      tags:
+      - chats
+      summary: Delete Chat
+      operationId: delete_chat_chats__chat_id__delete
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: chat_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Chat Id
+      responses:
+        '204':
+          description: Successful Response
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /chats/{chat_id}/schema:
+    get:
+      tags:
+      - chats
+      summary: Get Schema Snapshot
+      operationId: get_schema_snapshot_chats__chat_id__schema_get
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: chat_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Chat Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SchemaSnapshot'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /chats/{chat_id}/prompt:
+    post:
+      tags:
+      - chats
+      summary: Submit Prompt
+      operationId: submit_prompt_chats__chat_id__prompt_post
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: chat_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Chat Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PromptRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DraftRead'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /chats/{chat_id}/draft:
+    get:
+      tags:
+      - chats
+      summary: Get Draft
+      operationId: get_draft_chats__chat_id__draft_get
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: chat_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Chat Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DraftRead'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /chats/{chat_id}/draft:revise:
+    post:
+      tags:
+      - chats
+      summary: Revise Draft
+      operationId: revise_draft_chats__chat_id__draft_revise_post
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: chat_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Chat Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReviseRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DraftRead'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /chats/{chat_id}/draft:confirm:
+    post:
+      tags:
+      - chats
+      summary: Confirm Draft
+      operationId: confirm_draft_chats__chat_id__draft_confirm_post
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: chat_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Chat Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DraftRead'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /chats/{chat_id}/clarifications:
+    post:
+      tags:
+      - chats
+      summary: Submit Clarification
+      operationId: submit_clarification_chats__chat_id__clarifications_post
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: chat_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Chat Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ClarificationAnswer'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DraftRead'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /chats/{chat_id}/execution:
+    get:
+      tags:
+      - chats
+      summary: Get Execution Status
+      operationId: get_execution_status_chats__chat_id__execution_get
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: chat_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Chat Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExecutionStatus'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /connections:
+    get:
+      tags:
+      - connections
+      summary: List Connections
+      operationId: list_connections_connections_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/DatabaseConnectionRead'
+                type: array
+                title: Response List Connections Connections Get
+      security:
+      - HTTPBearer: []
+    post:
+      tags:
+      - connections
+      summary: Create Connection
+      operationId: create_connection_connections_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConnectionCreateRequest'
+        required: true
+      responses:
+        '201':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DatabaseConnectionRead'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      security:
+      - HTTPBearer: []
+  /connections/{connection_id}:
+    get:
+      tags:
+      - connections
+      summary: Get Connection
+      operationId: get_connection_connections__connection_id__get
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: connection_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Connection Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DatabaseConnectionRead'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    patch:
+      tags:
+      - connections
+      summary: Update Connection
+      operationId: update_connection_connections__connection_id__patch
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: connection_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Connection Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConnectionUpdateRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DatabaseConnectionRead'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    delete:
+      tags:
+      - connections
+      summary: Delete Connection
+      operationId: delete_connection_connections__connection_id__delete
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: connection_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Connection Id
+      responses:
+        '204':
+          description: Successful Response
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /connections/{connection_id}/check:
+    get:
+      tags:
+      - connections
+      summary: Check Connection
+      operationId: check_connection_connections__connection_id__check_get
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: connection_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Connection Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CheckConnectionResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /connections/{connection_id}/finalize:
+    post:
+      tags:
+      - connections
+      summary: Finalize Connection
+      operationId: finalize_connection_connections__connection_id__finalize_post
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: connection_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Connection Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SchemaSnapshot'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /:
+    get:
+      summary: Root
+      operationId: root__get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                additionalProperties:
+                  type: string
+                type: object
+                title: Response Root  Get
+components:
+  schemas:
+    ChatCreateRequest:
+      properties:
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        connection_ids:
+          items:
+            type: string
+            format: uuid
+          type: array
+          title: Connection Ids
+          default: []
+      type: object
+      title: ChatCreateRequest
+    ChatRead:
+      properties:
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        id:
+          type: string
+          format: uuid
+          title: Id
+        status:
+          $ref: '#/components/schemas/ChatStatus'
+        created_at:
+          type: string
+          format: date-time
+          title: Created At
+        updated_at:
+          type: string
+          format: date-time
+          title: Updated At
+      type: object
+      required:
+      - id
+      - status
+      - created_at
+      - updated_at
+      title: ChatRead
+    ChatStatus:
+      type: string
+      enum:
+      - idle
+      - collecting_schemas
+      - ready_for_prompt
+      - generating_draft
+      - draft_ready
+      - awaiting_clarification
+      - executing
+      - completed
+      title: ChatStatus
+    CheckConnectionResponse:
+      properties:
+        status:
+          type: string
+          title: Status
+        error:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Error
+      type: object
+      required:
+      - status
+      title: CheckConnectionResponse
+    ClarificationAnswer:
+      properties:
+        question_id:
+          type: string
+          title: Question Id
+        selected_options:
+          items:
+            type: string
+          type: array
+          title: Selected Options
+        custom_answer:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Custom Answer
+      type: object
+      required:
+      - question_id
+      - selected_options
+      title: ClarificationAnswer
+    ConnectionCreateRequest:
+      properties:
+        name:
+          type: string
+          title: Name
+        type:
+          type: string
+          title: Type
+        connection_params:
+          additionalProperties: true
+          type: object
+          title: Connection Params
+      type: object
+      required:
+      - name
+      - type
+      - connection_params
+      title: ConnectionCreateRequest
+    ConnectionUpdateRequest:
+      properties:
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        type:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Type
+        connection_params:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Connection Params
+      type: object
+      title: ConnectionUpdateRequest
+    DatabaseConnectionRead:
+      properties:
+        id:
+          type: string
+          format: uuid
+          title: Id
+        name:
+          type: string
+          title: Name
+        type:
+          type: string
+          title: Type
+        status:
+          type: string
+          title: Status
+      type: object
+      required:
+      - id
+      - name
+      - type
+      - status
+      title: DatabaseConnectionRead
+    DraftRead:
+      properties:
+        metrics:
+          items:
+            type: string
+          type: array
+          title: Metrics
+        dimensions:
+          items:
+            type: string
+          type: array
+          title: Dimensions
+        filters:
+          items:
+            additionalProperties: true
+            type: object
+          type: array
+          title: Filters
+        sql:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Sql
+        status:
+          type: string
+          title: Status
+      type: object
+      required:
+      - metrics
+      - dimensions
+      - filters
+      - status
+      title: DraftRead
+    ExecutionStatus:
+      properties:
+        chat_id:
+          type: string
+          format: uuid
+          title: Chat Id
+        status:
+          type: string
+          title: Status
+        progress:
+          type: number
+          title: Progress
+        result_url:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Result Url
+      type: object
+      required:
+      - chat_id
+      - status
+      - progress
+      title: ExecutionStatus
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
+    LoginRequest:
+      properties:
+        email:
+          type: string
+          format: email
+          title: Email
+        password:
+          type: string
+          maxLength: 128
+          minLength: 8
+          title: Password
+      type: object
+      required:
+      - email
+      - password
+      title: LoginRequest
+    LoginResponse:
+      properties:
+        jwt_token:
+          type: string
+          title: Jwt Token
+        user:
+          $ref: '#/components/schemas/UserRead'
+      type: object
+      required:
+      - jwt_token
+      - user
+      title: LoginResponse
+    PromptRequest:
+      properties:
+        prompt:
+          type: string
+          title: Prompt
+      type: object
+      required:
+      - prompt
+      title: PromptRequest
+    RegisterRequest:
+      properties:
+        email:
+          type: string
+          format: email
+          title: Email
+        password:
+          type: string
+          maxLength: 128
+          minLength: 8
+          title: Password
+        first_name:
+          anyOf:
+          - type: string
+            maxLength: 128
+            minLength: 2
+          - type: 'null'
+          title: First Name
+        last_name:
+          anyOf:
+          - type: string
+            maxLength: 128
+            minLength: 2
+          - type: 'null'
+          title: Last Name
+        avatar:
+          type: string
+          maxLength: 2083
+          minLength: 1
+          format: uri
+          title: Avatar
+      type: object
+      required:
+      - email
+      - password
+      title: RegisterRequest
+    RegisterResponse:
+      properties:
+        user:
+          $ref: '#/components/schemas/UserRead'
+      type: object
+      required:
+      - user
+      title: RegisterResponse
+    ReviseRequest:
+      properties:
+        instruction:
+          type: string
+          title: Instruction
+      type: object
+      required:
+      - instruction
+      title: ReviseRequest
+    SchemaSnapshot:
+      properties:
+        tables:
+          items:
+            additionalProperties: true
+            type: object
+          type: array
+          title: Tables
+        relationships:
+          items:
+            additionalProperties: true
+            type: object
+          type: array
+          title: Relationships
+      type: object
+      required:
+      - tables
+      - relationships
+      title: SchemaSnapshot
+    UserAdminUpdate:
+      properties:
+        first_name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: First Name
+        last_name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Last Name
+        avatar_url:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Avatar Url
+        email:
+          anyOf:
+          - type: string
+            format: email
+          - type: 'null'
+          title: Email
+        role:
+          anyOf:
+          - $ref: '#/components/schemas/UserRole'
+          - type: 'null'
+      type: object
+      title: UserAdminUpdate
+    UserProfileRead:
+      properties:
+        first_name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: First Name
+        last_name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Last Name
+        avatar_url:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Avatar Url
+        id:
+          type: string
+          format: uuid
+          title: Id
+        updated_at:
+          type: string
+          format: date-time
+          title: Updated At
+      type: object
+      required:
+      - id
+      - updated_at
+      title: UserProfileRead
+    UserRead:
+      properties:
+        email:
+          type: string
+          format: email
+          title: Email
+        role:
+          $ref: '#/components/schemas/UserRole'
+          default: visitor
+        id:
+          type: string
+          format: uuid
+          title: Id
+        created_at:
+          type: string
+          format: date-time
+          title: Created At
+        updated_at:
+          type: string
+          format: date-time
+          title: Updated At
+        profile:
+          anyOf:
+          - $ref: '#/components/schemas/UserProfileRead'
+          - type: 'null'
+      type: object
+      required:
+      - email
+      - id
+      - created_at
+      - updated_at
+      title: UserRead
+    UserRole:
+      type: string
+      enum:
+      - admin
+      - visitor
+      title: UserRole
+    UserUpdate:
+      properties:
+        first_name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: First Name
+        last_name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Last Name
+        avatar_url:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Avatar Url
+        email:
+          anyOf:
+          - type: string
+            format: email
+          - type: 'null'
+          title: Email
+      type: object
+      title: UserUpdate
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          type: array
+          title: Location
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
+        input:
+          title: Input
+        ctx:
+          type: object
+          title: Context
+      type: object
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
+  securitySchemes:
+    HTTPBearer:
+      type: http
+      scheme: bearer
