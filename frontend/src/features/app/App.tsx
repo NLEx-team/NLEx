@@ -3,7 +3,7 @@ import { Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-
 import { useAuth } from '../auth';
 import { AuthForm } from '../auth/components/AuthForm';
 import { UserProfilePage } from '../auth/components/UserProfilePage';
-import { Chat, ChatHistory, NewChatButton, useChat } from '../chat';
+import { Chat, ChatHistory, useChat } from '../chat';
 import { CatalogManager } from '../catalog';
 import { AppHeader } from './components/AppHeader';
 import { Sidebar } from './components/Sidebar';
@@ -17,7 +17,6 @@ function ChatPage() {
   return (
     <>
       <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)}>
-        <NewChatButton />
         <ChatHistory
           sessions={chat.sessions}
           activeSessionId={chat.activeSessionId}
