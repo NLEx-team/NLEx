@@ -6,7 +6,8 @@ import { Confirm } from '../../../shared/ui/confirm';
 import { useCatalogs } from '../hooks/useCatalogs';
 import { CatalogList } from './CatalogList';
 import { AddCatalogModal } from './AddCatalogModal';
-import type { CatalogCreate } from '../types';
+import { catalogApi } from '../api';
+import type { CatalogRead, CatalogCreate } from '../types';
 
 export function CatalogManager() {
   const { user } = useAuth();
@@ -30,6 +31,17 @@ export function CatalogManager() {
     setPendingDeleteId(null);
   }, [confirm, deleteCatalog]);
 
+  const handleInfo = useCallback(async (cat: CatalogRead) => {
+    try {
+      const freshList = await catalogApi.list();
+      const fresh = freshList.find(c => c.id === cat.id) || cat;
+      setSelectedCatalog(fresh);
+    } catch {
+      setSelectedCatalog(cat);
+    }
+    setIsModalOpen(true);
+  }, []);
+
   const catalogName = pendingDeleteId
     ? catalogs.find(c => c.id === pendingDeleteId)?.name
     : '';
@@ -46,7 +58,7 @@ export function CatalogManager() {
           onTest={testCatalog}
           onDelete={handleDelete}
           onAdd={() => { setSelectedCatalog(null); setIsModalOpen(true); }}
-          onInfo={(cat) => { setSelectedCatalog(cat); setIsModalOpen(true); }}
+          onInfo={handleInfo}
         />
       </SidebarSection>
 
