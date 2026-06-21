@@ -4,18 +4,12 @@ import { Field, Button, Avatar } from '../../../shared/ui';
 import { Icon } from "@iconify/react";
 import './ProfileForm.css';
 
-interface ProfileData {
-  first_name?: string;
-  last_name?: string;
-  avatar_url?: string;
-}
-
 interface ProfileFormProps {
-  onSuccess?: (data?: ProfileData) => void;
+  onSuccess?: () => void;
 }
 
 export const ProfileForm: React.FC<ProfileFormProps> = ({ onSuccess }) => {
-  const { user } = useAuth();
+  const { updateProfile, user } = useAuth();
   const [firstName, setFirstName] = useState(user?.profile?.first_name || '');
   const [lastName, setLastName] = useState(user?.profile?.last_name || '');
   const [avatarUrl, setAvatarUrl] = useState(user?.profile?.avatar_url || '');
@@ -33,16 +27,20 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({ onSuccess }) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    // Simulate minor delay to show loading state
-    await new Promise(resolve => setTimeout(resolve, 500));
-    setLoading(false);
-    
-    if (onSuccess) {
-      onSuccess({
+    try {
+      await updateProfile({
         first_name: firstName,
         last_name: lastName,
         avatar_url: avatarUrl,
       });
+      // Ideally we would redirect or show success here
+      if (onSuccess) {
+        onSuccess();
+      }
+    } catch (err) {
+      // Error is handled by the form UI
+    } finally {
+      setLoading(false);
     }
   };
 

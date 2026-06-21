@@ -7,7 +7,7 @@ import { ProfileForm } from './ProfileForm';
 import './AuthForm.css';
 
 export const AuthForm: React.FC = () => {
-  const { login, updateProfile } = useAuth();
+  const { login } = useAuth();
   const [mode, setMode] = useState<AuthToggleValue>('login');
   const [isProfileSetupMode, setIsProfileSetupMode] = useState(false);
   const credentialsRef = useRef<{ email: string; password: string } | null>(null);
@@ -17,18 +17,14 @@ export const AuthForm: React.FC = () => {
     setIsProfileSetupMode(true);
   };
 
-  const handleProfileComplete = async (profileData?: {first_name?: string; last_name?: string; avatar_url?: string}) => {
+  const handleProfileComplete = async () => {
     const creds = credentialsRef.current;
     if (creds) {
-      try {
-        await login(creds);
-        if (profileData) {
-          await updateProfile(profileData);
-        }
-      } catch (err) {
-        console.error('Failed to complete login/profile step:', err);
-      }
+      await login(creds);
     }
+    credentialsRef.current = null;
+    setIsProfileSetupMode(false);
+    setMode('login');
   };
 
   return (
