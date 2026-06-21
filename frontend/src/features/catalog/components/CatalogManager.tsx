@@ -7,7 +7,6 @@ import { useCatalogs } from '../hooks/useCatalogs';
 import { CatalogList } from './CatalogList';
 import { AddCatalogModal } from './AddCatalogModal';
 import type { CatalogCreate } from '../types';
-import './CatalogManager.css';
 
 export function CatalogManager() {
   const { user } = useAuth();

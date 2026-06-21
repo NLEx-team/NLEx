@@ -4,10 +4,13 @@
   gap: var(--spacing-sm);
   padding: 5px;
   border: var(--border-width) solid var(--color-back-active);
-  border-radius: 6px;
+  border-radius: var(--radius);
 }
 
 .sidebar-section__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   padding: 0;
 }
 
@@ -17,7 +20,7 @@
   border: none;
   background: transparent;
   font: inherit;
-  font-size: 12px;
+  font-size: var(--font-size-xs);
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -34,6 +37,25 @@
   outline: var(--focus-outline-width) solid var(--color-accent);
   outline-offset: var(--focus-outline-offset);
   border-radius: var(--radius);
+}
+
+.sidebar-section__add-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--icon-size);
+  height: var(--icon-size);
+  padding: 0;
+  border: none;
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+}
+
+.sidebar-section__add-btn:hover {
+  background: var(--color-back-active);
+  color: var(--color-accent);
 }
 
 .sidebar-section__add-btn:disabled {

@@ -18,8 +18,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
+  width: var(--icon-btn-size);
+  height: var(--icon-btn-size);
   padding: 0;
   border: none;
   border-radius: var(--radius);
@@ -54,8 +54,8 @@
 }
 
 .app-header__language-slot {
-  width: 36px;
-  height: 36px;
+  width: var(--icon-btn-size);
+  height: var(--icon-btn-size);
   flex-shrink: 0;
 }
 

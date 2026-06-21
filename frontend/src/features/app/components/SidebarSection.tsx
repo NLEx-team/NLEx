@@ -21,10 +21,10 @@ export function SidebarSection({
 
   return (
     <section className={`sidebar-section ${className}`.trim()}>
-      <div className="sidebar-section__header catalog-manager__header">
+      <div className="sidebar-section__header">
         <button
           type="button"
-          className="sidebar-section__title catalog-manager__title"
+          className="sidebar-section__title"
           onClick={() => setIsCollapsed((collapsed) => !collapsed)}
           aria-expanded={!isCollapsed}
         >
@@ -32,7 +32,7 @@ export function SidebarSection({
         </button>
         <button
           type="button"
-          className="sidebar-section__add-btn catalog-manager__add-btn"
+          className="sidebar-section__add-btn"
           onClick={onAdd}
           disabled={!onAdd}
           title="Add"

@@ -86,46 +86,36 @@ export function UserProfilePage() {
         </div>
 
         <div className="profile-page__fields">
-          {fields.map((field) => (
-            <div key={field.key} className="profile-page__field">
-              <label className="profile-page__field-label">{field.label}</label>
-              <div className="profile-page__field-control">
-                {isEditing ? (
-                  <Field
-                    value={formState[field.key]}
-                    onChange={(e) => updateField(field.key, e.target.value)}
-                    disabled={loading}
-                  />
-                ) : (
-                  <span
-                    className={`profile-page__field-value ${!field.value ? 'profile-page__field-value--empty' : ''}`}
-                  >
-                    {field.value || 'Not set'}
-                  </span>
-                )}
-              </div>
-            </div>
-          ))}
-
-          {isEditing && (
-            <div className="profile-page__field">
-              <label className="profile-page__field-label">Avatar URL</label>
-              <div className="profile-page__field-control">
-                <Field
-                  value={formState.avatar_url}
-                  onChange={(e) => updateField('avatar_url', e.target.value)}
-                  disabled={loading}
-                />
-              </div>
-            </div>
+          {fields.map((field) =>
+            isEditing ? (
+              <Field
+                key={field.key}
+                label={field.label}
+                value={formState[field.key]}
+                onChange={(e) => updateField(field.key, e.target.value)}
+                disabled={loading}
+              />
+            ) : (
+              <Field
+                key={field.key}
+                label={field.label}
+                value={field.value}
+                mode="readonly"
+                placeholder="Not set"
+              />
+            ),
           )}
 
-          <div className="profile-page__field">
-            <label className="profile-page__field-label">Role</label>
-            <div className="profile-page__field-control">
-              <span className="profile-page__field-value">{user.role}</span>
-            </div>
-          </div>
+          {isEditing && (
+            <Field
+              label="Avatar URL"
+              value={formState.avatar_url}
+              onChange={(e) => updateField('avatar_url', e.target.value)}
+              disabled={loading}
+            />
+          )}
+
+          <Field label="Role" value={user.role} mode="readonly" />
         </div>
 
         <div className="profile-page__actions">
@@ -133,7 +123,7 @@ export function UserProfilePage() {
             <Icon icon="mdi:logout" />
             <span>Log out</span>
           </Button>
-          <Button variant="secondary" onClick={handleModeToggle} disabled={loading}>
+          <Button variant="primary" onClick={handleModeToggle} disabled={loading}>
             <span>{loading ? 'Saving...' : isEditing ? 'Save' : 'Edit'}</span>
           </Button>
         </div>
