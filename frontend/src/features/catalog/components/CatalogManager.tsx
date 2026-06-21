@@ -1,13 +1,12 @@
 import { useState, useCallback } from 'react';
-import { Icon } from '@iconify/react';
 import { useAuth } from '../../auth/hooks/useAuth';
+import { SidebarSection } from '../../app/components/SidebarSection';
 import { useConfirm } from '../../../shared/ui/confirm';
 import { Confirm } from '../../../shared/ui/confirm';
 import { useCatalogs } from '../hooks/useCatalogs';
 import { CatalogList } from './CatalogList';
 import { AddCatalogModal } from './AddCatalogModal';
 import type { CatalogCreate } from '../types';
-import './CatalogManager.css';
 
 export function CatalogManager() {
   const { user } = useAuth();
@@ -35,26 +34,19 @@ export function CatalogManager() {
     : '';
 
   return (
-    <div className="catalog-manager">
-      <div className="catalog-manager__header">
-        <h3 className="catalog-manager__title">Catalogs</h3>
-        {isAdmin && (
-          <button
-            className="catalog-manager__add-btn"
-            onClick={() => setIsModalOpen(true)}
-            title="Connect catalog"
-          >
-            <Icon icon="mdi:plus" />
-          </button>
-        )}
-      </div>
-
-      <CatalogList
-        catalogs={catalogs}
-        loading={loading}
-        onTest={testCatalog}
-        onDelete={handleDelete}
-      />
+    <>
+      <SidebarSection
+        title="Catalogs"
+        className="catalog-manager"
+        onAdd={isAdmin ? () => setIsModalOpen(true) : undefined}
+      >
+        <CatalogList
+          catalogs={catalogs}
+          loading={loading}
+          onTest={testCatalog}
+          onDelete={handleDelete}
+        />
+      </SidebarSection>
 
       <Confirm
         isOpen={isConfirmOpen}
@@ -73,6 +65,6 @@ export function CatalogManager() {
         onClose={() => setIsModalOpen(false)}
         onSubmit={handleSubmit}
       />
-    </div>
+    </>
   );
 }

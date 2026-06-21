@@ -1,7 +1,7 @@
 .catalog-list {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: var(--spacing-xs);
 }
 
 .catalog-list__empty {
@@ -59,7 +59,7 @@
 }
 
 .catalog-item__meta {
-  font-size: 12px;
+  font-size: var(--font-size-xs);
   color: var(--color-text-secondary);
   overflow: hidden;
   text-overflow: ellipsis;
@@ -69,7 +69,7 @@
 .catalog-item__actions {
   display: flex;
   align-items: center;
-  gap: 2px;
+  gap: var(--spacing-xs);
   opacity: 0;
   transition: opacity 0.15s ease;
 }

@@ -13,6 +13,7 @@
   --color-on-accent: #ffffff;
 
   /* spacing */
+  --spacing-xs: 2px;
   --spacing-sm: 10px;
   --spacing-md: 16px;
   --spacing-lg: 25px;
@@ -35,6 +36,7 @@
   --border-width: 1px;
   --input-gap: 6px;
   --icon-size: 20px;
+  --icon-btn-size: 36px;
   --checkbox-size: 16px;
   --avatar-size-lg: 90px;
   --avatar-size-md: 50px;
@@ -57,7 +59,8 @@
   --font-family: 'Inter', system-ui, -apple-system, sans-serif;
   --font-size-main: 16px;
   --font-size-title: 20px;
-  --font-size-error: 12px;
+  --font-size-xs: 12px;
+  --font-size-error: var(--font-size-xs);
 }
 
 [data-theme="dark"] {

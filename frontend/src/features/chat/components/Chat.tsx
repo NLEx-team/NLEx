@@ -2,31 +2,26 @@ import { useCallback, useEffect, useRef } from 'react';
 import { Icon } from '@iconify/react';
 import { ChatInput } from '../../../shared/ui/chat-input';
 import { ChatMessage } from '../../../shared/ui/chat-message';
-import { ThemeToggle } from '../../app/components/ThemeToggle';
 import { chatApi } from '../api';
 import type { ChatMessage as ChatMessageType } from '../types';
 import './Chat.css';
 
 interface ChatProps {
-  activeSessionTitle?: string;
   messages: ChatMessageType[];
   inputValue: string;
   setInputValue: (value: string) => void;
   handleSendMessage: () => void;
   handleClarification: (questionId: string, selectedOptions: string[]) => void;
   pending: boolean;
-  onToggleSidebar: () => void;
 }
 
 export function Chat({
-  activeSessionTitle,
   messages,
   inputValue,
   setInputValue,
   handleSendMessage,
   handleClarification,
   pending,
-  onToggleSidebar,
 }: ChatProps) {
   const handleExport = useCallback((exportUrl: string) => {
     chatApi.downloadExport(exportUrl);
@@ -40,22 +35,6 @@ export function Chat({
   return (
     <div className="chat">
       <div className="chat__layout">
-        <header className="chat__header">
-          <button
-            className="chat__menu-btn"
-            onClick={onToggleSidebar}
-            aria-label="Open sidebar"
-          >
-            <Icon icon="mdi:menu" />
-          </button>
-          <h1 className="chat__title">
-            {activeSessionTitle ?? 'Chat'}
-          </h1>
-          <div className="chat__header-actions">
-            <ThemeToggle className="chat__menu-btn" />
-          </div>
-        </header>
-
         <div className="chat__messages">
           {messages.length === 0 && (
             <div className="chat__messages-empty">

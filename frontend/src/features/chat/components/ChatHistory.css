@@ -8,5 +8,5 @@
 .chat-history__sessions {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: var(--spacing-xs);
 }
