@@ -11,7 +11,8 @@ import { ThemeToggle } from './components/ThemeToggle';
 import './App.css';
 
 function ChatPage() {
-  const chat = useChat();
+  const { user } = useAuth();
+  const chat = useChat(user!.id);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   return (

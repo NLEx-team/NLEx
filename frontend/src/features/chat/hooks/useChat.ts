@@ -51,21 +51,25 @@ const WELCOME_MESSAGE: ChatMessage = {
   timestamp: new Date().toISOString(),
 };
 
-export function useChat() {
+export function useChat(userId: string) {
+  const sessionsKey = `nlex_sessions_${userId}`;
+  const messagesKey = `nlex_messages_${userId}`;
+  const activeKey = `nlex_active_session_${userId}`;
+
   const [sessions, setSessions] = useState<ChatSession[]>(() => {
     try {
-      const saved = localStorage.getItem('nlex_sessions');
+      const saved = localStorage.getItem(sessionsKey);
       return saved ? JSON.parse(saved) : [];
     } catch { return []; }
   });
   
   const [activeSessionId, setActiveSessionId] = useState<string>(() => {
-    return localStorage.getItem('nlex_active_session') || '';
+    return localStorage.getItem(activeKey) || '';
   });
   
   const [messagesBySession, setMessagesBySession] = useState<Record<string, ChatMessage[]>>(() => {
     try {
-      const saved = localStorage.getItem('nlex_messages');
+      const saved = localStorage.getItem(messagesKey);
       return saved ? JSON.parse(saved) : {};
     } catch { return {}; }
   });
@@ -89,18 +93,18 @@ export function useChat() {
   }, []);
 
   useEffect(() => {
-    localStorage.setItem('nlex_sessions', JSON.stringify(sessions));
-  }, [sessions]);
+    localStorage.setItem(sessionsKey, JSON.stringify(sessions));
+  }, [sessions, sessionsKey]);
 
   useEffect(() => {
-    localStorage.setItem('nlex_messages', JSON.stringify(messagesBySession));
-  }, [messagesBySession]);
+    localStorage.setItem(messagesKey, JSON.stringify(messagesBySession));
+  }, [messagesBySession, messagesKey]);
 
   useEffect(() => {
     if (activeSessionId) {
-      localStorage.setItem('nlex_active_session', activeSessionId);
+      localStorage.setItem(activeKey, activeSessionId);
     }
-  }, [activeSessionId]);
+  }, [activeSessionId, activeKey]);
 
   const [initialized, setInitialized] = useState(false);
   useEffect(() => {

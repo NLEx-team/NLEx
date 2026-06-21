@@ -70,22 +70,25 @@ async def submit_clarification(
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@router.get("/{chat_id}/export")
+@router.get("/{chat_id}/export/{export_id}")
 async def export_chat_to_excel(
     chat_id: UUID,
+    export_id: str,
     controller: ChatController = Depends(get_chat_controller),
     user = Depends(get_current_user)
 ):
     """
-    Export the last query result of a chat as a downloadable Excel file.
-    Returns a cached file if available, otherwise generates a new one.
+    Export the query result as a downloadable Excel file.
+    Returns the cached file matching the export_id.
     """
     try:
-        file_path = await controller.export_chat_result(chat_id)
+        file_path = controller.excel_service.get_cached_file(export_id)
+        if not file_path:
+            raise ValueError("Export file not found or expired.")
         return FileResponse(
             path=file_path,
             media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-            filename=f"export_{chat_id.hex[:8]}.xlsx",
+            filename=f"export_{export_id[:8]}.xlsx",
             headers={
                 "Access-Control-Expose-Headers": "Content-Disposition",
             },

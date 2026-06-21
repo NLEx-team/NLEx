@@ -1,15 +1,18 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Modal } from '../../../shared/ui/modal';
 import { Field } from '../../../shared/ui/field';
 import { Dropdown } from '../../../shared/ui/dropdown';
 import { Button } from '../../../shared/ui/button';
-import type { DatabaseType, CatalogCreate } from '../types';
+import { catalogApi } from '../api';
+import type { DatabaseType, CatalogCreate, CatalogRead } from '../types';
 import './AddCatalogModal.css';
 
 interface AddCatalogModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (data: CatalogCreate) => Promise<void>;
+  initialData?: CatalogRead;
+  onDelete?: () => void;
 }
 
 const DB_OPTIONS = [
@@ -19,7 +22,7 @@ const DB_OPTIONS = [
   { label: 'ClickHouse', value: 'clickhouse' },
 ];
 
-export function AddCatalogModal({ isOpen, onClose, onSubmit }: AddCatalogModalProps) {
+export function AddCatalogModal({ isOpen, onClose, onSubmit, initialData, onDelete }: AddCatalogModalProps) {
   const [name, setName] = useState('');
   const [type, setType] = useState<DatabaseType>('postgresql');
   const [url, setUrl] = useState('');
@@ -27,6 +30,7 @@ export function AddCatalogModal({ isOpen, onClose, onSubmit }: AddCatalogModalPr
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [testResult, setTestResult] = useState<{ success: boolean; latency_ms: number | null; error: string | null } | null>(null);
 
   const resetForm = () => {
     setName('');
@@ -35,11 +39,50 @@ export function AddCatalogModal({ isOpen, onClose, onSubmit }: AddCatalogModalPr
     setUser('');
     setPassword('');
     setError(null);
+    setTestResult(null);
   };
 
   const handleClose = () => {
     resetForm();
     onClose();
+  };
+
+  // Use React.useEffect correctly
+  useEffect(() => {
+    if (isOpen) {
+      if (initialData) {
+        setName(initialData.name);
+        setType(initialData.type as DatabaseType);
+        setUrl('');
+        setUser('');
+        setPassword('');
+        setError(null);
+        setTestResult(null);
+      } else {
+        resetForm();
+      }
+    }
+  }, [isOpen, initialData]);
+
+  const isEdit = !!initialData;
+
+  const handleCheckConnection = async () => {
+    if (!url.trim()) {
+      setError('URL is required to test connection');
+      return;
+    }
+    setLoading(true);
+    setTestResult(null);
+    setError(null);
+    try {
+      const data: CatalogCreate = { name: name.trim() || 'test_db', type, url: url.trim(), user, password };
+      const res = await catalogApi.testNew(data);
+      setTestResult(res);
+    } catch (err: any) {
+      setTestResult({ success: false, latency_ms: null, error: err.message || 'Connection failed' });
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -64,10 +107,12 @@ export function AddCatalogModal({ isOpen, onClose, onSubmit }: AddCatalogModalPr
 
   return (
     <Modal isOpen={isOpen} onClose={handleClose} className="add-catalog-modal">
-      <h2 className="add-catalog-modal__title">Connect Catalog</h2>
+      <div className="add-catalog-modal__header">
+        <h2 className="add-catalog-modal__title">{isEdit ? 'Database info' : 'Add database'}</h2>
+      </div>
       <form className="add-catalog-modal__form" onSubmit={handleSubmit}>
         <Field
-          label="Catalog name"
+          label="Alias"
           placeholder="My Database"
           value={name}
           onChange={e => setName(e.target.value)}
@@ -109,13 +154,35 @@ export function AddCatalogModal({ isOpen, onClose, onSubmit }: AddCatalogModalPr
             <span className="field__error" role="alert">{error}</span>
           </div>
         )}
+        {testResult && (
+          <div className={`field field--${testResult.success ? 'success' : 'error'}`} style={{ color: testResult.success ? 'var(--color-accent)' : 'var(--color-error-border)', fontSize: '13px' }}>
+            {testResult.success 
+              ? `Connected successfully! Latency: ${testResult.latency_ms}ms`
+              : `Connection failed: ${testResult.error}`}
+          </div>
+        )}
         <div className="add-catalog-modal__actions">
-          <Button type="button" variant="secondary" onClick={handleClose} disabled={loading}>
-            Cancel
+          <Button type="button" variant="secondary" onClick={handleCheckConnection} disabled={loading}>
+            Check connection
           </Button>
-          <Button type="submit" disabled={loading}>
-            {loading ? 'Connecting...' : 'Connect'}
-          </Button>
+          <div className="add-catalog-modal__actions-right">
+            {isEdit ? (
+              <>
+                {onDelete && (
+                  <Button type="button" onClick={() => { onDelete(); handleClose(); }} disabled={loading} style={{ background: '#2B6A4C', color: 'white' }}>
+                    Delete
+                  </Button>
+                )}
+                <Button type="submit" disabled={loading}>
+                  Edit
+                </Button>
+              </>
+            ) : (
+              <Button type="submit" disabled={loading}>
+                Add
+              </Button>
+            )}
+          </div>
         </div>
       </form>
     </Modal>

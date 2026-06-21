@@ -51,9 +51,9 @@ class OrchestratorService:
         logger.info(f"Orchestrator transition: {self.state.value} -> {to_state.value}")
         self.state = to_state
 
-    async def initialize_session(self, active_catalogs: List[str]):
+    async def initialize_session(self, active_catalogs: Dict[str, str]):
         """
-        Set up the session with the provided active catalogs.
+        Set up the session with the provided active catalogs (dict mapping cat_id to alias).
         """
         self.active_catalogs = active_catalogs
         if not self.active_catalogs:
@@ -72,7 +72,7 @@ class OrchestratorService:
             combined_schemas = []
             all_relationships = []
             
-            for catalog_name in self.active_catalogs:
+            for catalog_name, catalog_alias in self.active_catalogs.items():
                 # RelationshipInferenceService.get_augmented_schema returns full schema for ONE catalog
                 catalog_schema = await self.inference_service.get_augmented_schema(catalog_name)
                 
@@ -81,12 +81,13 @@ class OrchestratorService:
                 for schema in catalog_schema["schemas"]:
                     combined_schemas.append({
                         **schema,
-                        "catalog": catalog_name
+                        "catalog": catalog_name,
+                        "catalog_alias": catalog_alias
                     })
                 all_relationships.extend(catalog_schema.get("relationships", []))
             
             self.full_schema = {
-                "catalogs": self.active_catalogs,
+                "catalogs": list(self.active_catalogs.keys()),
                 "schemas": combined_schemas,
                 "relationships": all_relationships
             }

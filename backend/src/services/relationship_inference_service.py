@@ -3,6 +3,9 @@ from typing import Any
 from src.services.schema_service import SchemaService
 from src.services.llm_service import LLMService
 
+# Global in-memory cache for augmented schemas across all chat sessions
+_GLOBAL_SCHEMA_CACHE = {}
+
 class RelationshipInferenceService:
     def __init__(self, schema_service: SchemaService, llm_service: LLMService):
         """
@@ -10,11 +13,15 @@ class RelationshipInferenceService:
         """
         self.schema_service = schema_service
         self.llm_service = llm_service
+        self._cache = _GLOBAL_SCHEMA_CACHE
 
     async def get_augmented_schema(self, catalog: str) -> dict[str, Any]:
         """
         Fetches the full schema for a catalog and augments it with LLM-inferred relationships.
         """
+        if catalog in self._cache:
+            return self._cache[catalog]
+
         # 1. Get existing schema with physical foreign keys and samples
         schema = await self.schema_service.get_full_schema(catalog)
         
@@ -68,6 +75,7 @@ class RelationshipInferenceService:
                     schema["relationships"].append(formatted_rel)
                     existing_rels_keys.add(rel_key)
                     
+        self._cache[catalog] = schema
         return schema
 
     def _prepare_llm_input(self, schema: dict[str, Any]) -> dict[str, Any]:

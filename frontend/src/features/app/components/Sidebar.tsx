@@ -1,7 +1,6 @@
 import { useEffect, useRef, type ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../auth/hooks/useAuth';
-import { Logo } from '../../../shared/ui';
 import { Avatar } from '../../../shared/ui/avatar';
 import { Icon } from '@iconify/react';
 import './Sidebar.css';
@@ -37,14 +36,14 @@ export function Sidebar({ isOpen, onClose, children }: SidebarProps) {
       className={`sidebar ${isOpen ? 'sidebar--open' : 'sidebar--closed'}`}
     >
       <div className="sidebar__header">
-        <Logo variant="compact" />
+        <div className="sidebar__logo">NLEx</div>
         <button
           type="button"
           className="sidebar__menu-btn"
           onClick={onClose}
           aria-label="Close sidebar"
         >
-          <Icon icon="mdi:menu" />
+          <Icon icon="mdi:format-list-bulleted" width="28" height="28" color="#8A92A6" />
         </button>
       </div>
 

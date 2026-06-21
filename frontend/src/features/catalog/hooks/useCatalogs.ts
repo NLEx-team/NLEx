@@ -22,6 +22,8 @@ export function useCatalogs() {
 
   useEffect(() => {
     fetchCatalogs();
+    const intervalId = setInterval(fetchCatalogs, 30000); // Poll every 30s
+    return () => clearInterval(intervalId);
   }, [fetchCatalogs]);
 
   const createCatalog = async (data: CatalogCreate) => {

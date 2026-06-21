@@ -79,7 +79,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const updateProfile = async (data: { first_name?: string; last_name?: string; avatar_url?: string }) => {
     try {
-      const updatedUser = await api.put<User>('/users/me', data);
+      const updatedUser = await api.patch<User>('/users/me', data);
       setUser(updatedUser);
     } catch (error) {
       throw error;

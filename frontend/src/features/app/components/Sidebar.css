@@ -21,6 +21,13 @@
   width: var(--sidebar-width, 320px);
 }
 
+.sidebar__logo {
+  font-size: 32px;
+  font-weight: 800;
+  color: #1A7338;
+  letter-spacing: -0.5px;
+}
+
 .sidebar__header {
   display: flex;
   align-items: center;
@@ -109,4 +116,26 @@
 .sidebar__logout-btn:hover {
   background: var(--color-back-active);
   color: var(--color-error-border);
+}
+
+.sidebar__new-chat-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 10px 16px;
+  background: var(--color-back-main);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  color: var(--color-text-primary);
+  font-size: 14px;
+  cursor: pointer;
+  margin-bottom: 24px;
+  font-family: inherit;
+  font-weight: 500;
+  transition: background-color 0.2s ease;
+}
+
+.sidebar__new-chat-btn:hover {
+  background: var(--color-back-components);
 }

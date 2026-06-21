@@ -19,3 +19,9 @@ export interface CatalogRead {
   created_at: string;
   updated_at: string;
 }
+
+export interface CatalogTestResult {
+  success: boolean;
+  latency_ms: number | null;
+  error: string | null;
+}

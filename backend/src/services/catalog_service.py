@@ -51,14 +51,16 @@ class CatalogService:
                 password=catalog.password
             )
             
+            trino_name = f"cat_{catalog.id.hex}"
+            
             # 1. Drop if exists (to be sure)
-            await self.db_service.disconnect_catalog(catalog.name)
+            await self.db_service.disconnect_catalog(trino_name)
             
             # 2. Connect
-            await self.db_service.connect_catalog(catalog.name, conn)
+            await self.db_service.connect_catalog(trino_name, conn)
             
             # 3. Verify (try to list schemas)
-            await self.db_service.get_namespaces(catalog.name)
+            await self.db_service.get_namespaces(trino_name)
             
             # Success
             return await self.repository.update_status(catalog_id, CatalogStatus.ACTIVE)
@@ -75,13 +77,45 @@ class CatalogService:
     async def delete_catalog(self, catalog_id: UUID) -> bool:
         catalog = await self.repository.get_by_id(catalog_id)
         if catalog:
+            trino_name = f"cat_{catalog.id.hex}"
             try:
-                await self.db_service.disconnect_catalog(catalog.name)
+                await self.db_service.disconnect_catalog(trino_name)
             except Exception as e:
-                logger.warning(f"Failed to disconnect catalog {catalog.name} from Trino during deletion: {e}")
+                logger.warning(f"Failed to disconnect catalog {trino_name} from Trino during deletion: {e}")
         
         return await self.repository.delete(catalog_id)
 
     async def test_connection(self, catalog_id: UUID) -> bool:
         catalog = await self.sync_catalog(catalog_id)
         return catalog.status == CatalogStatus.ACTIVE
+
+    async def test_raw_connection(self, catalog_in: CatalogCreate) -> dict:
+        import time
+        import uuid
+        
+        # We need a valid catalog name for Trino, e.g. letters and underscores
+        temp_name = f"test_{uuid.uuid4().hex[:8]}"
+        conn = CatalogConnection(
+            type=DatabaseType(catalog_in.type),
+            url=catalog_in.url,
+            user=catalog_in.user,
+            password=catalog_in.password
+        )
+        
+        start_time = time.time()
+        try:
+            # Drop if exists just in case
+            await self.db_service.execute_query_async(f"DROP CATALOG IF EXISTS {temp_name}")
+            await self.db_service.connect_catalog(temp_name, conn)
+            # test query
+            await self.db_service.get_namespaces(temp_name)
+            latency = int((time.time() - start_time) * 1000)
+            return {"success": True, "latency_ms": latency}
+        except Exception as e:
+            logger.error(f"Test connection failed: {e}")
+            return {"success": False, "error": str(e), "latency_ms": None}
+        finally:
+            try:
+                await self.db_service.disconnect_catalog(temp_name)
+            except Exception:
+                pass

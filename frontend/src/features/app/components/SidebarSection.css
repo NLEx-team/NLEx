@@ -1,17 +1,19 @@
 .sidebar-section {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-sm);
-  padding: 5px;
-  border: var(--border-width) solid var(--color-back-active);
-  border-radius: var(--radius);
+  padding: 0;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  background: var(--color-back-main);
+  overflow: hidden;
 }
 
 .sidebar-section__header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0;
+  padding: 12px 16px;
+  background: var(--color-back-main);
 }
 
 .sidebar-section__title {
@@ -19,11 +21,9 @@
   padding: 0;
   border: none;
   background: transparent;
-  font: inherit;
-  font-size: var(--font-size-xs);
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
   color: var(--color-text-secondary);
   cursor: pointer;
   text-align: left;
@@ -39,36 +39,25 @@
   border-radius: var(--radius);
 }
 
-.sidebar-section__add-btn {
+.sidebar-section__toggle-btn {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: var(--icon-size);
-  height: var(--icon-size);
+  width: 24px;
+  height: 24px;
   padding: 0;
   border: none;
-  border-radius: var(--radius);
   background: transparent;
-  color: var(--color-text-secondary);
   cursor: pointer;
 }
 
-.sidebar-section__add-btn:hover {
+.sidebar-section__toggle-btn:hover {
   background: var(--color-back-active);
-  color: var(--color-accent);
-}
-
-.sidebar-section__add-btn:disabled {
-  opacity: 0.35;
-  cursor: default;
-}
-
-.sidebar-section__add-btn:disabled:hover {
-  background: transparent;
-  color: var(--color-text-secondary);
+  border-radius: var(--radius);
 }
 
 .sidebar-section__body {
   display: flex;
   flex-direction: column;
+  border-top: 1px solid var(--color-border);
 }

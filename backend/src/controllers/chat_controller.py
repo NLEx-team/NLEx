@@ -54,8 +54,8 @@ class ChatController:
             
             # Initialize with active catalogs
             active_catalogs = await self.catalog_service.get_active_catalogs()
-            catalog_names = [c.name for c in active_catalogs]
-            await orchestrator.initialize_session(catalog_names)
+            trino_catalogs = {f"cat_{c.id.hex}": c.name for c in active_catalogs}
+            await orchestrator.initialize_session(trino_catalogs)
             
             _ORCHESTRATOR_SESSIONS[chat_id] = orchestrator
             
@@ -64,53 +64,18 @@ class ChatController:
     async def process_prompt(self, chat_id: UUID, prompt: str) -> Dict[str, Any]:
         orchestrator = await self.get_orchestrator(chat_id)
 
-        # Invalidate cached export when a new query is made
-        self.excel_service.invalidate_cache(chat_id)
-
         result = await orchestrator.execute_user_query(prompt)
-        return self._format_response(chat_id, orchestrator, result)
+        active_catalogs = await self.catalog_service.get_active_catalogs()
+        return self._format_response(chat_id, orchestrator, result, active_catalogs)
 
     async def process_clarification(self, chat_id: UUID, clarification: str) -> Dict[str, Any]:
         orchestrator = await self.get_orchestrator(chat_id)
 
-        # Invalidate cached export when clarification changes result
-        self.excel_service.invalidate_cache(chat_id)
-
         result = await orchestrator.handle_clarification(clarification)
-        return self._format_response(chat_id, orchestrator, result)
+        active_catalogs = await self.catalog_service.get_active_catalogs()
+        return self._format_response(chat_id, orchestrator, result, active_catalogs)
 
-    async def export_chat_result(self, chat_id: UUID) -> str:
-        """
-        Generates (or returns cached) Excel file for the last query result.
-        Returns the file path.
-        """
-        # Check for cached file first
-        cached = self.excel_service.get_cached_file(chat_id)
-        if cached:
-            logger.info(f"Returning cached export for chat {chat_id}")
-            return cached
-
-        # Get the orchestrator and its last result
-        if chat_id not in _ORCHESTRATOR_SESSIONS:
-            raise ValueError("Chat session not found. Please submit a query first.")
-
-        orchestrator = _ORCHESTRATOR_SESSIONS[chat_id]
-
-        if not orchestrator.last_result:
-            raise ValueError("No query results available for export. Please submit a query first.")
-
-        if orchestrator.last_result.get("status") != "success":
-            raise ValueError("Last query did not complete successfully. Cannot export.")
-
-        headers = orchestrator.last_result.get("headers", [])
-        data = orchestrator.last_result.get("data", [])
-
-        if not headers:
-            raise ValueError("No headers in query result. Cannot generate export.")
-
-        return self.excel_service.generate_excel(chat_id, headers, data)
-
-    def _format_response(self, chat_id: UUID, orchestrator: OrchestratorService, result: Dict[str, Any]) -> Dict[str, Any]:
+    def _format_response(self, chat_id: UUID, orchestrator: OrchestratorService, result: Dict[str, Any], active_catalogs: List[Any]) -> Dict[str, Any]:
         """
         Maps Orchestrator results and state to a public ChatResponse.
         """
@@ -135,6 +100,26 @@ class ChatController:
         elif orchestrator.state == OrchestratorState.AWAITING_USER_QUERY:
             next_steps.append("Submit a natural language prompt")
 
+        # Beautify SQL by replacing technical catalog names with user aliases
+        if "sql" in result and result.get("sql"):
+            sql_str = result["sql"]
+            for cat in active_catalogs:
+                trino_name = f"cat_{cat.id.hex}"
+                # Trino syntax: quote identifiers with spaces
+                display_name = f'"{cat.name}"' if " " in cat.name or not cat.name.isidentifier() else cat.name
+                sql_str = sql_str.replace(trino_name, display_name)
+            result["sql"] = sql_str
+            
+        # Beautify clarification questions and options
+        if result.get("status") == "clarification":
+            for cat in active_catalogs:
+                trino_name = f"cat_{cat.id.hex}"
+                display_name = cat.name # No quotes for simple text display
+                if "question" in result and result.get("question"):
+                    result["question"] = result["question"].replace(trino_name, display_name)
+                if "options" in result and isinstance(result.get("options"), list):
+                    result["options"] = [opt.replace(trino_name, display_name) for opt in result["options"]]
+
         response = {
             "chat_id": chat_id,
             "status": state_map.get(orchestrator.state, "unknown"),
@@ -145,6 +130,12 @@ class ChatController:
         # Add export_url when query completed successfully
         if (orchestrator.state == OrchestratorState.COMPLETED
                 and result.get("status") == "success"):
-            response["export_url"] = f"/chats/{chat_id}/export"
+            export_id = uuid4().hex
+            self.excel_service.generate_excel(
+                export_id, 
+                result.get("headers", []), 
+                result.get("data", [])
+            )
+            response["export_url"] = f"/chats/{chat_id}/export/{export_id}"
 
         return response

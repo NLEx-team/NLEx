@@ -31,25 +31,14 @@ export function SidebarSection({
           {title}
         </button>
         <div style={{ display: 'flex', alignItems: 'center' }}>
-          {onAdd && (
-            <button
-              type="button"
-              className="sidebar-section__add-btn"
-              onClick={onAdd}
-              title="Add"
-              aria-label="Add"
-            >
-              <Icon icon="mdi:playlist-plus" />
-            </button>
-          )}
           <button
             type="button"
-            className="sidebar-section__add-btn"
+            className="sidebar-section__toggle-btn"
             onClick={() => setIsCollapsed((collapsed) => !collapsed)}
             title={isCollapsed ? "Expand" : "Collapse"}
             aria-label={isCollapsed ? "Expand" : "Collapse"}
           >
-            <Icon icon={isCollapsed ? "mdi:plus" : "mdi:minus"} />
+            <Icon icon={isCollapsed ? "mdi:chevron-down" : "mdi:chevron-up"} color="#8A92A6" width="20" height="20" />
           </button>
         </div>
       </div>

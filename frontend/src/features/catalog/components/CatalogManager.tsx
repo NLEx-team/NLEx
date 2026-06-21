@@ -12,6 +12,7 @@ export function CatalogManager() {
   const { user } = useAuth();
   const { catalogs, loading, createCatalog, deleteCatalog, testCatalog } = useCatalogs();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedCatalog, setSelectedCatalog] = useState<CatalogRead | null>(null);
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
   const { confirm, isOpen: isConfirmOpen, onConfirm, onCancel } = useConfirm();
   const isAdmin = user?.role === 'admin';
@@ -36,15 +37,16 @@ export function CatalogManager() {
   return (
     <>
       <SidebarSection
-        title="Catalogs"
+        title="Database list"
         className="catalog-manager"
-        onAdd={isAdmin ? () => setIsModalOpen(true) : undefined}
       >
         <CatalogList
           catalogs={catalogs}
           loading={loading}
           onTest={testCatalog}
           onDelete={handleDelete}
+          onAdd={() => { setSelectedCatalog(null); setIsModalOpen(true); }}
+          onInfo={(cat) => { setSelectedCatalog(cat); setIsModalOpen(true); }}
         />
       </SidebarSection>
 
@@ -64,6 +66,8 @@ export function CatalogManager() {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onSubmit={handleSubmit}
+        initialData={selectedCatalog || undefined}
+        onDelete={selectedCatalog ? () => handleDelete(selectedCatalog.id) : undefined}
       />
     </>
   );
