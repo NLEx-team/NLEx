@@ -16,7 +16,7 @@ interface CatalogListProps {
 const STATUS_LABELS: Record<string, string> = {
   active: 'Connected',
   inactive: 'Inactive',
-  error: 'Error',
+  error: 'Disconnected',
 };
 
 export function CatalogList({ catalogs, loading, onTest, onDelete, onAdd, onInfo }: CatalogListProps) {

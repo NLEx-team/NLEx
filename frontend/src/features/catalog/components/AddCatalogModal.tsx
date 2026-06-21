@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Modal } from '../../../shared/ui/modal';
 import { Field } from '../../../shared/ui/field';
 import { Dropdown } from '../../../shared/ui/dropdown';
@@ -22,7 +22,16 @@ const DB_OPTIONS = [
   { label: 'ClickHouse', value: 'clickhouse' },
 ];
 
+const STATUS_LABELS: Record<string, string> = {
+  active: 'Connected',
+  inactive: 'Inactive',
+  error: 'Disconnected',
+};
+
+type ModalMode = 'create' | 'view' | 'edit';
+
 export function AddCatalogModal({ isOpen, onClose, onSubmit, initialData, onDelete }: AddCatalogModalProps) {
+  const [mode, setMode] = useState<ModalMode>('create');
   const [name, setName] = useState('');
   const [type, setType] = useState<DatabaseType>('postgresql');
   const [url, setUrl] = useState('');
@@ -31,6 +40,19 @@ export function AddCatalogModal({ isOpen, onClose, onSubmit, initialData, onDele
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [testResult, setTestResult] = useState<{ success: boolean; latency_ms: number | null; error: string | null } | null>(null);
+
+  const isEdit = !!initialData;
+
+  const isDirty = useMemo(() => {
+    if (!initialData) return true;
+    return (
+      name !== initialData.name ||
+      type !== initialData.type ||
+      url !== initialData.url ||
+      user !== initialData.user ||
+      password !== ''
+    );
+  }, [name, type, url, user, password, initialData]);
 
   const resetForm = () => {
     setName('');
@@ -42,29 +64,33 @@ export function AddCatalogModal({ isOpen, onClose, onSubmit, initialData, onDele
     setTestResult(null);
   };
 
+  const initFromData = (data: CatalogRead) => {
+    setName(data.name);
+    setType(data.type as DatabaseType);
+    setUrl(data.url);
+    setUser(data.user);
+    setPassword('');
+    setError(null);
+    setTestResult(null);
+  };
+
   const handleClose = () => {
     resetForm();
+    setMode('create');
     onClose();
   };
 
-  // Use React.useEffect correctly
   useEffect(() => {
     if (isOpen) {
       if (initialData) {
-        setName(initialData.name);
-        setType(initialData.type as DatabaseType);
-        setUrl('');
-        setUser('');
-        setPassword('');
-        setError(null);
-        setTestResult(null);
+        setMode('view');
+        initFromData(initialData);
       } else {
+        setMode('create');
         resetForm();
       }
     }
   }, [isOpen, initialData]);
-
-  const isEdit = !!initialData;
 
   const handleCheckConnection = async () => {
     if (!url.trim()) {
@@ -105,10 +131,64 @@ export function AddCatalogModal({ isOpen, onClose, onSubmit, initialData, onDele
     }
   };
 
+  const handleEditStart = () => {
+    initFromData(initialData!);
+    setMode('edit');
+  };
+
+  const handleCancelEdit = () => {
+    initFromData(initialData!);
+    setMode('view');
+  };
+
+  const renderStatus = () => {
+    if (!initialData) return null;
+    const statusLabel = STATUS_LABELS[initialData.status] || initialData.status;
+    const statusClass = `catalog-item__status--${initialData.status}`;
+    return (
+      <div className="add-catalog-modal__field" style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+        <span className={`catalog-item__status ${statusClass}`} style={{ display: 'inline-block' }} />
+        <span style={{ fontSize: 14, color: 'var(--color-text-secondary)' }}>{statusLabel}</span>
+      </div>
+    );
+  };
+
+  if (mode === 'view') {
+    return (
+      <Modal isOpen={isOpen} onClose={handleClose} className="add-catalog-modal">
+        <div className="add-catalog-modal__header">
+          <h2 className="add-catalog-modal__title">Database info</h2>
+        </div>
+        <div className="add-catalog-modal__form">
+          <Field mode="readonly" label="Alias" value={name} />
+          <Field mode="readonly" label="URL" value={url} />
+          <Field mode="readonly" label="Database type" value={type} />
+          <Field mode="readonly" label="Database user" value={user} />
+          {renderStatus()}
+          <div className="add-catalog-modal__actions">
+            <Button type="button" variant="secondary" onClick={handleCheckConnection} disabled={loading}>
+              Check connection
+            </Button>
+            <div className="add-catalog-modal__actions-right">
+              {onDelete && (
+                <Button type="button" onClick={() => { onDelete(); handleClose(); }} disabled={loading} style={{ background: '#2B6A4C', color: 'white' }}>
+                  Delete
+                </Button>
+              )}
+              <Button type="button" onClick={handleEditStart}>
+                Edit
+              </Button>
+            </div>
+          </div>
+        </div>
+      </Modal>
+    );
+  }
+
   return (
     <Modal isOpen={isOpen} onClose={handleClose} className="add-catalog-modal">
       <div className="add-catalog-modal__header">
-        <h2 className="add-catalog-modal__title">{isEdit ? 'Database info' : 'Add database'}</h2>
+        <h2 className="add-catalog-modal__title">{isEdit ? 'Edit database' : 'Add database'}</h2>
       </div>
       <form className="add-catalog-modal__form" onSubmit={handleSubmit}>
         <Field
@@ -168,13 +248,11 @@ export function AddCatalogModal({ isOpen, onClose, onSubmit, initialData, onDele
           <div className="add-catalog-modal__actions-right">
             {isEdit ? (
               <>
-                {onDelete && (
-                  <Button type="button" onClick={() => { onDelete(); handleClose(); }} disabled={loading} style={{ background: '#2B6A4C', color: 'white' }}>
-                    Delete
-                  </Button>
-                )}
-                <Button type="submit" disabled={loading}>
-                  Edit
+                <Button type="button" variant="secondary" onClick={handleCancelEdit} disabled={loading}>
+                  Cancel
+                </Button>
+                <Button type="submit" disabled={loading || !isDirty}>
+                  Save
                 </Button>
               </>
             ) : (
