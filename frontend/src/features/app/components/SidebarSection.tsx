@@ -1,5 +1,6 @@
-import { useState, type ReactNode } from 'react';
+import { type ReactNode } from 'react';
 import { Icon } from '@iconify/react';
+import { useLocalStorage } from '../../../shared/hooks/useLocalStorage';
 import './SidebarSection.css';
 
 interface SidebarSectionProps {
@@ -17,7 +18,8 @@ export function SidebarSection({
   onAdd,
   defaultCollapsed = true,
 }: SidebarSectionProps) {
-  const [isCollapsed, setIsCollapsed] = useState(defaultCollapsed);
+  const storageKey = `sidebar-section:${title}`;
+  const [isCollapsed, setIsCollapsed] = useLocalStorage(storageKey, defaultCollapsed);
 
   const toggleCollapse = () => setIsCollapsed((c) => !c);
 
