@@ -1,10 +1,11 @@
 import { useState } from 'react';
-import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
+import { Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth';
 import { AuthForm } from '../auth/components/AuthForm';
 import { UserProfilePage } from '../auth/components/UserProfilePage';
 import { Chat, ChatHistory, useChat } from '../chat';
 import { CatalogManager } from '../catalog';
+import { AppHeader } from './components/AppHeader';
 import { Sidebar } from './components/Sidebar';
 import { ThemeToggle } from './components/ThemeToggle';
 import './App.css';
@@ -23,10 +24,52 @@ function ChatPage() {
         />
         <CatalogManager />
       </Sidebar>
-      <Chat
-        {...chat}
-        onToggleSidebar={() => setIsSidebarOpen(prev => !prev)}
-      />
+      <div className="app-page">
+        <AppHeader
+          title={chat.activeSession?.title ?? 'Chat'}
+          variant="chat"
+          isSidebarOpen={isSidebarOpen}
+          onOpenSidebar={() => setIsSidebarOpen(true)}
+        />
+        <div className="app-page__content">
+          <Chat
+            messages={chat.messages}
+            inputValue={chat.inputValue}
+            setInputValue={chat.setInputValue}
+            handleSendMessage={chat.handleSendMessage}
+            handleClarification={chat.handleClarification}
+            pending={chat.pending}
+          />
+        </div>
+      </div>
+    </>
+  );
+}
+
+function ProfilePage() {
+  const navigate = useNavigate();
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+
+  return (
+    <>
+      <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)}>
+        <ChatHistory
+          sessions={[]}
+          activeSessionId=""
+          onSelectSession={() => navigate('/chat')}
+        />
+        <CatalogManager />
+      </Sidebar>
+      <div className="app-page">
+        <AppHeader
+          title="Profile"
+          variant="profile"
+          onBack={() => navigate('/chat')}
+        />
+        <div className="app-page__content">
+          <UserProfilePage />
+        </div>
+      </div>
     </>
   );
 }
@@ -59,7 +102,7 @@ export default function App() {
         />
         <Route
           path="/profile"
-          element={isAuthenticated ? <UserProfilePage /> : <Navigate to="/auth" replace />}
+          element={isAuthenticated ? <ProfilePage /> : <Navigate to="/auth" replace />}
         />
         <Route
           path="*"

@@ -58,12 +58,6 @@ export function UserProfilePage() {
   return (
     <div className="profile-page">
       <div className="profile-page__card">
-        <div className="profile-page__back">
-          <button className="profile-page__back-btn" onClick={() => navigate(-1)} type="button">
-            <Icon icon="mdi:arrow-left" />
-          </button>
-        </div>
-
         <div className="profile-page__avatar">
           <Avatar src={profile?.avatar_url} size="lg" />
           <button
