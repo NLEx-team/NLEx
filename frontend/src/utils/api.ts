@@ -14,33 +14,52 @@ class ApiError extends Error {
   }
 }
 
-async function request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
+async function request<T>(endpoint: string, options: RequestInit & { timeout?: number } = {}): Promise<T> {
+  const { timeout = 90000, ...fetchOptions } = options; // 90 seconds default timeout
   const token = localStorage.getItem('jwt_token');
   
-  const headers = new Headers(options.headers);
+  const headers = new Headers(fetchOptions.headers);
   if (token) {
     headers.set('Authorization', `Bearer ${token}`);
   }
-  if (!(options.body instanceof FormData) && !headers.has('Content-Type')) {
+  if (!(fetchOptions.body instanceof FormData) && !headers.has('Content-Type')) {
     headers.set('Content-Type', 'application/json');
   }
 
-  const response = await fetch(`${API_BASE}${endpoint}`, {
-    ...options,
-    headers,
-  });
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeout);
 
-  const data = await response.json().catch(() => null);
+  try {
+    const response = await fetch(`${API_BASE}${endpoint}`, {
+      ...fetchOptions,
+      headers,
+      signal: controller.signal,
+    });
 
-  if (!response.ok) {
-    throw new ApiError(
-      data?.detail || response.statusText || 'Request failed',
-      response.status,
-      data
-    );
+    clearTimeout(timeoutId);
+
+    const data = await response.json().catch(() => null);
+
+    if (!response.ok) {
+      throw new ApiError(
+        data?.detail || response.statusText || 'Request failed',
+        response.status,
+        data
+      );
+    }
+
+    return data as T;
+  } catch (error: any) {
+    clearTimeout(timeoutId);
+    if (error.name === 'AbortError') {
+      throw new ApiError('Нет доступа к ИИ (превышено время ожидания)', 408);
+    }
+    // Also handle backend connection refused or generic fetch failures
+    if (error instanceof TypeError && error.message.includes('fetch')) {
+      throw new ApiError('Сервер недоступен. Проверьте подключение.', 503);
+    }
+    throw error;
   }
-
-  return data as T;
 }
 
 export const api = {
