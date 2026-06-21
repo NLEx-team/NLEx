@@ -18,7 +18,7 @@ const STATUS_LABELS: Record<string, string> = {
 };
 
 export function CatalogList({ catalogs, loading, onTest, onDelete }: CatalogListProps) {
-  const [isTesting, setIsTesting] = useState<boolean>(false);
+  const [testingId, setTestingId] = useState<string | null>(null);
   const { user } = useAuth();
   const isAdmin = user?.role === 'admin';
 
@@ -31,9 +31,9 @@ export function CatalogList({ catalogs, loading, onTest, onDelete }: CatalogList
   }
 
   const handleTest = async (id: string) => {
-    setIsTesting(true);
+    setTestingId(id);
     await onTest(id);
-    setIsTesting(false);
+    setTestingId(null);
   };
 
   const handleDelete = (id: string) => {
@@ -48,15 +48,16 @@ export function CatalogList({ catalogs, loading, onTest, onDelete }: CatalogList
           <div className="catalog-item__info">
             <div className="catalog-item__name">{catalog.name}</div>
             <div className="catalog-item__meta">{
-              isTesting ? 'Testing...' : STATUS_LABELS[catalog.status]
+              testingId === catalog.id ? 'Testing...' : STATUS_LABELS[catalog.status]
             }</div>
           </div>
           {isAdmin && (
             <div className="catalog-item__actions">
               <button
+                type="button"
                 className={
                   "catalog-item__action-btn catalog-item__action-btn--test" + 
-                  (isTesting ? " catalog-item__action-btn--loading" : "")
+                  (testingId === catalog.id ? " catalog-item__action-btn--loading" : "")
                 }
                 onClick={() => handleTest(catalog.id)}
                 title="Test connection"
@@ -64,6 +65,7 @@ export function CatalogList({ catalogs, loading, onTest, onDelete }: CatalogList
                 <Icon icon="mdi:refresh" />
               </button>
               <button
+                type="button"
                 className="catalog-item__action-btn catalog-item__action-btn--delete"
                 onClick={() => handleDelete(catalog.id)}
                 title="Remove catalog"

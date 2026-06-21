@@ -9,8 +9,12 @@ export interface CatalogCreate {
   password: string;
 }
 
-export interface CatalogRead extends CatalogCreate {
+export interface CatalogRead {
   id: string;
+  name: string;
+  type: DatabaseType;
+  url: string;
+  user: string;
   status: CatalogStatus;
   created_at: string;
   updated_at: string;

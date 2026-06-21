@@ -20,7 +20,6 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({ onSuccess }) => {
     if (!file) return;
 
     // Mock upload - in reality we would upload the file to backend and get a URL
-    console.log('Uploading file:', file.name);
     const mockUrl = `https://api.dicebear.com/7.x/avataaars/svg?seed=${file.name}`;
     setAvatarUrl(mockUrl);
   };
@@ -35,12 +34,11 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({ onSuccess }) => {
         avatar_url: avatarUrl,
       });
       // Ideally we would redirect or show success here
-      console.log('Profile updated successfully');
       if (onSuccess) {
         onSuccess();
       }
     } catch (err) {
-      console.error('Failed to update profile:', err);
+      // Error is handled by the form UI
     } finally {
       setLoading(false);
     }
@@ -48,8 +46,6 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({ onSuccess }) => {
 
   const handleSkip = () => {
     // Allow user to skip this form
-    console.log('Profile setup skipped');
-    // Implement navigation to main app here
     if (onSuccess) {
       onSuccess();
     }
@@ -89,6 +85,7 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({ onSuccess }) => {
 
         <div className="button-group">
           <Button 
+            type="button"
             variant="secondary" 
             onClick={handleSkip}
             disabled={loading}

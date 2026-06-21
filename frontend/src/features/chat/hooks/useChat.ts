@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, useRef } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { chatApi } from '../api';
 import type { ChatMessage, ChatSession, ContentBlock } from '../types';
 
@@ -52,27 +52,71 @@ const WELCOME_MESSAGE: ChatMessage = {
 };
 
 export function useChat() {
-  const [sessions, setSessions] = useState<ChatSession[]>([]);
-  const [activeSessionId, setActiveSessionId] = useState<string>('');
-  const [messages, setMessages] = useState<ChatMessage[]>([WELCOME_MESSAGE]);
+  const [sessions, setSessions] = useState<ChatSession[]>(() => {
+    try {
+      const saved = localStorage.getItem('nlex_sessions');
+      return saved ? JSON.parse(saved) : [];
+    } catch { return []; }
+  });
+  
+  const [activeSessionId, setActiveSessionId] = useState<string>(() => {
+    return localStorage.getItem('nlex_active_session') || '';
+  });
+  
+  const [messagesBySession, setMessagesBySession] = useState<Record<string, ChatMessage[]>>(() => {
+    try {
+      const saved = localStorage.getItem('nlex_messages');
+      return saved ? JSON.parse(saved) : {};
+    } catch { return {}; }
+  });
+  
   const [inputValue, setInputValue] = useState('');
   const [pending, setPending] = useState(false);
-  const chatIdRef = useRef<string | null>(null);
 
-  useEffect(() => {
+  const initChat = useCallback(() => {
     chatApi.create().then(chat => {
-      chatIdRef.current = chat.id;
       const session: ChatSession = { id: chat.id, title: chat.name };
-      setSessions([session]);
+      setSessions(prev => [...prev, session]);
+      setMessagesBySession(prev => ({
+        ...prev,
+        [chat.id]: [WELCOME_MESSAGE]
+      }));
       setActiveSessionId(chat.id);
+      setInputValue('');
     }).catch(() => {
       // fallback: keep welcome message only
     });
   }, []);
 
+  useEffect(() => {
+    localStorage.setItem('nlex_sessions', JSON.stringify(sessions));
+  }, [sessions]);
+
+  useEffect(() => {
+    localStorage.setItem('nlex_messages', JSON.stringify(messagesBySession));
+  }, [messagesBySession]);
+
+  useEffect(() => {
+    if (activeSessionId) {
+      localStorage.setItem('nlex_active_session', activeSessionId);
+    }
+  }, [activeSessionId]);
+
+  const [initialized, setInitialized] = useState(false);
+  useEffect(() => {
+    if (!initialized) {
+      if (sessions.length === 0) {
+        initChat();
+      } else if (!activeSessionId && sessions.length > 0) {
+        setActiveSessionId(sessions[0].id);
+      }
+      setInitialized(true);
+    }
+  }, [initChat, sessions.length, activeSessionId, initialized]);
+
   const handleSendMessage = useCallback(async () => {
     const text = inputValue.trim();
-    if (!text || pending || !chatIdRef.current) return;
+    if (!text || pending || !activeSessionId) return;
 
     setInputValue('');
 
@@ -82,11 +126,22 @@ export function useChat() {
       blocks: [{ type: 'text', text }],
       timestamp: new Date().toISOString(),
     };
-    setMessages(prev => [...prev, userMsg]);
+
+    const isFirstMessage = (messagesBySession[activeSessionId] || []).length <= 1;
+    if (isFirstMessage) {
+      const newTitle = text.length > 30 ? text.slice(0, 30) + '...' : text;
+      setSessions(prev => prev.map(s => s.id === activeSessionId ? { ...s, title: newTitle } : s));
+    }
+    
+    setMessagesBySession(prev => ({
+      ...prev,
+      [activeSessionId]: [...(prev[activeSessionId] || []), userMsg]
+    }));
+    
     setPending(true);
 
     try {
-      const response = await chatApi.sendPrompt(chatIdRef.current, text);
+      const response = await chatApi.sendPrompt(activeSessionId, text);
       const blocks = parseBlocks(response);
       const assistantMsg: ChatMessage = {
         id: generateId(),
@@ -95,7 +150,11 @@ export function useChat() {
         timestamp: new Date().toISOString(),
         exportUrl: response.export_url,
       };
-      setMessages(prev => [...prev, assistantMsg]);
+      
+      setMessagesBySession(prev => ({
+        ...prev,
+        [activeSessionId]: [...(prev[activeSessionId] || []), assistantMsg]
+      }));
     } catch (err: any) {
       const errorMsg: ChatMessage = {
         id: generateId(),
@@ -103,19 +162,22 @@ export function useChat() {
         blocks: [{ type: 'error', message: err.message || 'Something went wrong' }],
         timestamp: new Date().toISOString(),
       };
-      setMessages(prev => [...prev, errorMsg]);
+      setMessagesBySession(prev => ({
+        ...prev,
+        [activeSessionId]: [...(prev[activeSessionId] || []), errorMsg]
+      }));
     } finally {
       setPending(false);
     }
-  }, [inputValue, pending]);
+  }, [inputValue, pending, activeSessionId]);
 
   const handleClarification = useCallback(async (questionId: string, selectedOptions: string[]) => {
-    if (!chatIdRef.current || pending) return;
+    if (!activeSessionId || pending) return;
 
     setPending(true);
 
     try {
-      const response = await chatApi.sendClarification(chatIdRef.current, questionId, selectedOptions);
+      const response = await chatApi.sendClarification(activeSessionId, questionId, selectedOptions);
       const blocks = parseBlocks(response);
       const assistantMsg: ChatMessage = {
         id: generateId(),
@@ -124,7 +186,11 @@ export function useChat() {
         timestamp: new Date().toISOString(),
         exportUrl: response.export_url,
       };
-      setMessages(prev => [...prev, assistantMsg]);
+      
+      setMessagesBySession(prev => ({
+        ...prev,
+        [activeSessionId]: [...(prev[activeSessionId] || []), assistantMsg]
+      }));
     } catch (err: any) {
       const errorMsg: ChatMessage = {
         id: generateId(),
@@ -132,24 +198,29 @@ export function useChat() {
         blocks: [{ type: 'error', message: err.message || 'Something went wrong' }],
         timestamp: new Date().toISOString(),
       };
-      setMessages(prev => [...prev, errorMsg]);
+      setMessagesBySession(prev => ({
+        ...prev,
+        [activeSessionId]: [...(prev[activeSessionId] || []), errorMsg]
+      }));
     } finally {
       setPending(false);
     }
-  }, [pending]);
+  }, [pending, activeSessionId]);
 
   const activeSession = sessions.find(s => s.id === activeSessionId);
+  const currentMessages = messagesBySession[activeSessionId] || [WELCOME_MESSAGE];
 
   return {
     sessions,
     activeSessionId,
     activeSession,
-    messages,
+    messages: currentMessages,
     inputValue,
     pending,
     setInputValue,
     setActiveSessionId,
     handleSendMessage,
     handleClarification,
+    startNewChat: initChat,
   };
 }

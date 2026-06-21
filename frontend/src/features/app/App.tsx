@@ -21,6 +21,7 @@ function ChatPage() {
           sessions={chat.sessions}
           activeSessionId={chat.activeSessionId}
           onSelectSession={chat.setActiveSessionId}
+          onNewChat={chat.startNewChat}
         />
         <CatalogManager />
       </Sidebar>

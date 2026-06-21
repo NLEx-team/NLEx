@@ -20,6 +20,10 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
       setError('Email and password are required');
       return;
     }
+    if (password !== passwordRepeat) {
+      setError('Passwords do not match');
+      return;
+    }
 
     setLoading(true);
     setError(null);

@@ -24,7 +24,10 @@ export function Chat({
   pending,
 }: ChatProps) {
   const handleExport = useCallback((exportUrl: string) => {
-    chatApi.downloadExport(exportUrl);
+    chatApi.downloadExport(exportUrl).catch((err) => {
+      console.error('Export download failed:', err);
+      alert('Failed to download export. Please try again.');
+    });
   }, []);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -34,36 +37,40 @@ export function Chat({
 
   return (
     <div className="chat">
-      <div className="chat__layout">
-        <div className="chat__messages">
-          {messages.length === 0 && (
-            <div className="chat__messages-empty">
-              Start a conversation by typing a message below.
-            </div>
-          )}
-          {messages.map((msg) => (
-            <ChatMessage
-              key={msg.id}
-              role={msg.role}
-              blocks={msg.blocks}
-              exportUrl={msg.exportUrl}
-              onClarify={handleClarification}
-              onExport={handleExport}
-            />
-          ))}
-          {pending && (
-            <div className="chat-message chat-message--assistant">
-              <div className="chat-message__bubble">
-                <div className="chat-message__pending">
-                  <Icon icon="mdi:loading" className="chat-message__pending-icon" />
-                  <span>Processing...</span>
+      <div className="chat__scroll-area">
+        <div className="chat__layout">
+          <div className="chat__messages">
+            {messages.length === 0 && (
+              <div className="chat__messages-empty">
+                Start a conversation by typing a message below.
+              </div>
+            )}
+            {messages.map((msg) => (
+              <ChatMessage
+                key={msg.id}
+                role={msg.role}
+                blocks={msg.blocks}
+                exportUrl={msg.exportUrl}
+                onClarify={handleClarification}
+                onExport={handleExport}
+              />
+            ))}
+            {pending && (
+              <div className="chat-message chat-message--assistant">
+                <div className="chat-message__bubble">
+                  <div className="chat-message__pending">
+                    <Icon icon="mdi:loading" className="chat-message__pending-icon" />
+                    <span>Processing...</span>
+                  </div>
                 </div>
               </div>
-            </div>
-          )}
-          <div ref={messagesEndRef} />
+            )}
+            <div ref={messagesEndRef} />
+          </div>
         </div>
+      </div>
 
+      <div className="chat__footer-wrapper">
         <div className="chat__footer">
           <ChatInput
             value={inputValue}

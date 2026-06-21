@@ -17,6 +17,10 @@
   overflow: hidden;
 }
 
+.sidebar--open {
+  width: var(--sidebar-width, 320px);
+}
+
 .sidebar__header {
   display: flex;
   align-items: center;

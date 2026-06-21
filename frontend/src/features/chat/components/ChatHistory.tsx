@@ -9,12 +9,13 @@ interface ChatHistoryProps {
   sessions: ChatSession[];
   activeSessionId: string;
   onSelectSession: (id: string) => void;
+  onNewChat?: () => void;
 }
 
-export function ChatHistory({ sessions, activeSessionId, onSelectSession }: ChatHistoryProps) {
+export function ChatHistory({ sessions, activeSessionId, onSelectSession, onNewChat }: ChatHistoryProps) {
   return (
     <>
-      <Button variant="secondary" className="button--field chat-history__new-chat-btn">
+      <Button variant="secondary" className="button--field chat-history__new-chat-btn" onClick={onNewChat}>
         <Icon icon="mdi:plus" />
         <span>New Chat</span>
       </Button>

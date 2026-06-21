@@ -30,16 +30,28 @@ export function SidebarSection({
         >
           {title}
         </button>
-        <button
-          type="button"
-          className="sidebar-section__add-btn"
-          onClick={onAdd}
-          disabled={!onAdd}
-          title="Add"
-          aria-label="Add"
-        >
-          <Icon icon="mdi:plus" />
-        </button>
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          {onAdd && (
+            <button
+              type="button"
+              className="sidebar-section__add-btn"
+              onClick={onAdd}
+              title="Add"
+              aria-label="Add"
+            >
+              <Icon icon="mdi:playlist-plus" />
+            </button>
+          )}
+          <button
+            type="button"
+            className="sidebar-section__add-btn"
+            onClick={() => setIsCollapsed((collapsed) => !collapsed)}
+            title={isCollapsed ? "Expand" : "Collapse"}
+            aria-label={isCollapsed ? "Expand" : "Collapse"}
+          >
+            <Icon icon={isCollapsed ? "mdi:plus" : "mdi:minus"} />
+          </button>
+        </div>
       </div>
       {!isCollapsed && <div className="sidebar-section__body">{children}</div>}
     </section>

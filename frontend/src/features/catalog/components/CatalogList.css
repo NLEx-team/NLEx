@@ -33,15 +33,15 @@
 }
 
 .catalog-item__status--active {
-  background: #22c55e;
+  background: var(--color-accent);
 }
 
 .catalog-item__status--inactive {
-  background: #6b7280;
+  background: var(--color-text-secondary);
 }
 
 .catalog-item__status--error {
-  background: #ef4444;
+  background: var(--color-error-border);
 }
 
 .catalog-item__info {
@@ -108,7 +108,7 @@
 }
 
 .catalog-item__action-btn--delete:hover {
-  color: #ef4444;
+  color: var(--color-error-border);
 }
 
 @keyframes rotate {
