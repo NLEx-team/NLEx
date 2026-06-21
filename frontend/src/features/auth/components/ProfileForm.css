@@ -1,0 +1,121 @@
+.profile-form-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 400px;
+  margin: 0 auto;
+  padding: var(--spacing-lg);
+}
+
+.profile-header {
+  text-align: center;
+  margin-bottom: var(--spacing-lg);
+}
+
+.profile-header h2 {
+  margin-bottom: var(--spacing-xs);
+  color: var(--color-text-primary);
+}
+
+.profile-header p {
+  color: var(--color-text-secondary);
+  font-size: 0.9rem;
+}
+
+.profile-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  width: 100%;
+}
+
+.avatar-upload {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: var(--spacing-md);
+}
+
+.avatar-label {
+  cursor: pointer;
+  position: relative;
+  display: block;
+}
+
+.avatar-edit-icon {
+  position: absolute;
+  background-color: var(--color-back-main);
+  border-radius: 50%;
+  width: calc(var(--icon-size) + var(--spacing-sm));
+  height: calc(var(--icon-size) + var(--spacing-sm));
+  border: 1px solid var(--color-back-active);
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.avatar-circle {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid var(--color-border);
+  position: relative;
+  background-color: var(--color-back-components);
+  transition: transform 0.2s ease;
+}
+
+.avatar-label:hover .avatar-circle {
+  transform: scale(1.05);
+}
+
+.avatar-circle img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.avatar-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3rem;
+  color: var(--color-text-secondary);
+}
+
+.avatar-overlay {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  font-weight: bold;
+  border: 2px solid var(--color-back-main);
+  box-shadow: var(--shadow-elevated);
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.fields-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.button-group {
+  display: flex;
+  gap: var(--spacing-sm);
+  justify-content: center;
+  margin-top: var(--spacing-md);
+}

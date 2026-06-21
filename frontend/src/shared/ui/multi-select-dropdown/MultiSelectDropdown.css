@@ -1,0 +1,113 @@
+.multi-select-dropdown {
+  position: relative;
+  width: 100%;
+}
+
+.multi-select-dropdown__trigger {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: var(--components-height);
+  padding: 0 var(--spacing-sm);
+  border: var(--border-width) solid var(--color-back-active);
+  border-radius: var(--input-radius);
+  background: var(--color-back-main);
+  color: var(--color-text-primary);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.multi-select-dropdown__trigger:focus-visible {
+  outline: none;
+  border-color: var(--color-accent);
+}
+
+.multi-select-dropdown--open .multi-select-dropdown__trigger {
+  border-color: var(--color-accent);
+}
+
+.multi-select-dropdown__trigger:disabled {
+  background: var(--color-back-components);
+  cursor: not-allowed;
+}
+
+.multi-select-dropdown__value {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.multi-select-dropdown__placeholder {
+  color: var(--color-text-secondary);
+}
+
+.multi-select-dropdown__icon {
+  flex-shrink: 0;
+  margin-left: var(--spacing-sm);
+}
+
+.multi-select-dropdown__list {
+  position: absolute;
+  top: calc(100% + var(--input-gap));
+  left: 0;
+  z-index: var(--z-index-dropdown);
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border: var(--border-width) solid var(--color-back-active);
+  border-radius: var(--input-radius);
+  background: var(--color-back-main);
+  box-shadow: var(--shadow-elevated);
+}
+
+.multi-select-dropdown__option {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  width: 100%;
+  height: var(--components-height);
+  padding: 0 var(--spacing-md);
+  background: var(--color-back-main);
+  color: var(--color-text-primary);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.multi-select-dropdown__option:not(:first-child) {
+  border-top: var(--border-width) solid var(--color-text-secondary);
+}
+
+.multi-select-dropdown__option--selected {
+  color: var(--color-accent);
+}
+
+.multi-select-dropdown__checkbox {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: var(--checkbox-size);
+  height: var(--checkbox-size);
+  color: var(--color-text-primary);
+}
+
+.multi-select-dropdown__option--selected .multi-select-dropdown__checkbox {
+  color: var(--color-accent);
+}
+
+.multi-select-dropdown__label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.multi-select-dropdown__option--selected .multi-select-dropdown__label {
+  color: var(--color-accent);
+}

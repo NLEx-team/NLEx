@@ -1,0 +1,12 @@
+.chat-history__new-chat-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+}
+
+.chat-history__sessions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}

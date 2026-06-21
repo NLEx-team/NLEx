@@ -1,0 +1,45 @@
+.profile-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  padding: calc(var(--spacing-lg) + var(--spacing-sm)) var(--spacing-md);
+  background: var(--color-back-main);
+}
+
+.profile-page__card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-lg);
+  width: 100%;
+  max-width: 420px;
+}
+
+.profile-page__avatar {
+  position: relative;
+}
+
+.profile-page__fields {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  width: 100%;
+}
+
+.profile-page__actions {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  width: 100%;
+  padding-top: var(--spacing-md);
+  border-top: var(--border-width) solid var(--color-back-active);
+}
+
+.profile-page__actions .button {
+  gap: var(--spacing-sm);
+}

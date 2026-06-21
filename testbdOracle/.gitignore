@@ -1,0 +1,19 @@
+# Логи Oracle и sqlplus
+*.log
+*.trc
+*.trm
+spool*.txt
+
+# Временные файлы Windows
+Thumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Временные файлы редакторов
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Docker volumes (локальные данные БД)
+oradata/

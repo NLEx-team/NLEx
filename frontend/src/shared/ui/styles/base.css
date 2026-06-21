@@ -1,0 +1,28 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-family);
+  font-size: var(--font-size-main);
+  background-color: var(--color-back-main);
+  color: var(--color-text-primary);
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+svg.iconify {
+  width: var(--icon-size);
+  height: var(--icon-size);
+  flex-shrink: 0;
+}

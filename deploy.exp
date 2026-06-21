@@ -1,0 +1,39 @@
+#!/usr/bin/expect -f
+
+set timeout -1
+set ip "194.226.97.77"
+set password "XorWxnZ2tNJEA8lS"
+
+spawn ssh -o StrictHostKeyChecking=no root@$ip
+
+expect {
+    "password:" {
+        send "$password\r"
+    }
+}
+
+expect "#"
+
+send "cd ~/NLEx\r"
+expect "#"
+
+send "git fetch\r"
+expect "#"
+
+send "git checkout feature/mvp-v0\r"
+expect "#"
+
+send "cp .env.example .env\r"
+expect "#"
+
+send "cp .env.example .env.secret\r"
+expect "#"
+
+send "docker network create shared-net || true\r"
+expect "#"
+
+send "docker compose --profile prod up -d --build\r"
+expect "#"
+
+send "exit\r"
+expect eof
