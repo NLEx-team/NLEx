@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import { useAuth } from '../auth';
 import { AuthForm } from '../auth/components/AuthForm';
+import { UserProfilePage } from '../auth/components/UserProfilePage';
 import { Chat, ChatHistory, useChat } from '../chat';
 import { CatalogManager } from '../catalog';
 import { Sidebar } from './components/Sidebar';
@@ -55,6 +56,10 @@ export default function App() {
         <Route
           path="/chat"
           element={isAuthenticated ? <ChatPage /> : <Navigate to="/auth" replace />}
+        />
+        <Route
+          path="/profile"
+          element={isAuthenticated ? <UserProfilePage /> : <Navigate to="/auth" replace />}
         />
         <Route
           path="*"

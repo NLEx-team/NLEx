@@ -3,7 +3,7 @@ import { useAuth } from '../hooks/useAuth';
 import { Field, PasswordField, Button } from '../../../shared/ui';
 
 interface RegisterFormProps {
-  onSuccess?: () => void;
+  onSuccess?: (email: string, password: string) => void;
 }
 
 export const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
@@ -29,7 +29,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
         password,
       });
       if (onSuccess) {
-        onSuccess();
+        onSuccess(email, password);
       }
     } catch (err: any) {
       setError('Failed to register. Please try again.');
