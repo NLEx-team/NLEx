@@ -28,10 +28,6 @@ export function CatalogList({ catalogs, loading, onTest, onDelete, onAdd, onInfo
     return <div className="catalog-list__empty">Loading catalogs...</div>;
   }
 
-  if (catalogs.length === 0) {
-    return <div className="catalog-list__empty">No catalogs connected</div>;
-  }
-
   const handleTest = async (id: string) => {
     setTestingId(id);
     try {
@@ -53,36 +49,41 @@ export function CatalogList({ catalogs, loading, onTest, onDelete, onAdd, onInfo
           <Icon icon="mdi:plus" />
         </button>
       )}
-      {catalogs.map(catalog => (
-        <div key={catalog.id} className="catalog-item">
-          <span className={`catalog-item__status catalog-item__status--${catalog.status}`} />
-          <div className="catalog-item__info">
-            <span className="catalog-item__name">{catalog.name}</span>
-            <span className="catalog-item__meta">{testingId === catalog.id ? 'Testing...' : STATUS_LABELS[catalog.status]}</span>
+      
+      {catalogs.length === 0 ? (
+        <div className="catalog-list__empty" style={{ paddingTop: '16px' }}>No catalogs connected</div>
+      ) : (
+        catalogs.map(catalog => (
+          <div key={catalog.id} className="catalog-item">
+            <span className={`catalog-item__status catalog-item__status--${catalog.status}`} />
+            <div className="catalog-item__info">
+              <span className="catalog-item__name">{catalog.name}</span>
+              <span className="catalog-item__meta">{testingId === catalog.id ? 'Testing...' : STATUS_LABELS[catalog.status]}</span>
+            </div>
+            <div className="catalog-item__actions">
+              <button
+                type="button"
+                className={
+                  "catalog-item__action-btn catalog-item__action-btn--test" + 
+                  (testingId === catalog.id ? " catalog-item__action-btn--loading" : "")
+                }
+                onClick={() => handleTest(catalog.id)}
+                title="Test connection"
+              >
+                <Icon icon="mdi:refresh" />
+              </button>
+              <button
+                type="button"
+                className="catalog-item__action-btn"
+                onClick={() => onInfo?.(catalog)}
+                title="Database info"
+              >
+                <Icon icon="mdi:information-outline" />
+              </button>
+            </div>
           </div>
-          <div className="catalog-item__actions">
-            <button
-              type="button"
-              className={
-                "catalog-item__action-btn catalog-item__action-btn--test" + 
-                (testingId === catalog.id ? " catalog-item__action-btn--loading" : "")
-              }
-              onClick={() => handleTest(catalog.id)}
-              title="Test connection"
-            >
-              <Icon icon="mdi:refresh" />
-            </button>
-            <button
-              type="button"
-              className="catalog-item__action-btn"
-              onClick={() => onInfo?.(catalog)}
-              title="Database info"
-            >
-              <Icon icon="mdi:information-outline" />
-            </button>
-          </div>
-        </div>
-      ))}
+        ))
+      )}
     </div>
   );
 }
