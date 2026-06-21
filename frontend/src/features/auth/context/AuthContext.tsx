@@ -72,8 +72,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const register = async (data: RegisterData) => {
     try {
       await api.post('/auth/register', data);
-      // Auto-login after registration
-      await login({ email: data.email, password: data.password });
     } catch (error) {
       throw error;
     }
