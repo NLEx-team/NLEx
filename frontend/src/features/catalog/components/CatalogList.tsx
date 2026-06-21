@@ -47,7 +47,7 @@ export function CatalogList({ catalogs, loading, onTest, onDelete, onAdd, onInfo
 
   return (
     <div className="catalog-list">
-      {onAdd && (
+      {isAdmin && onAdd && (
         <button type="button" className="catalog-item catalog-item--add" onClick={onAdd}>
           <span>Add new DB</span>
           <Icon icon="mdi:plus" />
