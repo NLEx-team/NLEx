@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef } from 'react';
 import { Icon } from '@iconify/react';
 import { ChatInput } from '../../../shared/ui/chat-input';
 import { ChatMessage } from '../../../shared/ui/chat-message';
+import { Logo } from '../../../shared/ui/logo';
 import { chatApi } from '../api';
 import type { ChatMessage as ChatMessageType } from '../types';
 import './Chat.css';
@@ -41,8 +42,9 @@ export function Chat({
         <div className="chat__layout">
           <div className="chat__messages">
             {messages.length === 0 && (
-              <div className="chat__messages-empty">
-                Start a conversation by typing a message below.
+              <div className="chat__welcome">
+                <Logo variant="full" />
+                <p className="chat__welcome-text">Ask a question about your data</p>
               </div>
             )}
             {messages.map((msg) => (

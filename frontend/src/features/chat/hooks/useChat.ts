@@ -44,13 +44,6 @@ function parseBlocks(response: { result: { status: string; question?: string; op
   return blocks;
 }
 
-const WELCOME_MESSAGE: ChatMessage = {
-  id: 'welcome',
-  role: 'assistant',
-  blocks: [{ type: 'text', text: 'Hello! How can I help you with your data today?' }],
-  timestamp: new Date().toISOString(),
-};
-
 export function useChat(userId: string) {
   const sessionsKey = `nlex_sessions_${userId}`;
   const messagesKey = `nlex_messages_${userId}`;
@@ -83,7 +76,7 @@ export function useChat(userId: string) {
       setSessions(prev => [...prev, session]);
       setMessagesBySession(prev => ({
         ...prev,
-        [chat.id]: [WELCOME_MESSAGE]
+        [chat.id]: []
       }));
       setActiveSessionId(chat.id);
       setInputValue('');
@@ -131,7 +124,8 @@ export function useChat(userId: string) {
       timestamp: new Date().toISOString(),
     };
 
-    const isFirstMessage = (messagesBySession[activeSessionId] || []).length <= 1;
+    const prevMessages = messagesBySession[activeSessionId] || [];
+    const isFirstMessage = prevMessages.length === 0;
     if (isFirstMessage) {
       const newTitle = text.length > 30 ? text.slice(0, 30) + '...' : text;
       setSessions(prev => prev.map(s => s.id === activeSessionId ? { ...s, title: newTitle } : s));
@@ -212,7 +206,7 @@ export function useChat(userId: string) {
   }, [pending, activeSessionId]);
 
   const activeSession = sessions.find(s => s.id === activeSessionId);
-  const currentMessages = messagesBySession[activeSessionId] || [WELCOME_MESSAGE];
+  const currentMessages = messagesBySession[activeSessionId] || [];
 
   return {
     sessions,

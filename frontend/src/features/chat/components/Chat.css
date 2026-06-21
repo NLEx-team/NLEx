@@ -34,14 +34,19 @@
   padding: var(--spacing-lg) 0;
 }
 
-.chat__messages-empty {
+.chat__welcome {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   flex: 1;
+  gap: 16px;
+}
+
+.chat__welcome-text {
+  margin: 0;
   color: var(--color-text-secondary);
-  text-align: center;
-  font-size: 14px;
+  font-size: 15px;
 }
 
 .chat__footer-wrapper {
