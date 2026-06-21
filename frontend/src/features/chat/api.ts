@@ -28,14 +28,14 @@ export const chatApi = {
     ),
 
   sendPrompt: (chatId: string, prompt: string) =>
-    api.post<PromptResponse>(`/chats/${chatId}/prompt`, { prompt }),
+    api.post<PromptResponse>(`/chats/${chatId}/prompt`, { prompt }, { timeout: 300000 }),
 
   sendClarification: (chatId: string, questionId: string, selectedOptions: string[], customAnswer?: string) =>
     api.post<PromptResponse>(`/chats/${chatId}/clarify`, {
       question_id: questionId,
       selected_options: selectedOptions,
       custom_answer: customAnswer || null,
-    }),
+    }, { timeout: 300000 }),
 
   downloadExport: async (exportUrl: string) => {
     const token = localStorage.getItem('jwt_token');

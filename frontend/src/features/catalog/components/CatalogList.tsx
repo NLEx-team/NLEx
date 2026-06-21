@@ -9,16 +9,18 @@ interface CatalogListProps {
   loading: boolean;
   onTest: (id: string) => void;
   onDelete: (id: string) => void;
+  onAdd?: () => void;
+  onInfo?: (catalog: CatalogRead) => void;
 }
 
 const STATUS_LABELS: Record<string, string> = {
   active: 'Connected',
   inactive: 'Inactive',
-  error: 'Error',
+  error: 'Disconnected',
 };
 
-export function CatalogList({ catalogs, loading, onTest, onDelete }: CatalogListProps) {
-  const [isTesting, setIsTesting] = useState<boolean>(false);
+export function CatalogList({ catalogs, loading, onTest, onDelete, onAdd, onInfo }: CatalogListProps) {
+  const [testingId, setTestingId] = useState<string | null>(null);
   const { user } = useAuth();
   const isAdmin = user?.role === 'admin';
 
@@ -31,9 +33,12 @@ export function CatalogList({ catalogs, loading, onTest, onDelete }: CatalogList
   }
 
   const handleTest = async (id: string) => {
-    setIsTesting(true);
-    await onTest(id);
-    setIsTesting(false);
+    setTestingId(id);
+    try {
+      await onTest(id);
+    } finally {
+      setTestingId(null);
+    }
   };
 
   const handleDelete = (id: string) => {
@@ -42,36 +47,40 @@ export function CatalogList({ catalogs, loading, onTest, onDelete }: CatalogList
 
   return (
     <div className="catalog-list">
+      {isAdmin && onAdd && (
+        <button type="button" className="catalog-item catalog-item--add" onClick={onAdd}>
+          <span>Add new DB</span>
+          <Icon icon="mdi:plus" />
+        </button>
+      )}
       {catalogs.map(catalog => (
         <div key={catalog.id} className="catalog-item">
           <span className={`catalog-item__status catalog-item__status--${catalog.status}`} />
           <div className="catalog-item__info">
-            <div className="catalog-item__name">{catalog.name}</div>
-            <div className="catalog-item__meta">{
-              isTesting ? 'Testing...' : STATUS_LABELS[catalog.status]
-            }</div>
+            <span className="catalog-item__name">{catalog.name}</span>
+            <span className="catalog-item__meta">{testingId === catalog.id ? 'Testing...' : STATUS_LABELS[catalog.status]}</span>
           </div>
-          {isAdmin && (
-            <div className="catalog-item__actions">
-              <button
-                className={
-                  "catalog-item__action-btn catalog-item__action-btn--test" + 
-                  (isTesting ? " catalog-item__action-btn--loading" : "")
-                }
-                onClick={() => handleTest(catalog.id)}
-                title="Test connection"
-              >
-                <Icon icon="mdi:refresh" />
-              </button>
-              <button
-                className="catalog-item__action-btn catalog-item__action-btn--delete"
-                onClick={() => handleDelete(catalog.id)}
-                title="Remove catalog"
-              >
-                <Icon icon="mdi:delete-outline" />
-              </button>
-            </div>
-          )}
+          <div className="catalog-item__actions">
+            <button
+              type="button"
+              className={
+                "catalog-item__action-btn catalog-item__action-btn--test" + 
+                (testingId === catalog.id ? " catalog-item__action-btn--loading" : "")
+              }
+              onClick={() => handleTest(catalog.id)}
+              title="Test connection"
+            >
+              <Icon icon="mdi:refresh" />
+            </button>
+            <button
+              type="button"
+              className="catalog-item__action-btn"
+              onClick={() => onInfo?.(catalog)}
+              title="Database info"
+            >
+              <Icon icon="mdi:information-outline" />
+            </button>
+          </div>
         </div>
       ))}
     </div>

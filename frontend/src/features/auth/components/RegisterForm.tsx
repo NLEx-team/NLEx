@@ -20,6 +20,10 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
       setError('Email and password are required');
       return;
     }
+    if (password !== passwordRepeat) {
+      setError('Passwords do not match');
+      return;
+    }
 
     setLoading(true);
     setError(null);
@@ -54,7 +58,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
         placeholder="Email"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
-        mode={error ? 'error' : 'default'}
+        mode={error && error !== 'Passwords do not match' ? 'error' : 'default'}
         disabled={loading}
       />
       <PasswordField

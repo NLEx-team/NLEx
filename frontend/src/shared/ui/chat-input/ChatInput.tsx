@@ -38,6 +38,17 @@ export function ChatInput({
 
   const containerClassName = ["chat-input", className].filter(Boolean).join(" ");
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      if (value.trim() && !disabled) {
+        onSubmit();
+      }
+    }
+  };
+
+  const isSubmitDisabled = disabled || !value.trim();
+
   return (
     <div className={containerClassName}>
       <textarea
@@ -46,6 +57,7 @@ export function ChatInput({
         className="chat-input__textarea"
         value={value}
         onChange={onChange}
+        onKeyDown={handleKeyDown}
         placeholder={placeholder}
         disabled={disabled}
         rows={1}
@@ -55,7 +67,7 @@ export function ChatInput({
         type="button"
         className="chat-input__submit"
         onClick={onSubmit}
-        disabled={disabled}
+        disabled={isSubmitDisabled}
         aria-label="Send message"
       >
         <IconWrapper>

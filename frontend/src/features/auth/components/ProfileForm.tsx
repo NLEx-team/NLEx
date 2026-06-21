@@ -4,12 +4,18 @@ import { Field, Button, Avatar } from '../../../shared/ui';
 import { Icon } from "@iconify/react";
 import './ProfileForm.css';
 
+interface ProfileData {
+  first_name?: string;
+  last_name?: string;
+  avatar_url?: string;
+}
+
 interface ProfileFormProps {
-  onSuccess?: () => void;
+  onSuccess?: (data?: ProfileData) => void;
 }
 
 export const ProfileForm: React.FC<ProfileFormProps> = ({ onSuccess }) => {
-  const { updateProfile, user } = useAuth();
+  const { user } = useAuth();
   const [firstName, setFirstName] = useState(user?.profile?.first_name || '');
   const [lastName, setLastName] = useState(user?.profile?.last_name || '');
   const [avatarUrl, setAvatarUrl] = useState(user?.profile?.avatar_url || '');
@@ -20,7 +26,6 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({ onSuccess }) => {
     if (!file) return;
 
     // Mock upload - in reality we would upload the file to backend and get a URL
-    console.log('Uploading file:', file.name);
     const mockUrl = `https://api.dicebear.com/7.x/avataaars/svg?seed=${file.name}`;
     setAvatarUrl(mockUrl);
   };
@@ -28,28 +33,21 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({ onSuccess }) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    try {
-      await updateProfile({
+    // Simulate minor delay to show loading state
+    await new Promise(resolve => setTimeout(resolve, 500));
+    setLoading(false);
+    
+    if (onSuccess) {
+      onSuccess({
         first_name: firstName,
         last_name: lastName,
         avatar_url: avatarUrl,
       });
-      // Ideally we would redirect or show success here
-      console.log('Profile updated successfully');
-      if (onSuccess) {
-        onSuccess();
-      }
-    } catch (err) {
-      console.error('Failed to update profile:', err);
-    } finally {
-      setLoading(false);
     }
   };
 
   const handleSkip = () => {
     // Allow user to skip this form
-    console.log('Profile setup skipped');
-    // Implement navigation to main app here
     if (onSuccess) {
       onSuccess();
     }
@@ -89,6 +87,7 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({ onSuccess }) => {
 
         <div className="button-group">
           <Button 
+            type="button"
             variant="secondary" 
             onClick={handleSkip}
             disabled={loading}

@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth';
 import { AuthForm } from '../auth/components/AuthForm';
@@ -8,11 +7,13 @@ import { CatalogManager } from '../catalog';
 import { AppHeader } from './components/AppHeader';
 import { Sidebar } from './components/Sidebar';
 import { ThemeToggle } from './components/ThemeToggle';
+import { useLocalStorage } from '../../shared/hooks/useLocalStorage';
 import './App.css';
 
 function ChatPage() {
-  const chat = useChat();
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const { user } = useAuth();
+  const chat = useChat(user!.id);
+  const [isSidebarOpen, setIsSidebarOpen] = useLocalStorage('sidebar:open', false);
 
   return (
     <>
@@ -21,6 +22,7 @@ function ChatPage() {
           sessions={chat.sessions}
           activeSessionId={chat.activeSessionId}
           onSelectSession={chat.setActiveSessionId}
+          onNewChat={chat.startNewChat}
         />
         <CatalogManager />
       </Sidebar>
@@ -48,7 +50,7 @@ function ChatPage() {
 
 function ProfilePage() {
   const navigate = useNavigate();
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useLocalStorage('sidebar:open', false);
 
   return (
     <>

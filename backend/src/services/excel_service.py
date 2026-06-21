@@ -22,23 +22,23 @@ class ExcelExportService:
         self.exports_dir = exports_dir
         os.makedirs(self.exports_dir, exist_ok=True)
 
-    def _get_file_path(self, chat_id: UUID) -> str:
-        """Returns the cached file path for a given chat_id."""
-        return os.path.join(self.exports_dir, f"{chat_id}.xlsx")
+    def _get_file_path(self, export_id: str) -> str:
+        """Returns the file path for a given export_id."""
+        return os.path.join(self.exports_dir, f"{export_id}.xlsx")
 
-    def get_cached_file(self, chat_id: UUID) -> Optional[str]:
+    def get_cached_file(self, export_id: str) -> Optional[str]:
         """
         Returns the path to a cached Excel file if it exists,
         otherwise None.
         """
-        path = self._get_file_path(chat_id)
+        path = self._get_file_path(export_id)
         if os.path.exists(path):
             return path
         return None
 
     def generate_excel(
         self,
-        chat_id: UUID,
+        export_id: str,
         headers: List[str],
         data: List[List[Any]],
     ) -> str:
@@ -99,15 +99,8 @@ class ExcelExportService:
         ws.freeze_panes = "A2"
 
         # Save to volume
-        file_path = self._get_file_path(chat_id)
+        file_path = self._get_file_path(export_id)
         wb.save(file_path)
         logger.info(f"Excel file generated and saved: {file_path}")
 
         return file_path
-
-    def invalidate_cache(self, chat_id: UUID) -> None:
-        """Removes cached file for a chat (e.g. when a new query is made)."""
-        path = self._get_file_path(chat_id)
-        if os.path.exists(path):
-            os.remove(path)
-            logger.info(f"Invalidated cached export for chat {chat_id}")

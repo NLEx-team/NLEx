@@ -1,5 +1,6 @@
-import { useState, type ReactNode } from 'react';
+import { type ReactNode } from 'react';
 import { Icon } from '@iconify/react';
+import { useLocalStorage } from '../../../shared/hooks/useLocalStorage';
 import './SidebarSection.css';
 
 interface SidebarSectionProps {
@@ -17,29 +18,28 @@ export function SidebarSection({
   onAdd,
   defaultCollapsed = true,
 }: SidebarSectionProps) {
-  const [isCollapsed, setIsCollapsed] = useState(defaultCollapsed);
+  const storageKey = `sidebar-section:${title}`;
+  const [isCollapsed, setIsCollapsed] = useLocalStorage(storageKey, defaultCollapsed);
+
+  const toggleCollapse = () => setIsCollapsed((c) => !c);
 
   return (
     <section className={`sidebar-section ${className}`.trim()}>
-      <div className="sidebar-section__header">
-        <button
-          type="button"
-          className="sidebar-section__title"
-          onClick={() => setIsCollapsed((collapsed) => !collapsed)}
-          aria-expanded={!isCollapsed}
-        >
-          {title}
-        </button>
-        <button
-          type="button"
-          className="sidebar-section__add-btn"
-          onClick={onAdd}
-          disabled={!onAdd}
-          title="Add"
-          aria-label="Add"
-        >
-          <Icon icon="mdi:plus" />
-        </button>
+      <div
+        className="sidebar-section__header"
+        onClick={toggleCollapse}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            toggleCollapse();
+          }
+        }}
+        aria-expanded={!isCollapsed}
+      >
+        <span className="sidebar-section__title">{title}</span>
+        <Icon icon={isCollapsed ? 'mdi:chevron-down' : 'mdi:chevron-up'} color="#8A92A6" width="20" height="20" />
       </div>
       {!isCollapsed && <div className="sidebar-section__body">{children}</div>}
     </section>

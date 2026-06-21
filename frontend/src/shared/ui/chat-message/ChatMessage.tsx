@@ -49,7 +49,7 @@ function TableBlockView({ block, exportUrl, onExport }: { block: TableBlock; exp
               </tr>
             </thead>
             <tbody>
-              {block.rows.map((row, ri) => (
+              {block.rows.slice(0, 5).map((row, ri) => (
                 <tr key={ri}>
                   {row.map((cell: any, ci: number) => (
                     <td key={ci}>{cell == null ? 'NULL' : String(cell)}</td>
@@ -58,6 +58,11 @@ function TableBlockView({ block, exportUrl, onExport }: { block: TableBlock; exp
               ))}
             </tbody>
           </table>
+          {block.rows.length > 5 && (
+            <div style={{ padding: '8px', fontSize: '13px', color: 'var(--color-text-secondary)', textAlign: 'center', fontStyle: 'italic' }}>
+              Showing 5 of {block.rows.length} rows
+            </div>
+          )}
         </div>
         <div className="chat-message__table-actions">
           {block.sql && (

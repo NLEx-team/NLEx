@@ -26,5 +26,15 @@
   position: fixed;
   top: var(--spacing-md);
   right: var(--spacing-md);
-  z-index: calc(var(--z-index-modal) + 1);
+  z-index: var(--z-index-dropdown);
+}
+
+.app-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  width: 100%;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-main);
 }

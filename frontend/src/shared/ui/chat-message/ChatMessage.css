@@ -78,7 +78,7 @@
 
 .chat-message__option-btn--selected {
   background: var(--color-accent);
-  color: #fff;
+  color: var(--color-on-accent);
   border-color: var(--color-accent);
 }
 
@@ -113,9 +113,8 @@
 }
 
 .chat-message__table td {
-  padding: var(--spacing-xs) var(--spacing-sm);
-  border-top: var(--border-width) solid var(--color-back-active);
   padding: var(--spacing-sm);
+  border-top: var(--border-width) solid var(--color-back-active);
   white-space: nowrap;
 }
 

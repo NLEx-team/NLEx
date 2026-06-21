@@ -6,12 +6,14 @@ import { Confirm } from '../../../shared/ui/confirm';
 import { useCatalogs } from '../hooks/useCatalogs';
 import { CatalogList } from './CatalogList';
 import { AddCatalogModal } from './AddCatalogModal';
-import type { CatalogCreate } from '../types';
+import { catalogApi } from '../api';
+import type { CatalogRead, CatalogCreate } from '../types';
 
 export function CatalogManager() {
   const { user } = useAuth();
   const { catalogs, loading, createCatalog, deleteCatalog, testCatalog } = useCatalogs();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedCatalog, setSelectedCatalog] = useState<CatalogRead | null>(null);
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
   const { confirm, isOpen: isConfirmOpen, onConfirm, onCancel } = useConfirm();
   const isAdmin = user?.role === 'admin';
@@ -29,6 +31,17 @@ export function CatalogManager() {
     setPendingDeleteId(null);
   }, [confirm, deleteCatalog]);
 
+  const handleInfo = useCallback(async (cat: CatalogRead) => {
+    try {
+      const freshList = await catalogApi.list();
+      const fresh = freshList.find(c => c.id === cat.id) || cat;
+      setSelectedCatalog(fresh);
+    } catch {
+      setSelectedCatalog(cat);
+    }
+    setIsModalOpen(true);
+  }, []);
+
   const catalogName = pendingDeleteId
     ? catalogs.find(c => c.id === pendingDeleteId)?.name
     : '';
@@ -36,15 +49,16 @@ export function CatalogManager() {
   return (
     <>
       <SidebarSection
-        title="Catalogs"
+        title="Database list"
         className="catalog-manager"
-        onAdd={isAdmin ? () => setIsModalOpen(true) : undefined}
       >
         <CatalogList
           catalogs={catalogs}
           loading={loading}
           onTest={testCatalog}
           onDelete={handleDelete}
+          onAdd={() => { setSelectedCatalog(null); setIsModalOpen(true); }}
+          onInfo={handleInfo}
         />
       </SidebarSection>
 
@@ -64,6 +78,8 @@ export function CatalogManager() {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onSubmit={handleSubmit}
+        initialData={selectedCatalog || undefined}
+        onDelete={selectedCatalog ? () => handleDelete(selectedCatalog.id) : undefined}
       />
     </>
   );

@@ -9,17 +9,18 @@ interface ChatHistoryProps {
   sessions: ChatSession[];
   activeSessionId: string;
   onSelectSession: (id: string) => void;
+  onNewChat?: () => void;
 }
 
-export function ChatHistory({ sessions, activeSessionId, onSelectSession }: ChatHistoryProps) {
+export function ChatHistory({ sessions, activeSessionId, onSelectSession, onNewChat }: ChatHistoryProps) {
   return (
     <>
-      <Button variant="secondary" className="button--field chat-history__new-chat-btn">
-        <Icon icon="mdi:plus" />
-        <span>New Chat</span>
-      </Button>
+      <button className="sidebar__new-chat-btn" onClick={onNewChat} type="button">
+        <Icon icon="mdi:plus" width="20" height="20" />
+        <span>New chat</span>
+      </button>
 
-      <SidebarSection title="Chats" className="chat-history">
+      <SidebarSection title="History" className="chat-history">
         <nav className="chat-history__sessions">
           {sessions.map(session => (
             <NavSelectItem

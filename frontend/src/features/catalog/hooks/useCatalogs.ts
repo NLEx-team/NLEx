@@ -25,8 +25,8 @@ export function useCatalogs() {
   }, [fetchCatalogs]);
 
   const createCatalog = async (data: CatalogCreate) => {
-    const catalog = await catalogApi.create(data);
-    setCatalogs(prev => [...prev, catalog]);
+    await catalogApi.create(data);
+    await fetchCatalogs();
   };
 
   const deleteCatalog = async (id: string) => {
