@@ -1,67 +1,54 @@
-# 🚀 NLEx (Natural Language to Excel)
+# NLEx
 
-![Status](https://img.shields.io/badge/Status-Active-success.svg)
-![React](https://img.shields.io/badge/Frontend-React%20%7C%20Vite-blue.svg)
-![Docker](https://img.shields.io/badge/Deployment-Docker%20Compose-2496ED.svg)
+**NLEx — Natural Language to SQL.** A service that translates natural language requests into SQL queries, enabling business analysts to interact with databases without writing code.
 
-NLEx — это интеллектуальная платформа для работы с базами данных с использованием естественного языка (ИИ). Проект позволяет пользователям подключать различные СУБД и задавать вопросы к своим данным в виде обычного чата, получая в ответ точные выборки и аналитику.
+## Documentation
 
-## ✨ Ключевые возможности
+- **License:** [MIT](LICENSE)
+- **Week 2 report (index):** [reports/week2/README.md](reports/week2/README.md)
+- **MVP v0 report:** [reports/week2/mvp-v0-report.md](reports/week2/mvp-v0-report.md)
+- **User stories:** [reports/week2/user-stories.md](reports/week2/user-stories.md)
+- **Contributing guide:** [CONTRIBUTING.md](CONTRIBUTING.md)
 
-- 🤖 AI-генерация SQL: Преобразование вопросов на естественном языке в сложные SQL-запросы.
-- 🗄 Менеджер подключений: Удобное добавление и управление базами данных (PostgreSQL, MySQL, ClickHouse, SQLite) прямо из интерфейса.
-- 💬 Интерактивный чат: История запросов, контекстные подсказки и возможность скачивания отчетов в Excel.
-- 🔒 Авторизация: Безопасная система регистрации и профили пользователей с разделением ролей (Администратор/Пользователь).
+## How to Run with Docker
 
-## 🛠 Технологический стек
-
-### Frontend
-- React 19 + Vite — Быстрый и современный UI.
-- TypeScript — Надежность и строгая типизация.
-- Vanilla CSS / BEM — Чистая и предсказуемая стилизация интерфейса.
-
-### Backend & Infrastructure
-- Python / FastAPI — Производительный бэкенд и интеграция с LLM.
-- PostgreSQL — Основная база данных для хранения истории чатов и пользователей.
-- Docker & Docker Compose — Контейнеризация для быстрого развертывания.
-- Vercel — Хостинг клиентской части (nlex.tech).
-
-## 🚀 Как запустить проект локально
-
-Проект полностью контейнеризирован и запускается одной командой благодаря Docker Compose.
-
-### Предварительные требования
-Убедитесь, что у вас установлены [Docker](https://docs.docker.com/get-docker/) и [Docker Compose](https://docs.docker.com/compose/install/).
-
-### Установка и запуск
-
-1. Клонируйте репозиторий:
-
-```bash
-git clone https://github.com/NLEx-team/NLEx.git
-cd NLEx
-```
-
-2. Настройте переменные окружения:
-Скопируйте пример файла конфигурации:
-
+### 1. Environment Configuration
+Create your secret environment file from the example:
 ```bash
 cp .env.example .env.secret
 ```
+Adjust the values in `.env.secret` (e.g., `FRONTEND_PORT`, `BACKEND_PORT`) as needed.
 
-3. Запустите проект в режиме разработки:
+### 2. Running the Project
 
+The project uses Docker Profiles to manage different environments.
+
+#### Development Mode
+Includes hot-reload for both frontend and backend.
 ```bash
-docker compose --profile dev up -d --build
+docker compose --env-file .env.secret --profile dev up --build
 ```
+- **Frontend:** [http://localhost:5173](http://localhost:5173) (or your configured `FRONTEND_PORT`)
+- **Backend API:** [http://localhost:8000](http://localhost:8000) (or your configured `BACKEND_PORT`)
 
-После успешной сборки сервисы будут доступны по адресам:
-- Frontend: http://localhost:5173
-- Backend API: http://localhost:8000
+#### Production Mode
+Optimized builds served via Nginx (frontend) and Uvicorn (backend).
+```bash
+docker compose --env-file .env.secret --profile prod up --build
+```
+- **Frontend:** [http://localhost:80](http://localhost:80)
+- **Backend API:** [http://localhost:8000](http://localhost:8000)
 
-## 👨‍💻 Разработчики
+#### Testing
+Runs the backend test suite in an isolated environment.
+```bash
+docker compose --env-file .env.secret --profile test up backend-test --build --abort-on-container-exit
+```
+This command automatically starts the database, runs the tests, and shuts everything down when finished.
 
-Разработано командой NLEx-team в рамках курсового проекта.
-- Разработка Frontend и интеграция с Vercel.
-- Разработка Backend, AI-модулей и базы данных.
-- Деплой, настройка VPS и Docker.
+### 3. Stopping the Services
+```bash
+docker compose --profile dev down  # for development
+# OR
+docker compose --profile prod down # for production
+```
