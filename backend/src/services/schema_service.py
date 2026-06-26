@@ -2,6 +2,15 @@ from typing import Any
 from src.services.distributed_db import DistributedDatabaseService
 from src.services.relationship_service import RelationshipService
 
+IGNORED_SCHEMAS = {
+    "information_schema", "system", "pg_catalog", "pg_toast",
+    "sys", "outln", "dbsnmp", "appqossys", "ctxsys", "xdb", 
+    "gsmadmin_internal", "lbacsys", "dvsys", "mdsys", "olapsys", 
+    "orddata", "ordsys", "wmsys", "ojvmsys", "sysback", "sysdg", 
+    "syskm", "sysrac", "syssm", "dbsfwuser", "gdsys", "o7_dictionary_accessibility",
+    "xs$null", "ops$oracle"
+}
+
 class SchemaService:
     def __init__(self, db: DistributedDatabaseService):
         self.db = db
@@ -17,7 +26,7 @@ class SchemaService:
         schemas = []
         all_relationships = []
         for namespace in namespaces:
-            if namespace in ("information_schema", "system"):
+            if namespace.lower() in IGNORED_SCHEMAS or namespace.lower().startswith("pg_temp") or namespace.lower().startswith("pg_toast_temp"):
                 continue
                 
             tables = await self.db.get_tables(catalog, namespace)
