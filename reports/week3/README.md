@@ -161,13 +161,13 @@ Due to the customer's sudden emergency relocation to Moscow, a full end-of-sprin
 * **Public Video Walkthrough Demonstration:** [Google Drive Shared Walkthrough Video](https://drive.google.com/file/d/1lYX10NJpp_ggTlxNltmux9hzM-Sh2hQz/view?usp=sharing)
 
 ### Configuration & Base Templates
-* **Issue Templates Directory:** [GitHub Issue Templates](../../.github/ISSUE_TEMPLATE/) *(dynamic management component)*
-* **Extended PR/MR Template File:** [Pull Request Template](../week2/PR_Template.md)
+* **Issue Templates Directory:** GitHub Issue Templates *(dynamic management component)*
+* **Extended PR/MR Template File:** [Pull Request Template](../week2/PR_template.md)
 * **Semantic Version Release Mapping:** [NLEx Release Tracking Dashboard](https://github.com/NLEx-team/NLEx/releases)
 
 ### Execution Traceability Logs
 * **Historical User Stories Register (Week 2):** [reports/week2/user-stories.md](../week2/user-stories.md)
-* **Shared Process Specification Guide:** [Process_Requirements.md](../../Process_Requirements.md) *(Referenced tracking source)*
+* **Shared Process Specification Guide:** Process_Requirements.md *(Referenced tracking source)*
 * **Product Vision & Roadmap Plan:** [roadmap.md](../../docs/roadmap.md)
 * **Definition of Done Document:** [definition-of-done.md](definition-of-done.md)
 * **Customer Review Notes:** [customer-review-notes.md](customer-review-notes.md)
