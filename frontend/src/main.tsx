@@ -5,8 +5,10 @@ import './shared/ui/styles/index.css'
 import { AuthProvider } from './features/auth'
 import App from './features/app/App.tsx'
 import { initTheme } from './shared/hooks'
+import { initIcons } from './shared/icons'
 
 initTheme();
+initIcons();
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

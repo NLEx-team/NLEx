@@ -29,7 +29,11 @@ class RelationshipInferenceService:
         llm_input = self._prepare_llm_input(schema)
         
         # 3. Call LLM to infer relationships
-        inference_result = self.llm_service.infer_relationships(json.dumps(llm_input, ensure_ascii=False))
+        import asyncio
+        inference_result = await asyncio.to_thread(
+            self.llm_service.infer_relationships,
+            json.dumps(llm_input, ensure_ascii=False)
+        )
         
         if "relationships" in inference_result:
             inferred_rels = inference_result["relationships"]

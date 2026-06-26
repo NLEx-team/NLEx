@@ -1,7 +1,10 @@
+import { useState, useEffect, useRef } from 'react';
 import { Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth';
 import { AuthForm } from '../auth/components/AuthForm';
 import { UserProfilePage } from '../auth/components/UserProfilePage';
+import { AnalyticsPage } from '../analytics/components/AnalyticsPage';
+import { AdminPage } from '../admin/components/AdminPage';
 import { Chat, ChatHistory, useChat } from '../chat';
 import { CatalogManager } from '../catalog';
 import { AppHeader } from './components/AppHeader';
@@ -10,10 +13,30 @@ import { ThemeToggle } from './components/ThemeToggle';
 import { useLocalStorage } from '../../shared/hooks/useLocalStorage';
 import './App.css';
 
-function ChatPage() {
+import { Outlet, useOutletContext } from 'react-router-dom';
+
+function AppLayout() {
   const { user } = useAuth();
-  const chat = useChat(user!.id);
+  const navigate = useNavigate();
+  const [selectedCatalogIds, setSelectedCatalogIds] = useState<string[]>([]);
+  const chat = useChat(user!.id, selectedCatalogIds);
   const [isSidebarOpen, setIsSidebarOpen] = useLocalStorage('sidebar:open', false);
+
+  const prevSessionIdRef = useRef(chat.activeSessionId);
+
+  // Sync selected DBs when active session changes
+  useEffect(() => {
+    const isNewChatCreation = prevSessionIdRef.current === '' && chat.activeSessionId !== '';
+    prevSessionIdRef.current = chat.activeSessionId;
+
+    if (chat.activeSession?.catalogIds) {
+      if (isNewChatCreation && selectedCatalogIds.length > 0 && chat.activeSession.catalogIds.length === 0) {
+        // Prevent wiping selection if the user clicked before chat initialization finished
+        return;
+      }
+      setSelectedCatalogIds(chat.activeSession.catalogIds);
+    }
+  }, [chat.activeSessionId]);
 
   return (
     <>
@@ -21,28 +44,56 @@ function ChatPage() {
         <ChatHistory
           sessions={chat.sessions}
           activeSessionId={chat.activeSessionId}
-          onSelectSession={chat.setActiveSessionId}
-          onNewChat={chat.startNewChat}
+          onSelectSession={(id) => {
+             chat.setActiveSessionId(id);
+             navigate('/chat');
+          }}
+          onNewChat={() => {
+             chat.startNewChat();
+             navigate('/chat');
+          }}
+          onRenameChat={chat.renameSession}
+          onDeleteChat={chat.removeSession}
         />
-        <CatalogManager />
+        <CatalogManager 
+          selectedIds={selectedCatalogIds}
+          onSelectionChange={(ids) => {
+            setSelectedCatalogIds(ids);
+            if (chat.activeSessionId) {
+              chat.updateSessionCatalogs(chat.activeSessionId, ids);
+            }
+          }}
+          disabled={chat.messages.length > 0}
+        />
       </Sidebar>
       <div className="app-page">
-        <AppHeader
-          title={chat.activeSession?.title ?? 'Chat'}
-          variant="chat"
-          isSidebarOpen={isSidebarOpen}
-          onOpenSidebar={() => setIsSidebarOpen(true)}
+         <Outlet context={{ chat, isSidebarOpen, setIsSidebarOpen }} />
+      </div>
+    </>
+  );
+}
+
+function ChatPage() {
+  const { chat, isSidebarOpen, setIsSidebarOpen } = useOutletContext<any>();
+
+  return (
+    <>
+      <AppHeader
+        title={chat.activeSession?.title ?? 'Chat'}
+        variant="chat"
+        isSidebarOpen={isSidebarOpen}
+        onOpenSidebar={() => setIsSidebarOpen(true)}
+      />
+      <div className="app-page__content">
+        <Chat
+          messages={chat.messages}
+          inputValue={chat.inputValue}
+          setInputValue={chat.setInputValue}
+          handleSendMessage={chat.handleSendMessage}
+          handleClarification={chat.handleClarification}
+          pending={chat.pending}
+          pendingStatus={chat.pendingStatus}
         />
-        <div className="app-page__content">
-          <Chat
-            messages={chat.messages}
-            inputValue={chat.inputValue}
-            setInputValue={chat.setInputValue}
-            handleSendMessage={chat.handleSendMessage}
-            handleClarification={chat.handleClarification}
-            pending={chat.pending}
-          />
-        </div>
       </div>
     </>
   );
@@ -50,27 +101,48 @@ function ChatPage() {
 
 function ProfilePage() {
   const navigate = useNavigate();
-  const [isSidebarOpen, setIsSidebarOpen] = useLocalStorage('sidebar:open', false);
 
   return (
     <>
-      <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)}>
-        <ChatHistory
-          sessions={[]}
-          activeSessionId=""
-          onSelectSession={() => navigate('/chat')}
-        />
-        <CatalogManager />
-      </Sidebar>
-      <div className="app-page">
-        <AppHeader
-          title="Profile"
-          variant="profile"
-          onBack={() => navigate('/chat')}
-        />
-        <div className="app-page__content">
-          <UserProfilePage />
-        </div>
+      <AppHeader
+        title="Profile"
+        variant="profile"
+        onBack={() => navigate('/chat')}
+      />
+      <div className="app-page__content">
+        <UserProfilePage />
+      </div>
+    </>
+  );
+}
+
+function AnalyticsPageWrapper() {
+  const navigate = useNavigate();
+  return (
+    <>
+      <AppHeader
+        title="Analytics"
+        variant="profile"
+        onBack={() => navigate('/profile')}
+      />
+      <div className="app-page__content">
+        <AnalyticsPage />
+      </div>
+    </>
+  );
+}
+
+function AdminPageWrapper() {
+  const navigate = useNavigate();
+  return (
+    <>
+      <AppHeader
+        title="Admin Panel"
+        variant="profile"
+        onBack={() => navigate('/profile')}
+      />
+      <div className="app-page__content">
+        <AdminPage />
       </div>
     </>
   );
@@ -98,14 +170,14 @@ export default function App() {
           path="/auth"
           element={isAuthenticated ? <Navigate to="/chat" replace /> : <AuthForm />}
         />
-        <Route
-          path="/chat"
-          element={isAuthenticated ? <ChatPage /> : <Navigate to="/auth" replace />}
-        />
-        <Route
-          path="/profile"
-          element={isAuthenticated ? <ProfilePage /> : <Navigate to="/auth" replace />}
-        />
+        
+        <Route element={isAuthenticated ? <AppLayout /> : <Navigate to="/auth" replace />}>
+          <Route path="/chat" element={<ChatPage />} />
+          <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/analytics" element={<AnalyticsPageWrapper />} />
+          <Route path="/admin" element={<AdminPageWrapper />} />
+        </Route>
+
         <Route
           path="*"
           element={<Navigate to={isAuthenticated ? '/chat' : '/auth'} replace />}

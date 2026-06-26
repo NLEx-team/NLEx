@@ -57,9 +57,19 @@ async def delete_catalog(
 async def test_catalog(
     catalog_id: UUID,
     service: CatalogService = Depends(get_catalog_service),
-    _ = Depends(require_admin)
+    _ = Depends(get_current_user)
 ):
     return await service.sync_catalog(catalog_id)
+
+@router.post("/{catalog_id}/ping", response_model=CatalogTestResult)
+async def ping_catalog(
+    catalog_id: UUID,
+    service: CatalogService = Depends(get_catalog_service),
+    _ = Depends(get_current_user)
+):
+    """Lightweight ping to measure connection latency. Available to all users."""
+    result = await service.ping_catalog(catalog_id)
+    return CatalogTestResult(**result)
 
 @router.post("/test-connection", response_model=CatalogTestResult)
 async def test_new_connection(
@@ -69,3 +79,4 @@ async def test_new_connection(
 ):
     result = await service.test_raw_connection(catalog_in)
     return CatalogTestResult(**result)
+

@@ -136,7 +136,7 @@ class OrchestratorService:
         
         while attempts <= self.max_retries:
             # Call LLM via SQLGenerationService
-            result = self.sql_service.generate_sql(
+            result = await self.sql_service.generate_sql(
                 user_prompt=current_prompt, 
                 schema=schema_str,
                 history=self.chat_history
@@ -175,16 +175,27 @@ class OrchestratorService:
             # Execute SQL
             self._transition(OrchestratorState.EXECUTING_SQL)
             try:
-                data = await self.db_service.execute_query_async(sql)
+                # 1. Fetch total count
+                count_sql = f"SELECT COUNT(*) FROM ({sql}) AS count_wrap"
+                count_data = await self.db_service.execute_query_async(count_sql)
+                total_rows = count_data[0][0] if count_data and count_data[0] else 0
+                
+                # 2. Fetch preview data (limit 5) - Optimized at SQL level
+                preview_sql = f"SELECT * FROM ({sql}) AS preview_wrap LIMIT 5"
+                preview_data = await self.db_service.execute_query_async(preview_sql)
+                
                 self._transition(OrchestratorState.COMPLETED)
                 success_result = {
                     "status": "success",
-                    "data": data,
+                    "data": preview_data,
+                    "total_rows": total_rows,
                     "headers": result.get("headers"),
                     "explanation": result.get("explanation"),
                     "sql": sql,
                     "attempts": attempts + 1
                 }
+                if "_usage" in result:
+                    success_result["_usage"] = result["_usage"]
                 self.last_result = success_result
                 return success_result
             except Exception as e:

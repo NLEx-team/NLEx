@@ -119,3 +119,31 @@ class CatalogService:
                 await self.db_service.disconnect_catalog(temp_name)
             except Exception:
                 pass
+
+    async def ping_catalog(self, catalog_id: UUID) -> dict:
+        """
+        Lightweight ping: just runs a query on the already-registered catalog
+        to measure latency. Does NOT re-register the catalog in Trino.
+        """
+        import time
+
+        catalog = await self.repository.get_by_id(catalog_id)
+        if not catalog:
+            return {"success": False, "error": "Catalog not found", "latency_ms": None}
+
+        trino_name = f"cat_{catalog.id.hex}"
+
+        start_time = time.time()
+        try:
+            await self.db_service.get_namespaces(trino_name)
+            latency = int((time.time() - start_time) * 1000)
+            # Update status to active if it was error
+            if catalog.status != CatalogStatus.ACTIVE:
+                await self.repository.update_status(catalog_id, CatalogStatus.ACTIVE)
+            return {"success": True, "latency_ms": latency, "error": None}
+        except Exception as e:
+            latency = int((time.time() - start_time) * 1000)
+            logger.error(f"Ping catalog {catalog.name} failed: {e}")
+            await self.repository.update_status(catalog_id, CatalogStatus.ERROR)
+            return {"success": False, "latency_ms": latency, "error": str(e)}
+

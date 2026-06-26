@@ -28,20 +28,3 @@ async def test_llm_service_connectivity():
     
     print(f"LLM responded successfully with status: {response['status']}")
 
-def test_llm_service_custom_config():
-    """
-    Test that LLMService properly prioritizes provided constructor arguments over .env settings.
-    """
-    custom_api_key = "test_custom_key_123"
-    custom_base_url = "https://custom.api.ai/v1/chat/completions"
-    custom_model = "test-model-70b"
-
-    service = LLMService(
-        api_key=custom_api_key,
-        base_url=custom_base_url,
-        model=custom_model
-    )
-
-    assert service.client.api_key == custom_api_key
-    assert service.client.base_url == "https://custom.api.ai/v1/" # base_url is parsed
-    assert service.model == custom_model

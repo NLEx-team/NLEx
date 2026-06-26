@@ -46,20 +46,30 @@ _REQUEST_TIMEOUT = 60.0  # seconds
 
 
 class LLMService:
-    def __init__(self):
-        if not settings.OPENAI_API_KEY:
+    def __init__(
+        self, 
+        use_thinking_model: bool = False,
+        api_key: str = None,
+        base_url: str = None,
+        model: str = None
+    ):
+        actual_api_key = api_key or settings.OPENAI_API_KEY
+        if not actual_api_key:
             raise ValueError("OPENAI_API_KEY is not configured")
 
-        self.model = settings.LLM_MODEL
+        if model:
+            self.model = model
+        else:
+            self.model = settings.LLM_MODEL_THINKING if use_thinking_model else settings.LLM_MODEL_FAST
 
+        actual_base_url = base_url or settings.OPENAI_BASE_URL
         # Remove /chat/completions from base_url if it's there, as SDK will add it
-        base_url = settings.OPENAI_BASE_URL
-        if base_url and base_url.endswith("/chat/completions"):
-            base_url = base_url.rsplit("/chat/completions", 1)[0]
+        if actual_base_url and actual_base_url.endswith("/chat/completions"):
+            actual_base_url = actual_base_url.rsplit("/chat/completions", 1)[0]
 
         self.client = OpenAI(
-            api_key=settings.OPENAI_API_KEY,
-            base_url=base_url,
+            api_key=actual_api_key,
+            base_url=actual_base_url,
             timeout=_REQUEST_TIMEOUT,
         )
 
@@ -109,6 +119,38 @@ class LLMService:
 
         return self._execute_with_retry(messages, "inference")
 
+    def generate_chat_title(self, history: list[dict[str, str]]) -> dict[str, Any]:
+        """
+        Generates a short title based on the chat history.
+        """
+        system_prompt = (
+            "You are a helpful assistant. Based on the following conversation, generate a very short "
+            "and convenient title (max 3-5 words) for this chat. Respond with a JSON object: "
+            "{'title': 'Your Title'}."
+        )
+        
+        messages = [{"role": "system", "content": system_prompt}] + history
+        return self._execute_with_retry(messages, "title")
+
+    def test_connection(self, prompt: str) -> str:
+        """
+        Tests the connection to the LLM by sending a simple prompt and returning the text response.
+        Does not expect JSON format.
+        """
+        messages = [{"role": "user", "content": prompt}]
+        
+        try:
+            response = self.client.chat.completions.create(
+                model=self.model,
+                messages=messages,
+                response_format={"type": "text"},
+                temperature=0.7,
+            )
+            return response.choices[0].message.content
+        except Exception as e:
+            logger.error(f"Error testing LLM connection: {str(e)}", exc_info=True)
+            raise ValueError(f"Failed to connect to LLM: {str(e)}")
+
     def _execute_with_retry(self, messages: list[dict[str, str]], task_type: str) -> dict[str, Any]:
         """
         Executes LLM call with exponential backoff retry.
@@ -137,6 +179,14 @@ class LLMService:
                     time.sleep(_BASE_DELAY)
                     continue
             except OpenAIError as e:
+                # Handle context length exceeded by truncating history
+                if "context_length_exceeded" in str(e) and len(messages) > 3:
+                    logger.warning("Context length exceeded. Truncating history and retrying.")
+                    # Keep system prompt (idx 0), and drop the oldest user/assistant pair (idx 1, 2)
+                    messages = [messages[0]] + messages[3:]
+                    last_error = e
+                    continue
+
                 # Non-transient errors (auth, bad request) — do not retry
                 logger.error("LLM non-retryable error: %s", str(e))
                 return {"status": "error", "message": f"API Error: {str(e)}"}
@@ -166,6 +216,14 @@ class LLMService:
 
         result = json.loads(raw_response)
         self._validate_response(result, task_type)
+        
+        if response.usage:
+            result["_usage"] = {
+                "prompt_tokens": response.usage.prompt_tokens,
+                "completion_tokens": response.usage.completion_tokens,
+                "total_tokens": response.usage.total_tokens
+            }
+            
         return result
 
     @staticmethod
@@ -205,3 +263,9 @@ class LLMService:
 
             if "relationships" in result and not isinstance(result["relationships"], list):
                 raise ValueError("'relationships' must be a list")
+                
+        elif task_type == "title":
+            if "title" not in result:
+                raise ValueError("Missing 'title' field in response")
+            if not isinstance(result["title"], str):
+                raise ValueError("'title' must be a string")

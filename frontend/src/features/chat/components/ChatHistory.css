@@ -8,5 +8,66 @@
 .chat-history__sessions {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-xs);
+  gap: 4px;
+}
+
+.chat-action-menu {
+  position: relative;
+}
+
+.chat-action-menu__trigger {
+  background: transparent;
+  border: none;
+  padding: 4px;
+  border-radius: 4px;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.chat-action-menu__trigger:hover {
+  background: var(--color-back-components);
+  color: var(--color-text-primary);
+}
+
+.chat-action-menu__dropdown {
+  position: absolute;
+  right: 0;
+  top: 100%;
+  background: var(--color-back-main);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  padding: 4px;
+  display: flex;
+  flex-direction: column;
+  z-index: 10;
+  min-width: 120px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.chat-action-menu__dropdown button {
+  background: transparent;
+  border: none;
+  padding: 8px 12px;
+  text-align: left;
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 13px;
+  color: var(--color-text-primary);
+}
+
+.chat-action-menu__dropdown button:hover {
+  background: var(--color-back-components);
+}
+
+.chat-action-menu__dropdown .chat-action-menu__delete {
+  color: #ef4444; /* red */
+}
+
+.chat-action-menu__dropdown .chat-action-menu__delete:hover {
+  background: #fef2f2;
+  color: #dc2626;
 }

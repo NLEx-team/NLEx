@@ -6,5 +6,7 @@ export const catalogApi = {
   create: (data: CatalogCreate) => api.post<CatalogRead>('/catalogs', data),
   delete: (id: string) => api.delete(`/catalogs/${id}`),
   test: (id: string) => api.post<CatalogRead>(`/catalogs/${id}/test`),
+  ping: (id: string) => api.post<CatalogTestResult>(`/catalogs/${id}/ping`),
   testNew: (data: CatalogCreate) => api.post<CatalogTestResult>('/catalogs/test-connection', data),
 };
+
