@@ -51,7 +51,8 @@ class LLMService:
         use_thinking_model: bool = False,
         api_key: str = None,
         base_url: str = None,
-        model: str = None
+        model: str = None,
+        proxy_url: str = None
     ):
         actual_api_key = api_key or settings.OPENAI_API_KEY
         if not actual_api_key:
@@ -67,10 +68,17 @@ class LLMService:
         if actual_base_url and actual_base_url.endswith("/chat/completions"):
             actual_base_url = actual_base_url.rsplit("/chat/completions", 1)[0]
 
+        # If a proxy URL is provided, route requests through it via httpx
+        http_client = None
+        if proxy_url:
+            import httpx
+            http_client = httpx.Client(proxy=proxy_url, timeout=_REQUEST_TIMEOUT)
+
         self.client = OpenAI(
             api_key=actual_api_key,
             base_url=actual_base_url,
             timeout=_REQUEST_TIMEOUT,
+            http_client=http_client,
         )
 
     def generate_sql(

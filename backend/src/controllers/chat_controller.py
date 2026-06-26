@@ -74,7 +74,8 @@ class ChatController:
                     use_thinking_model=use_thinking_model,
                     api_key=shared_config.api_key,
                     base_url=shared_config.base_url,
-                    model=shared_config.model_name
+                    model=shared_config.model_name,
+                    proxy_url=shared_config.proxy_url
                 )
             else:
                 ls = LLMService(use_thinking_model=use_thinking_model)

@@ -12,6 +12,7 @@ interface LlmConfig {
   model_name: string;
   is_shared: boolean;
   is_active: boolean;
+  proxy_url?: string;
 }
 
 interface UserStats {
@@ -29,7 +30,7 @@ export function AdminPage() {
   const [activeTab, setActiveTab] = useState<'llm' | 'users'>('llm');
   
   // LLM State
-  const [llmConfig, setLlmConfig] = useState<LlmConfig>({ base_url: '', api_key: '', model_name: '', is_shared: false, is_active: true });
+  const [llmConfig, setLlmConfig] = useState<LlmConfig>({ base_url: '', api_key: '', model_name: '', is_shared: false, is_active: true, proxy_url: '' });
   const [llmLoading, setLlmLoading] = useState(false);
   const [llmMessage, setLlmMessage] = useState('');
   
@@ -101,7 +102,8 @@ export function AdminPage() {
         base_url: llmConfig.base_url,
         api_key: llmConfig.api_key,
         model_name: llmConfig.model_name,
-        prompt: 'Привет'
+        prompt: 'Привет',
+        proxy_url: llmConfig.proxy_url || null
       });
       
       if (res && res.success) {
@@ -201,6 +203,14 @@ export function AdminPage() {
                 onChange={e => setLlmConfig({...llmConfig, model_name: e.target.value})}
                 disabled={llmLoading}
                 placeholder="gpt-4o"
+              />
+              <Field
+                label="Proxy URL (Optional)"
+                value={llmConfig.proxy_url || ''}
+                onChange={e => setLlmConfig({...llmConfig, proxy_url: e.target.value})}
+                disabled={llmLoading}
+                placeholder="http://login:password@ip:port"
+                hintText="HTTP proxy for routing AI requests. Leave empty to use direct connection."
               />
               <label className="admin-checkbox">
                 <input 
