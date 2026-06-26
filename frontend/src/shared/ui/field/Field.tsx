@@ -13,6 +13,7 @@ export function Field({
   id,
   placeholder,
   value,
+  hintText,
   ...inputProps
 }: FieldProps) {
   const isError = mode === "error";
@@ -78,6 +79,12 @@ export function Field({
       {isError && errorText && (
         <span className="field__error" id={errorId} role="alert">
           {errorText}
+        </span>
+      )}
+      
+      {!isError && hintText && (
+        <span className="field__hint">
+          {hintText}
         </span>
       )}
     </div>

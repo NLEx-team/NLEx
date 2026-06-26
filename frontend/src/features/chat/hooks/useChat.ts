@@ -6,7 +6,7 @@ function generateId() {
   return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
 }
 
-function parseBlocks(response: { result: { status: string; question?: string; options?: string[]; data?: any[][]; headers?: string[]; explanation?: string; sql?: string; message?: string } }): ContentBlock[] {
+function parseBlocks(response: { result: { status: string; question?: string; options?: string[]; data?: any[][]; headers?: string[]; explanation?: string; sql?: string; message?: string; total_rows?: number } }): ContentBlock[] {
   const r = response.result;
   const blocks: ContentBlock[] = [];
 
@@ -28,6 +28,7 @@ function parseBlocks(response: { result: { status: string; question?: string; op
         rows: r.data,
         sql: r.sql,
         explanation: r.explanation,
+        totalRows: r.total_rows,
       });
     }
     if (!r.explanation && !r.data) {
@@ -44,36 +45,101 @@ function parseBlocks(response: { result: { status: string; question?: string; op
   return blocks;
 }
 
-export function useChat(userId: string) {
-  const sessionsKey = `nlex_sessions_${userId}`;
-  const messagesKey = `nlex_messages_${userId}`;
-  const activeKey = `nlex_active_session_${userId}`;
-
-  const [sessions, setSessions] = useState<ChatSession[]>(() => {
-    try {
-      const saved = localStorage.getItem(sessionsKey);
-      return saved ? JSON.parse(saved) : [];
-    } catch { return []; }
-  });
-  
-  const [activeSessionId, setActiveSessionId] = useState<string>(() => {
-    return localStorage.getItem(activeKey) || '';
-  });
-  
-  const [messagesBySession, setMessagesBySession] = useState<Record<string, ChatMessage[]>>(() => {
-    try {
-      const saved = localStorage.getItem(messagesKey);
-      return saved ? JSON.parse(saved) : {};
-    } catch { return {}; }
-  });
-  
+export function useChat(_userId: string, selectedCatalogIds: string[]) {
+  const [sessions, setSessions] = useState<ChatSession[]>([]);
+  const [activeSessionId, setActiveSessionId] = useState<string>('');
+  const [messagesBySession, setMessagesBySession] = useState<Record<string, ChatMessage[]>>({});
+  const [loadedSessions, setLoadedSessions] = useState<Set<string>>(new Set());
   const [inputValue, setInputValue] = useState('');
   const [pending, setPending] = useState(false);
+  const [pendingStatus, setPendingStatus] = useState<string>('');
+  const [initialized, setInitialized] = useState(false);
+
+  // Load sessions list from the server on mount
+  useEffect(() => {
+    if (initialized) return;
+    setInitialized(true);
+
+    chatApi.getChats()
+      .then(serverChats => {
+        if (serverChats.length > 0) {
+          const mapped: ChatSession[] = serverChats.map(c => ({
+            id: c.id,
+            title: c.title,
+            catalogIds: c.catalog_ids || [],
+          }));
+          setSessions(mapped);
+          setActiveSessionId(mapped[0].id);
+        } else {
+          // No chats yet — create one
+          chatApi.create(selectedCatalogIds).then(chat => {
+            const session: ChatSession = { id: chat.id, title: chat.name, catalogIds: chat.catalog_ids || [] };
+            setSessions([session]);
+            setActiveSessionId(chat.id);
+          });
+        }
+      })
+      .catch(() => {
+        // Fallback: create a new chat
+        chatApi.create().then(chat => {
+          const session: ChatSession = { id: chat.id, title: chat.name, catalogIds: chat.catalog_ids || [] };
+          setSessions([session]);
+          setActiveSessionId(chat.id);
+        }).catch(() => {});
+      });
+  }, [initialized]);
+
+  // Poll status when pending
+  useEffect(() => {
+    if (!pending || !activeSessionId) {
+      setPendingStatus('');
+      return;
+    }
+
+    const interval = setInterval(() => {
+      chatApi.getStatus(activeSessionId).then((res) => {
+        setPendingStatus(res.status);
+      }).catch(() => {
+        // ignore polling errors
+      });
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [pending, activeSessionId]);
+
+  // Load messages when switching to a session that hasn't been loaded yet
+  useEffect(() => {
+    if (!activeSessionId || loadedSessions.has(activeSessionId)) return;
+
+    setLoadedSessions(prev => new Set(prev).add(activeSessionId));
+
+    chatApi.getMessages(activeSessionId)
+      .then(serverMessages => {
+        const mapped: ChatMessage[] = serverMessages.map(m => ({
+          id: m.id,
+          role: m.role as 'user' | 'assistant',
+          blocks: m.blocks,
+          timestamp: m.created_at,
+          exportUrl: m.export_url || undefined,
+        }));
+        setMessagesBySession(prev => ({
+          ...prev,
+          [activeSessionId]: mapped,
+        }));
+      })
+      .catch(() => {
+        // If load fails, just start with empty
+        setMessagesBySession(prev => ({
+          ...prev,
+          [activeSessionId]: prev[activeSessionId] || [],
+        }));
+      });
+  }, [activeSessionId, loadedSessions]);
 
   const initChat = useCallback(() => {
-    chatApi.create().then(chat => {
-      const session: ChatSession = { id: chat.id, title: chat.name };
-      setSessions(prev => [...prev, session]);
+    chatApi.create(selectedCatalogIds).then(chat => {
+      const session: ChatSession = { id: chat.id, title: chat.name, catalogIds: chat.catalog_ids || [] };
+      setSessions(prev => [session, ...prev]);
       setMessagesBySession(prev => ({
         ...prev,
         [chat.id]: []
@@ -83,33 +149,7 @@ export function useChat(userId: string) {
     }).catch(() => {
       // fallback: keep welcome message only
     });
-  }, []);
-
-  useEffect(() => {
-    localStorage.setItem(sessionsKey, JSON.stringify(sessions));
-  }, [sessions, sessionsKey]);
-
-  useEffect(() => {
-    localStorage.setItem(messagesKey, JSON.stringify(messagesBySession));
-  }, [messagesBySession, messagesKey]);
-
-  useEffect(() => {
-    if (activeSessionId) {
-      localStorage.setItem(activeKey, activeSessionId);
-    }
-  }, [activeSessionId, activeKey]);
-
-  const [initialized, setInitialized] = useState(false);
-  useEffect(() => {
-    if (!initialized) {
-      if (sessions.length === 0) {
-        initChat();
-      } else if (!activeSessionId && sessions.length > 0) {
-        setActiveSessionId(sessions[0].id);
-      }
-      setInitialized(true);
-    }
-  }, [initChat, sessions.length, activeSessionId, initialized]);
+  }, [selectedCatalogIds]);
 
   const handleSendMessage = useCallback(async () => {
     const text = inputValue.trim();
@@ -139,7 +179,7 @@ export function useChat(userId: string) {
     setPending(true);
 
     try {
-      const response = await chatApi.sendPrompt(activeSessionId, text);
+      const response = await chatApi.sendPrompt(activeSessionId, text, selectedCatalogIds);
       const blocks = parseBlocks(response);
       const assistantMsg: ChatMessage = {
         id: generateId(),
@@ -148,6 +188,10 @@ export function useChat(userId: string) {
         timestamp: new Date().toISOString(),
         exportUrl: response.export_url,
       };
+      
+      if (response.chat_title) {
+        setSessions(prev => prev.map(s => s.id === activeSessionId ? { ...s, title: response.chat_title as string } : s));
+      }
       
       setMessagesBySession(prev => ({
         ...prev,
@@ -167,7 +211,7 @@ export function useChat(userId: string) {
     } finally {
       setPending(false);
     }
-  }, [inputValue, pending, activeSessionId]);
+  }, [inputValue, pending, activeSessionId, messagesBySession, selectedCatalogIds]);
 
   const handleClarification = useCallback(async (questionId: string, selectedOptions: string[]) => {
     if (!activeSessionId || pending) return;
@@ -208,6 +252,39 @@ export function useChat(userId: string) {
   const activeSession = sessions.find(s => s.id === activeSessionId);
   const currentMessages = messagesBySession[activeSessionId] || [];
 
+  const updateSessionCatalogs = useCallback((id: string, catalogIds: string[]) => {
+    setSessions(prev => prev.map(s => s.id === id ? { ...s, catalogIds } : s));
+  }, []);
+
+  const renameSession = useCallback(async (id: string, newTitle: string) => {
+    try {
+      await chatApi.update(id, newTitle);
+      setSessions(prev => prev.map(s => s.id === id ? { ...s, title: newTitle } : s));
+    } catch (err) {
+      console.error("Failed to rename session", err);
+    }
+  }, []);
+
+  const removeSession = useCallback(async (id: string) => {
+    try {
+      await chatApi.delete(id);
+      setSessions(prev => {
+        const nextSessions = prev.filter(s => s.id !== id);
+        if (activeSessionId === id) {
+          setActiveSessionId(nextSessions[0]?.id || '');
+        }
+        return nextSessions;
+      });
+      setMessagesBySession(prev => {
+        const next = { ...prev };
+        delete next[id];
+        return next;
+      });
+    } catch (err) {
+      console.error("Failed to remove session", err);
+    }
+  }, [activeSessionId]);
+
   return {
     sessions,
     activeSessionId,
@@ -215,10 +292,14 @@ export function useChat(userId: string) {
     messages: currentMessages,
     inputValue,
     pending,
+    pendingStatus,
     setInputValue,
     setActiveSessionId,
     handleSendMessage,
     handleClarification,
     startNewChat: initChat,
+    renameSession,
+    removeSession,
+    updateSessionCatalogs,
   };
 }

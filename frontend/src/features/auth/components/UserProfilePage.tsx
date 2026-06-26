@@ -42,10 +42,9 @@ export function UserProfilePage() {
     setLoading(true);
     try {
       await updateProfile({
-        first_name: formState.first_name || null,
-        last_name: formState.last_name || null,
-        email: formState.email,
-        avatar_url: formState.avatar_url || null,
+        first_name: formState.first_name || undefined,
+        last_name: formState.last_name || undefined,
+        avatar_url: formState.avatar_url || undefined,
       });
       setIsEditing(false);
     } catch {
@@ -119,12 +118,26 @@ export function UserProfilePage() {
         </div>
 
         <div className="profile-page__actions">
-          <Button variant="secondary" onClick={handleLogout} disabled={loading}>
+          <Button className="profile-btn profile-btn--outline" onClick={() => navigate('/analytics')} disabled={loading}>
+            <Icon icon="mdi:chart-bar" />
+            <span>Analytics</span>
+          </Button>
+          
+          {user.role === 'admin' && (
+            <Button className="profile-btn profile-btn--outline" onClick={() => navigate('/admin')} disabled={loading}>
+              <Icon icon="mdi:shield-account-outline" />
+              <span>Admin Panel</span>
+            </Button>
+          )}
+          
+          <Button className="profile-btn profile-btn--outline" onClick={handleModeToggle} disabled={loading}>
+            <Icon icon={isEditing ? "mdi:content-save" : "mdi:pencil"} />
+            <span>{loading ? 'Saving...' : isEditing ? 'Save' : 'Edit'}</span>
+          </Button>
+
+          <Button className="profile-btn profile-btn--outline profile-btn--danger" onClick={handleLogout} disabled={loading}>
             <Icon icon="mdi:logout" />
             <span>Log out</span>
-          </Button>
-          <Button variant="primary" onClick={handleModeToggle} disabled={loading}>
-            <span>{loading ? 'Saving...' : isEditing ? 'Save' : 'Edit'}</span>
           </Button>
         </div>
       </div>

@@ -1,5 +1,5 @@
 .confirm {
-  width: 360px;
+  width: 440px;
   max-width: calc(100vw - 32px);
 }
 
@@ -12,13 +12,14 @@
 
 .confirm__body {
   color: var(--color-text-secondary);
-  font-size: 14px;
+  font-size: 15px;
   line-height: 1.5;
+  margin-top: 4px;
 }
 
 .confirm__actions {
   display: flex;
   justify-content: flex-end;
   gap: var(--spacing-sm);
-  margin-top: var(--spacing-sm);
+  margin-top: var(--spacing-md);
 }
