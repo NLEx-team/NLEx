@@ -38,9 +38,10 @@ async def create_default_admin():
             result = await session.execute(stmt)
             admin = result.scalars().first()
             
+            hashed_password = AuthService.get_password_hash(settings.ADMIN_PASSWORD)
+            
             if not admin:
                 print(f"No admin found. Creating default admin: {settings.ADMIN_EMAIL}")
-                hashed_password = AuthService.get_password_hash(settings.ADMIN_PASSWORD)
                 db_admin = User(
                     email=settings.ADMIN_EMAIL,
                     hashed_password=hashed_password,
@@ -50,8 +51,14 @@ async def create_default_admin():
                     first_name="Default",
                     last_name="Admin"
                 )
-                await user_repo.create(db_admin)
-                print("Default admin created successfully.")
+                session.add(db_admin)
+            else:
+                # Update existing admin to match config
+                admin.email = settings.ADMIN_EMAIL
+                admin.hashed_password = hashed_password
+                
+            await session.commit()
+            print("Default admin verified/created successfully.")
 
 async def sync_catalogs_on_startup():
     """
