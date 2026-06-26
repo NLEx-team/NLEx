@@ -1,5 +1,5 @@
 import uuid
-from sqlalchemy import Column, String, ForeignKey, DateTime, JSON, Text, UUID
+from sqlalchemy import Column, String, ForeignKey, DateTime, JSON, Text, UUID, Integer, Boolean
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from src.database.session import Base
@@ -12,12 +12,15 @@ class Chat(Base):
     status = Column(String, default="IDLE", nullable=False)
     user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False)
     connection_id = Column(UUID(as_uuid=True), ForeignKey("database_connections.id"), nullable=True)
+    catalog_ids = Column(JSON, nullable=False, default=list)
+    is_deleted = Column(Boolean, default=False, nullable=False, server_default='false')
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now(), server_default=func.now())
 
     user = relationship("User")
     connection = relationship("DatabaseConnection")
     drafts = relationship("Draft", back_populates="chat", cascade="all, delete-orphan")
+    messages = relationship("ChatMessage", back_populates="chat", cascade="all, delete-orphan", order_by="ChatMessage.created_at")
 
 class Draft(Base):
     __tablename__ = "drafts"
@@ -33,3 +36,16 @@ class Draft(Base):
     updated_at = Column(DateTime(timezone=True), onupdate=func.now(), server_default=func.now())
 
     chat = relationship("Chat", back_populates="drafts")
+
+class ChatMessage(Base):
+    __tablename__ = "chat_messages"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    chat_id = Column(UUID(as_uuid=True), ForeignKey("chats.id", ondelete="CASCADE"), nullable=False)
+    role = Column(String, nullable=False)  # 'user' or 'assistant'
+    blocks = Column(JSON, nullable=False, default=list)  # Array of content blocks
+    export_url = Column(String, nullable=True)
+    total_tokens = Column(Integer, nullable=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    chat = relationship("Chat", back_populates="messages")
