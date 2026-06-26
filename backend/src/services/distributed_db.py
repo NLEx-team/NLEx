@@ -152,7 +152,7 @@ class DistributedDatabaseService:
 
         rows = await self.execute_query_async(
             f"""
-            SHOW SCHEMAS FROM {catalog}
+            SHOW SCHEMAS FROM "{catalog}"
             """
         )
         return [row[0] for row in rows]
@@ -166,7 +166,7 @@ class DistributedDatabaseService:
         self._validate_catalog_name(catalog)
 
         rows = await self.execute_query_async(
-            f"SHOW TABLES FROM {catalog}.{namespace}"
+            f'SHOW TABLES FROM "{catalog}"."{namespace}"'
         )
         return [row[0] for row in rows]
 
@@ -186,7 +186,7 @@ class DistributedDatabaseService:
                 data_type,
                 is_nullable,
                 ordinal_position
-            FROM {catalog}.information_schema.columns
+            FROM "{catalog}".information_schema.columns
             WHERE table_schema = '{namespace}'
             AND table_name = '{table}'
             ORDER BY ordinal_position

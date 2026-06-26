@@ -36,7 +36,7 @@ class SchemaService:
                 sample_rows = []
                 try:
                     sample_rows = await self.db.execute_query_async(
-                        f"SELECT * FROM {catalog}.{namespace}.{table} LIMIT 30"
+                        f'SELECT * FROM "{catalog}"."{namespace}"."{table}" LIMIT 30'
                     )
                 except Exception as e:
                     # Log error or just skip samples for this table
