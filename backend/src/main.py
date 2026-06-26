@@ -113,6 +113,9 @@ app.add_middleware(
     allow_origins=[
         "https://nlex.tech",
         "https://www.nlex.tech",
+        "http://nlex.tech",
+        "http://www.nlex.tech",
+        "http://194.226.97.77",
         "http://localhost:5173",
         "http://127.0.0.1:5173",
         "http://localhost:5174",
