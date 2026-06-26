@@ -3,8 +3,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.database.session import get_db
 from src.models.api.auth import LoginResponse, RegisterResponse, LoginRequest, RegisterRequest
 from src.controllers.auth import AuthController
+from src.utils.config import get_settings
 
 router = APIRouter()
+settings = get_settings()
 
 @router.post("/register", response_model=RegisterResponse)
 async def register(data: RegisterRequest, response: Response, db: AsyncSession = Depends(get_db)):
@@ -20,12 +22,7 @@ async def login(data: LoginRequest, response: Response, db: AsyncSession = Depen
         value=result.jwt_token,
         httponly=True,
         samesite="lax",
-        secure=False, # Use False for localhost testing, True for production
+        secure=settings.ENVIRONMENT == "production",
         max_age=1440 * 60, # 24 hours in seconds
     )
     return result
-
-@router.post("/logout")
-async def logout(response: Response):
-    response.delete_cookie("access_token")
-    return {"detail": "Logged out successfully"}

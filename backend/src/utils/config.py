@@ -2,6 +2,8 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 from functools import lru_cache
 
 class Settings(BaseSettings):
+    ENVIRONMENT: str = "development"
+    
     # Backend
     BACKEND_PORT: int = 8000
     
@@ -17,21 +19,20 @@ class Settings(BaseSettings):
 
     # Admin
     ADMIN_EMAIL: str = "admin@nlex.ai"
-    ADMIN_PASSWORD: str
+    ADMIN_PASSWORD: str = "admin123"
 
     # Trino
     TRINO_PORT: int = 8080
     
     # JWT
-    JWT_SECRET_KEY: str
+    JWT_SECRET_KEY: str = "your-super-secret-key-change-me"
     JWT_ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 # 24 hours
 
     # LLM
     OPENAI_API_KEY: str | None = None
     OPENAI_BASE_URL: str = "https://api.openai.com/v1"
-    LLM_MODEL_FAST: str = "gpt-5.4-mini"
-    LLM_MODEL_THINKING: str = "gpt-5.5"
+    LLM_MODEL: str = "gpt-4o-mini"
     MAX_SQL_RETRIES: int = 3
     
     @property
