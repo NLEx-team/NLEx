@@ -1,11 +1,10 @@
 import React, { createContext, useState, useEffect, useCallback } from 'react';
 import type { ReactNode } from 'react';
 import { api } from '../../../utils/api';
-import type { User, AuthResponse, LoginCredentials, RegisterData } from '../types';
+import type { User, LoginCredentials, RegisterData } from '../types';
 
 export interface AuthContextType {
   user: User | null;
-  token: string | null;
   isAuthenticated: boolean;
   isLoading: boolean;
   login: (credentials: LoginCredentials) => Promise<void>;
@@ -23,29 +22,19 @@ interface AuthProviderProps {
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [token, setToken] = useState<string | null>(localStorage.getItem('jwt_token'));
   const [isLoading, setIsLoading] = useState(true);
 
   const logout = useCallback(() => {
-    localStorage.removeItem('jwt_token');
-    setToken(null);
     setUser(null);
+    // Also call the logout endpoint to clear the HttpOnly cookie
+    api.post('/auth/logout').catch(console.error);
   }, []);
 
   const refreshUser = useCallback(async () => {
-    const currentToken = localStorage.getItem('jwt_token');
-    if (!currentToken) {
-      setIsLoading(false);
-      setToken(null);
-      setUser(null);
-      return;
-    }
-
     try {
       // Assuming there is a /users/me endpoint to get current user info
       const userData = await api.get<User>('/users/me');
       setUser(userData);
-      setToken(currentToken);
     } catch (error) {
       console.error('Failed to fetch user:', error);
       logout();
@@ -60,11 +49,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const login = async (credentials: LoginCredentials) => {
     try {
-      const response = await api.post<AuthResponse>('/auth/login', credentials);
-      localStorage.setItem('jwt_token', response.jwt_token);
-      setToken(response.jwt_token);
-      setUser(response.user);
-    } catch (error) {
+      await api.post<{ user: User }>('/auth/login', credentials);
+      await refreshUser();
+    } catch (error: any) {
       throw error;
     }
   };
@@ -88,8 +75,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const value = {
     user,
-    token,
-    isAuthenticated: !!token,
+    isAuthenticated: !!user,
     isLoading,
     login,
     register,

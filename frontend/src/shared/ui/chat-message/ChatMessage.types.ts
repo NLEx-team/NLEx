@@ -16,6 +16,7 @@ export interface TableBlock {
   type: 'table';
   headers: string[];
   rows: any[][];
+  totalRows?: number;
   sql?: string;
   explanation?: string;
 }
@@ -34,4 +35,5 @@ export interface ChatMessageProps {
   exportUrl?: string;
   onClarify?: (questionId: string, selectedOptions: string[]) => void;
   onExport?: (exportUrl: string) => void;
+  isLastMessage?: boolean;
 }

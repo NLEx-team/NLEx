@@ -1,0 +1,57 @@
+import { addIcon } from '@iconify/react';
+
+import arrowLeft from '@iconify-icons/mdi/arrow-left';
+import menu from '@iconify-icons/mdi/menu';
+import formatListBulleted from '@iconify-icons/mdi/format-list-bulleted';
+import logout from '@iconify-icons/mdi/logout';
+import pencil from '@iconify-icons/mdi/pencil';
+import informationOutline from '@iconify-icons/mdi/information-outline';
+import plus from '@iconify-icons/mdi/plus';
+import refresh from '@iconify-icons/mdi/refresh';
+import dotsVertical from '@iconify-icons/mdi/dots-vertical';
+import send from '@iconify-icons/mdi/send';
+import alertCircleOutline from '@iconify-icons/mdi/alert-circle-outline';
+import codeTags from '@iconify-icons/mdi/code-tags';
+import fileDownloadOutline from '@iconify-icons/mdi/file-download-outline';
+import sendOutline from '@iconify-icons/mdi/send-outline';
+import eyeOutline from '@iconify-icons/mdi/eye-outline';
+import hideOutline from '@iconify-icons/mdi/hide-outline';
+import chevronDown from '@iconify-icons/mdi/chevron-down';
+import chevronUp from '@iconify-icons/mdi/chevron-up';
+import loading from '@iconify-icons/mdi/loading';
+import databaseSyncOutline from '@iconify-icons/mdi/database-sync-outline';
+import graphOutline from '@iconify-icons/mdi/graph-outline';
+import databaseSearchOutline from '@iconify-icons/mdi/database-search-outline';
+import autoFix from '@iconify-icons/mdi/auto-fix';
+import checkCircleOutline from '@iconify-icons/mdi/check-circle-outline';
+import weatherSunny from '@iconify-icons/mdi/weather-sunny';
+import moonWaningCrescent from '@iconify-icons/mdi/moon-waning-crescent';
+
+export function initIcons() {
+  addIcon('mdi:arrow-left', arrowLeft);
+  addIcon('mdi:menu', menu);
+  addIcon('mdi:format-list-bulleted', formatListBulleted);
+  addIcon('mdi:logout', logout);
+  addIcon('mdi:pencil', pencil);
+  addIcon('mdi:information-outline', informationOutline);
+  addIcon('mdi:plus', plus);
+  addIcon('mdi:refresh', refresh);
+  addIcon('mdi:dots-vertical', dotsVertical);
+  addIcon('mdi:send', send);
+  addIcon('mdi:alert-circle-outline', alertCircleOutline);
+  addIcon('mdi:code-tags', codeTags);
+  addIcon('mdi:file-download-outline', fileDownloadOutline);
+  addIcon('mdi:send-outline', sendOutline);
+  addIcon('mdi:eye-outline', eyeOutline);
+  addIcon('mdi:hide-outline', hideOutline);
+  addIcon('mdi:chevron-down', chevronDown);
+  addIcon('mdi:chevron-up', chevronUp);
+  addIcon('mdi:loading', loading);
+  addIcon('mdi:database-sync-outline', databaseSyncOutline);
+  addIcon('mdi:graph-outline', graphOutline);
+  addIcon('mdi:database-search-outline', databaseSearchOutline);
+  addIcon('mdi:auto-fix', autoFix);
+  addIcon('mdi:check-circle-outline', checkCircleOutline);
+  addIcon('mdi:weather-sunny', weatherSunny);
+  addIcon('mdi:moon-waning-crescent', moonWaningCrescent);
+}
