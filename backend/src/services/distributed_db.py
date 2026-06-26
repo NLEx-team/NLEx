@@ -39,6 +39,21 @@ class DistributedDatabaseService:
             query,
         )
 
+    async def execute_query_async_preview(
+        self,
+        query: str,
+        limit: int = 5
+    ) -> list[list[Any]]:
+        def _fetch_limited():
+            with closing(self._get_connection()) as conn:
+                with closing(conn.cursor()) as cursor:
+                    cursor.execute(query)
+                    if cursor.description is None:
+                        return []
+                    return cursor.fetchmany(limit)
+                    
+        return await asyncio.to_thread(_fetch_limited)
+
     def execute_query_sync(
         self,
         query: str,
@@ -50,7 +65,28 @@ class DistributedDatabaseService:
                 if cursor.description is None:
                     return []
 
+                # ВНИМАНИЕ: Возвращено fetchall по требованию. Есть риск OOM при больших данных.
                 return cursor.fetchall()
+
+    def execute_query_sync_stream(
+        self,
+        query: str,
+        chunk_size: int = 1000
+    ):
+        """Yields results in chunks for memory-efficient processing."""
+        with closing(self._get_connection()) as conn:
+            with closing(conn.cursor()) as cursor:
+                cursor.execute(query)
+
+                if cursor.description is None:
+                    return
+                
+                while True:
+                    rows = cursor.fetchmany(chunk_size)
+                    if not rows:
+                        break
+                    for row in rows:
+                        yield row
 
     async def connect_catalog(
         self,
@@ -59,13 +95,17 @@ class DistributedDatabaseService:
     ) -> None:
         self._validate_catalog_name(name)
 
+        url = catalog.url.replace("'", "''")
+        user = catalog.user.replace("'", "''")
+        password = catalog.password.replace("'", "''")
+
         sql = f"""
         CREATE CATALOG {name}
         USING {catalog.type.value}
         WITH (
-            "connection-url" = '{catalog.url}',
-            "connection-user" = '{catalog.user}',
-            "connection-password" = '{catalog.password}'
+            "connection-url" = '{url}',
+            "connection-user" = '{user}',
+            "connection-password" = '{password}'
         )
         """
 
