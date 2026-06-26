@@ -4,6 +4,8 @@ from src.routers.auth import router as auth_router
 from src.routers.users import router as users_router
 from src.routers.chats import router as chats_router
 from src.routers.catalogs import router as catalogs_router
+from src.routers.analytics import router as analytics_router
+from src.routers.admin import router as admin_router
 from src.middleware.auth import AuthMiddleware
 from src.database.session import engine, Base
 from rich.traceback import install
@@ -105,7 +107,9 @@ app.add_middleware(
         "https://nlex.tech",
         "https://www.nlex.tech",
         "http://localhost:5173",
-        "http://127.0.0.1:5173"
+        "http://127.0.0.1:5173",
+        "http://localhost:5174",
+        "http://127.0.0.1:5174"
     ],
     allow_credentials=True,
     allow_methods=["*"],
@@ -117,6 +121,8 @@ app.include_router(auth_router, prefix="/auth", tags=["auth"])
 app.include_router(users_router, prefix="/users", tags=["users"])
 app.include_router(chats_router, prefix="/chats", tags=["chats"])
 app.include_router(catalogs_router, prefix="/catalogs", tags=["catalogs"])
+app.include_router(analytics_router, prefix="/analytics", tags=["analytics"])
+app.include_router(admin_router, prefix="", tags=["admin"])
 
 @app.get("/")
 async def root() -> dict[str, str]:
