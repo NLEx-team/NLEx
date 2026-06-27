@@ -41,6 +41,7 @@ export function AdminPage() {
 
   const [testProxyLoading, setTestProxyLoading] = useState(false);
   const [testProxyResult, setTestProxyResult] = useState<{success: boolean, text: string} | null>(null);
+  const [proxyMessage, setProxyMessage] = useState('');
 
   // Users State
   const [users, setUsers] = useState<UserStats[]>([]);
@@ -74,15 +75,22 @@ export function AdminPage() {
     }
   };
 
-  const saveLlmConfig = async (configToSave = llmConfig) => {
+  const saveLlmConfig = async (configToSave = llmConfig, source: 'llm' | 'proxy' = 'llm') => {
     setLlmLoading(true);
-    setLlmMessage('');
+    if (source === 'llm') setLlmMessage('');
+    else setProxyMessage('');
     try {
       await api.post('/admin/llm-config', configToSave);
-      setLlmMessage('Configuration saved successfully!');
-      setTimeout(() => setLlmMessage(''), 3000);
+      if (source === 'llm') {
+        setLlmMessage('Configuration saved successfully!');
+        setTimeout(() => setLlmMessage(''), 3000);
+      } else {
+        setProxyMessage('Configuration saved successfully!');
+        setTimeout(() => setProxyMessage(''), 3000);
+      }
     } catch (err: any) {
-      setLlmMessage('Failed to save configuration.');
+      if (source === 'llm') setLlmMessage('Failed to save configuration.');
+      else setProxyMessage('Failed to save configuration.');
     } finally {
       setLlmLoading(false);
     }
@@ -91,7 +99,7 @@ export function AdminPage() {
   const handleToggleActive = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newConfig = { ...llmConfig, is_active: e.target.checked };
     setLlmConfig(newConfig);
-    void saveLlmConfig(newConfig);
+    void saveLlmConfig(newConfig, 'llm');
   };
 
   const testLlmConnection = async () => {
@@ -142,6 +150,7 @@ export function AdminPage() {
       } else {
         setTestProxyResult({ success: false, text: res?.error || 'Proxy connection failed' });
       }
+      setTimeout(() => setTestProxyResult(null), 3000);
     } catch (err: any) {
       setTestProxyResult({ success: false, text: err.message || 'Failed to connect to proxy' });
     } finally {
@@ -258,7 +267,7 @@ export function AdminPage() {
                   </Button>
                   <Button 
                     variant="primary" 
-                    onClick={() => saveLlmConfig()} 
+                    onClick={() => saveLlmConfig(llmConfig, 'llm')} 
                     disabled={llmLoading}
                     style={{ padding: '12px 24px', fontSize: '15px' }}
                   >
@@ -360,13 +369,15 @@ export function AdminPage() {
                     )}
                     <Button 
                       variant="primary" 
-                      onClick={() => saveLlmConfig()} 
+                      onClick={() => saveLlmConfig(llmConfig, 'proxy')} 
                       disabled={llmLoading}
                       style={{ padding: '12px 24px', fontSize: '15px' }}
                     >
                       {llmLoading ? 'Saving...' : 'Save Configuration'}
                     </Button>
                   </div>
+                  
+                  {proxyMessage && <div style={{ textAlign: 'right' }}><span className="admin-message">{proxyMessage}</span></div>}
 
                   {testProxyResult && (
                     <div className={`admin-ping-result ${testProxyResult.success ? 'success' : 'error'}`}>
