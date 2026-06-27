@@ -1,6 +1,9 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, BackgroundTasks
 from typing import List
 from uuid import UUID
+import logging
+
+logger = logging.getLogger(__name__)
 
 from src.dependencies.auth import get_current_user, require_admin
 from src.database.models.user import User, UserRole
@@ -25,14 +28,37 @@ async def get_catalog_service(db = Depends(get_db)) -> CatalogService:
     )
     return CatalogService(repo, db_service)
 
+async def background_cache_schema(catalog_id: str):
+    from src.database.session import SessionLocal
+    from src.controllers.chat_controller import ChatController
+    import uuid
+    
+    try:
+        async with SessionLocal() as db:
+            repo = CatalogRepository(db)
+            db_service = DistributedDatabaseService(host="trino", port=settings.TRINO_PORT, user="trino")
+            catalog_service = CatalogService(repo, db_service)
+            
+            controller = ChatController(catalog_service, db)
+            dummy_chat_id = uuid.uuid4()
+            orchestrator = await controller.get_orchestrator(dummy_chat_id, catalog_ids=[catalog_id])
+            await orchestrator.infer_relationships()
+            logger.info(f"Successfully background cached schema for catalog {catalog_id}")
+    except Exception as e:
+        logger.error(f"Failed background cache for catalog {catalog_id}: {e}", exc_info=True)
+
 @router.post("", response_model=CatalogRead, status_code=status.HTTP_201_CREATED)
 async def create_catalog(
     catalog_in: CatalogCreate,
+    background_tasks: BackgroundTasks,
     service: CatalogService = Depends(get_catalog_service),
     _ = Depends(require_admin)
 ):
     try:
-        return await service.create_catalog(catalog_in)
+        catalog = await service.create_catalog(catalog_in)
+        if catalog.status == "active":
+            background_tasks.add_task(background_cache_schema, str(catalog.id))
+        return catalog
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
@@ -56,10 +82,14 @@ async def delete_catalog(
 @router.post("/{catalog_id}/test", response_model=CatalogRead)
 async def test_catalog(
     catalog_id: UUID,
+    background_tasks: BackgroundTasks,
     service: CatalogService = Depends(get_catalog_service),
     _ = Depends(get_current_user)
 ):
-    return await service.sync_catalog(catalog_id)
+    catalog = await service.sync_catalog(catalog_id)
+    if catalog.status == "active":
+        background_tasks.add_task(background_cache_schema, str(catalog.id))
+    return catalog
 
 @router.post("/{catalog_id}/ping", response_model=CatalogTestResult)
 async def ping_catalog(
