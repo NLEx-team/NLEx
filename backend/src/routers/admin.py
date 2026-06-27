@@ -151,10 +151,17 @@ async def test_proxy_config(
          return ProxyTestResponse(success=False, error="No proxy URL provided or configured in system")
 
     try:
-        # If proxy_mode is off, we still test connectivity but without a proxy
-        with httpx.Client(proxy=resolved_proxy, timeout=10.0) as client:
-            response = client.get("https://api.openai.com/v1")
-            return ProxyTestResponse(success=True)
+        proxies = [p.strip() for p in resolved_proxy.split(',')] if resolved_proxy else [None]
+        errors = []
+        for p in proxies:
+            try:
+                with httpx.Client(proxy=p, timeout=10.0) as client:
+                    response = client.get("https://api.openai.com/v1")
+                    return ProxyTestResponse(success=True)
+            except Exception as e:
+                errors.append(f"Proxy {p} failed: {str(e)}")
+                
+        return ProxyTestResponse(success=False, error="; ".join(errors))
     except Exception as e:
         return ProxyTestResponse(success=False, error=str(e))
 

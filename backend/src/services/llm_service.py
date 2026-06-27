@@ -68,18 +68,32 @@ class LLMService:
         if actual_base_url and actual_base_url.endswith("/chat/completions"):
             actual_base_url = actual_base_url.rsplit("/chat/completions", 1)[0]
 
-        # If a proxy URL is provided, route requests through it via httpx
-        http_client = None
+        # If a proxy URL is provided, it can be comma-separated for fallbacks
+        self.clients = []
+        actual_proxies = []
         if proxy_url:
+            actual_proxies = [p.strip() for p in proxy_url.split(",") if p.strip()]
+            
+        if actual_proxies:
             import httpx
-            http_client = httpx.Client(proxy=proxy_url, timeout=_REQUEST_TIMEOUT)
-
-        self.client = OpenAI(
-            api_key=actual_api_key,
-            base_url=actual_base_url,
-            timeout=_REQUEST_TIMEOUT,
-            http_client=http_client,
-        )
+            for p_url in actual_proxies:
+                http_client = httpx.Client(proxy=p_url, timeout=_REQUEST_TIMEOUT)
+                self.clients.append(OpenAI(
+                    api_key=actual_api_key,
+                    base_url=actual_base_url,
+                    timeout=_REQUEST_TIMEOUT,
+                    http_client=http_client,
+                ))
+        
+        # If no proxies, add a direct client
+        if not self.clients:
+            self.clients.append(OpenAI(
+                api_key=actual_api_key,
+                base_url=actual_base_url,
+                timeout=_REQUEST_TIMEOUT,
+            ))
+            
+        self.current_client_idx = 0
 
     def generate_sql(
         self, 
@@ -147,17 +161,21 @@ class LLMService:
         """
         messages = [{"role": "user", "content": prompt}]
         
-        try:
-            response = self.client.chat.completions.create(
-                model=self.model,
-                messages=messages,
-                response_format={"type": "text"},
-                temperature=0.7,
-            )
-            return response.choices[0].message.content
-        except Exception as e:
-            logger.error(f"Error testing LLM connection: {str(e)}", exc_info=True)
-            raise ValueError(f"Failed to connect to LLM: {str(e)}")
+        for idx, client in enumerate(self.clients):
+            try:
+                response = client.chat.completions.create(
+                    model=self.model,
+                    messages=messages,
+                    response_format={"type": "text"},
+                    temperature=0.7,
+                )
+                return response.choices[0].message.content
+            except Exception as e:
+                if idx == len(self.clients) - 1:
+                    logger.error(f"Error testing LLM connection: {str(e)}", exc_info=True)
+                    raise ValueError(f"Failed to connect to LLM on all proxies: {str(e)}")
+                else:
+                    logger.warning(f"Error on proxy {idx}: {str(e)}. Trying next...")
 
     def _execute_with_retry(self, messages: list[dict[str, str]], task_type: str) -> dict[str, Any]:
         """
@@ -165,11 +183,17 @@ class LLMService:
         """
         last_error: Exception | None = None
         for attempt in range(_MAX_RETRIES):
+            client = self.clients[self.current_client_idx]
             try:
-                result = self._call_llm(messages, task_type)
+                result = self._call_llm(messages, task_type, client)
                 return result
             except _RETRYABLE_ERRORS as e:
                 last_error = e
+                # Switch to the next proxy client if available
+                if len(self.clients) > 1:
+                    self.current_client_idx = (self.current_client_idx + 1) % len(self.clients)
+                    logger.warning("Switched to fallback proxy client due to error.")
+                    
                 delay = _BASE_DELAY * (2 ** attempt)
                 logger.warning(
                     "LLM request failed (attempt %d/%d): %s. Retrying in %.1fs",
@@ -204,12 +228,12 @@ class LLMService:
         logger.error("LLM all %d attempts exhausted. Last error: %s", _MAX_RETRIES, error_msg)
         return {"status": "error", "message": "Service temporarily unavailable. Please try again later."}
 
-    def _call_llm(self, messages: list[dict[str, str]], task_type: str) -> dict[str, Any]:
+    def _call_llm(self, messages: list[dict[str, str]], task_type: str, client: OpenAI) -> dict[str, Any]:
         """
         Single LLM call with parsing and validation.
         Raises: json.JSONDecodeError, ValueError, OpenAIError
         """
-        response = self.client.chat.completions.create(
+        response = client.chat.completions.create(
             model=self.model,
             messages=messages,
             temperature=0.0,
