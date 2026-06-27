@@ -1,0 +1,43 @@
+name: CI
+
+on:
+  push:
+    branches: [develop, main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Create environment file
+        run: |
+          cat > .env.secret <<EOF
+          FRONTEND_PORT=${{ secrets.FRONTEND_PORT }}
+          VITE_API_URL=${{ secrets.VITE_API_URL }}
+          BACKEND_PORT=${{ secrets.BACKEND_PORT }}
+          POSTGRES_USER=${{ secrets.POSTGRES_USER }}
+          POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
+          POSTGRES_DB=${{ secrets.POSTGRES_DB }}
+          POSTGRES_HOST=${{ secrets.POSTGRES_HOST }}
+          POSTGRES_PORT=${{ secrets.POSTGRES_PORT }}
+          DATABASE_URL=${{ secrets.DATABASE_URL }}
+          TRINO_PORT=${{ secrets.TRINO_PORT }}
+          ADMIN_EMAIL=${{ secrets.ADMIN_EMAIL }}
+          ADMIN_PASSWORD=${{ secrets.ADMIN_PASSWORD }}
+          JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }}
+          JWT_ALGORITHM=${{ secrets.JWT_ALGORITHM }}
+          ACCESS_TOKEN_EXPIRE_MINUTES=${{ secrets.ACCESS_TOKEN_EXPIRE_MINUTES }}
+          OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
+          OPENAI_BASE_URL=${{ secrets.OPENAI_BASE_URL }}
+          LLM_MODEL=${{ secrets.LLM_MODEL }}
+          EOF
+
+      - name: Build and run tests in Docker
+        run: |
+          docker compose --env-file .env.secret --profile test build
+          docker compose --env-file .env.secret --profile test up --abort-on-container-exit --exit-code-from backend-test
+
+     
