@@ -35,6 +35,7 @@ class Settings(BaseSettings):
     LLM_MODEL_FAST: str = "gpt-5.4-mini"
     LLM_MODEL_THINKING: str = "gpt-5.5"
     MAX_SQL_RETRIES: int = 3
+    SYSTEM_PROXY_URL: str | None = None
     
     @property
     def SQLALCHEMY_DATABASE_URL(self) -> str:

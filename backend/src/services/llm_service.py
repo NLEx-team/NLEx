@@ -42,7 +42,7 @@ _RETRYABLE_ERRORS = (APITimeoutError, RateLimitError, APIConnectionError)
 # Retry configuration
 _MAX_RETRIES = 3
 _BASE_DELAY = 1.0  # seconds
-_REQUEST_TIMEOUT = 60.0  # seconds
+_REQUEST_TIMEOUT = 120.0  # seconds
 
 
 class LLMService:

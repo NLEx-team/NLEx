@@ -55,8 +55,8 @@ class ChatController:
             chat = chat_result.scalar_one_or_none()
             user_id = chat.user_id if chat else None
 
-            # Prioritize personal (is_shared=False) over shared (is_shared=True)
-            result = await self.db.execute(
+            # Fetch LLM Config (prioritize personal over shared)
+            llm_result = await self.db.execute(
                 select(LlmConfiguration)
                 .where(
                     LlmConfiguration.is_active == True,
@@ -67,18 +67,38 @@ class ChatController:
                 )
                 .order_by(LlmConfiguration.is_shared.asc())
             )
-            shared_config = result.scalars().first()
+            llm_config = llm_result.scalars().first()
             
-            if shared_config:
+            # Fetch Proxy Config (prioritize personal over shared)
+            proxy_result = await self.db.execute(
+                select(LlmConfiguration)
+                .where(
+                    or_(
+                        LlmConfiguration.is_proxy_shared == True,
+                        LlmConfiguration.admin_id == user_id
+                    )
+                )
+                .order_by(LlmConfiguration.is_proxy_shared.asc())
+            )
+            proxy_config = proxy_result.scalars().first()
+            
+            resolved_proxy_url = None
+            if proxy_config:
+                if proxy_config.proxy_mode == 'custom':
+                    resolved_proxy_url = proxy_config.proxy_url
+                elif proxy_config.proxy_mode == 'system':
+                    resolved_proxy_url = settings.SYSTEM_PROXY_URL
+            
+            if llm_config:
                 ls = LLMService(
                     use_thinking_model=use_thinking_model,
-                    api_key=shared_config.api_key,
-                    base_url=shared_config.base_url,
-                    model=shared_config.model_name,
-                    proxy_url=shared_config.proxy_url
+                    api_key=llm_config.api_key,
+                    base_url=llm_config.base_url,
+                    model=llm_config.model_name,
+                    proxy_url=resolved_proxy_url
                 )
             else:
-                ls = LLMService(use_thinking_model=use_thinking_model)
+                ls = LLMService(use_thinking_model=use_thinking_model, proxy_url=resolved_proxy_url)
             
             db_service = DistributedDatabaseService(
                 host="trino", port=settings.TRINO_PORT, user="trino"
