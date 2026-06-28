@@ -37,9 +37,6 @@ jobs:
           LLM_MODEL=${{ secrets.LLM_MODEL }}
           EOF
 
-      - name: Verify env file
-        run: cat .env.secret
-
       - name: Build and run tests in Docker
         run: |
           docker compose --env-file .env.secret --profile test build
