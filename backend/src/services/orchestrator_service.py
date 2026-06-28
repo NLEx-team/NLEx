@@ -259,21 +259,14 @@ class OrchestratorService:
             # Execute SQL
             await self._transition(OrchestratorState.EXECUTING_SQL)
             try:
-                # Single query: preview + total count via window function
-                combined_sql = (
-                    f"SELECT *, COUNT(*) OVER() AS _total_rows "
-                    f"FROM ({sql}) AS preview_wrap LIMIT 5"
-                )
-                combined_data = await self.db_service.execute_query_async(combined_sql)
+                # 1. Get total rows
+                count_sql = f"SELECT COUNT(*) FROM ({sql}) AS count_wrap"
+                count_data = await self.db_service.execute_query_async(count_sql)
+                total_rows = count_data[0][0] if count_data else 0
                 
-                if combined_data:
-                    # _total_rows is the last column in each row
-                    total_rows = combined_data[0][-1]
-                    # Strip the _total_rows column from preview data
-                    preview_data = [row[:-1] for row in combined_data]
-                else:
-                    total_rows = 0
-                    preview_data = []
+                # 2. Get preview data (wrapping in a simple SELECT * LIMIT 5 preserves order)
+                preview_sql = f"SELECT * FROM ({sql}) AS preview_wrap LIMIT 5"
+                preview_data = await self.db_service.execute_query_async(preview_sql)
                 
                 await self._transition(OrchestratorState.COMPLETED)
                 success_result = {
