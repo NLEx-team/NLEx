@@ -13,9 +13,15 @@ class AuthMiddleware(BaseHTTPMiddleware):
         # Default to None
         request.state.user = None
         
-        auth_header = request.headers.get("Authorization")
-        if auth_header and auth_header.startswith("Bearer "):
-            token = auth_header.replace("Bearer ", "")
+        # Try getting token from cookie first, fallback to Authorization header
+        token = request.cookies.get("access_token")
+        
+        if not token:
+            auth_header = request.headers.get("Authorization")
+            if auth_header and auth_header.startswith("Bearer "):
+                token = auth_header.replace("Bearer ", "")
+                
+        if token:
             payload = AuthService.decode_token(token)
             
             if payload:

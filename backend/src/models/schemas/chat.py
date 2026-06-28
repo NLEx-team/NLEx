@@ -20,8 +20,29 @@ class ChatBase(BaseModel):
 class ChatRead(ChatBase):
     id: UUID
     status: ChatStatus
+    catalog_ids: List[str]
     created_at: datetime
     updated_at: datetime
+
+class ChatListItem(BaseModel):
+    id: str
+    title: str
+    catalog_ids: List[str]
+    updated_at: datetime
+
+    class Config:
+        from_attributes = True
+
+class ChatMessageRead(BaseModel):
+    id: str
+    role: str
+    blocks: List[Any]
+    export_url: Optional[str] = None
+    total_tokens: Optional[int] = None
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
 
 class DatabaseConnectionRead(BaseModel):
     id: UUID

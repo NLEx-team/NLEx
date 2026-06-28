@@ -223,3 +223,12 @@ __marimo__/
 
 # Other
 opencode.json
+frontend/.vite/
+
+test_*.py
+
+test_*.xlsx
+
+seed_second_db.py
+
+delete_cats.py

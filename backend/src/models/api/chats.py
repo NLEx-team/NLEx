@@ -5,10 +5,11 @@ from ..schemas.chat import ChatRead, DatabaseConnectionRead, DraftRead, SchemaSn
 
 class ChatCreateRequest(BaseModel):
     name: Optional[str] = None
-    connection_ids: List[UUID] = []
+    catalog_ids: List[str] = []
 
 class PromptRequest(BaseModel):
     prompt: str
+    catalog_ids: List[str] = []
 
 class ReviseRequest(BaseModel):
     instruction: str
@@ -17,3 +18,6 @@ class ClarificationAnswer(BaseModel):
     question_id: str
     selected_options: List[str]
     custom_answer: Optional[str] = None
+
+class ChatUpdateRequest(BaseModel):
+    name: str
