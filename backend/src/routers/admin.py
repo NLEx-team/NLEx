@@ -20,6 +20,9 @@ class LlmConfigBase(BaseModel):
     model_name: str
     is_shared: bool
     is_active: bool = True
+    proxy_mode: str = "system"
+    proxy_url: Optional[str] = None
+    is_proxy_shared: bool = False
 
 class LlmConfigRead(LlmConfigBase):
     id: uuid.UUID
@@ -70,6 +73,9 @@ async def create_or_update_llm_config(
         config.model_name = data.model_name
         config.is_shared = data.is_shared
         config.is_active = data.is_active
+        config.proxy_mode = data.proxy_mode
+        config.proxy_url = data.proxy_url
+        config.is_proxy_shared = data.is_proxy_shared
     else:
         config = LlmConfiguration(
             admin_id=admin.id,
@@ -77,7 +83,10 @@ async def create_or_update_llm_config(
             api_key=data.api_key,
             model_name=data.model_name,
             is_shared=data.is_shared,
-            is_active=data.is_active
+            is_active=data.is_active,
+            proxy_mode=data.proxy_mode,
+            proxy_url=data.proxy_url,
+            is_proxy_shared=data.is_proxy_shared
         )
         db.add(config)
         
@@ -90,6 +99,7 @@ class LlmTestRequest(BaseModel):
     api_key: str
     model_name: str
     prompt: str = "Привет"
+    proxy_url: Optional[str] = None
 
 class LlmTestResponse(BaseModel):
     success: bool
@@ -107,12 +117,53 @@ async def test_llm_config(
         ls = LLMService(
             api_key=data.api_key,
             base_url=data.base_url,
-            model=data.model_name
+            model=data.model_name,
+            proxy_url=data.proxy_url
         )
         response_text = ls.test_connection(data.prompt)
         return LlmTestResponse(success=True, response=response_text)
     except Exception as e:
         return LlmTestResponse(success=False, error=str(e))
+
+class ProxyTestRequest(BaseModel):
+    proxy_mode: str = "system"
+    proxy_url: Optional[str] = None
+
+class ProxyTestResponse(BaseModel):
+    success: bool
+    error: Optional[str] = None
+
+@router.post("/proxy-config/test", response_model=ProxyTestResponse)
+async def test_proxy_config(
+    data: ProxyTestRequest,
+    admin: User = Depends(require_admin)
+):
+    from src.utils.config import settings
+    import httpx
+    
+    resolved_proxy = None
+    if data.proxy_mode == 'custom':
+        resolved_proxy = data.proxy_url
+    elif data.proxy_mode == 'system':
+        resolved_proxy = settings.SYSTEM_PROXY_URL
+        
+    if not resolved_proxy and data.proxy_mode != 'off':
+         return ProxyTestResponse(success=False, error="No proxy URL provided or configured in system")
+
+    try:
+        proxies = [p.strip() for p in resolved_proxy.split(',')] if resolved_proxy else [None]
+        errors = []
+        for p in proxies:
+            try:
+                with httpx.Client(proxy=p, timeout=10.0) as client:
+                    response = client.get("https://api.openai.com/v1")
+                    return ProxyTestResponse(success=True)
+            except Exception as e:
+                errors.append(f"Proxy {p} failed: {str(e)}")
+                
+        return ProxyTestResponse(success=False, error="; ".join(errors))
+    except Exception as e:
+        return ProxyTestResponse(success=False, error=str(e))
 
 @router.get("/users", response_model=List[UserStats])
 async def get_all_users(

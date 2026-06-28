@@ -42,36 +42,54 @@ _RETRYABLE_ERRORS = (APITimeoutError, RateLimitError, APIConnectionError)
 # Retry configuration
 _MAX_RETRIES = 3
 _BASE_DELAY = 1.0  # seconds
-_REQUEST_TIMEOUT = 60.0  # seconds
+_REQUEST_TIMEOUT = 120.0  # seconds
 
 
 class LLMService:
     def __init__(
         self, 
-        use_thinking_model: bool = False,
         api_key: str = None,
         base_url: str = None,
-        model: str = None
+        model: str = None,
+        proxy_url: str = None
     ):
         actual_api_key = api_key or settings.OPENAI_API_KEY
         if not actual_api_key:
             raise ValueError("OPENAI_API_KEY is not configured")
 
-        if model:
-            self.model = model
-        else:
-            self.model = settings.LLM_MODEL_THINKING if use_thinking_model else settings.LLM_MODEL_FAST
+        self.model = model or settings.LLM_MODEL_FAST
 
         actual_base_url = base_url or settings.OPENAI_BASE_URL
         # Remove /chat/completions from base_url if it's there, as SDK will add it
         if actual_base_url and actual_base_url.endswith("/chat/completions"):
             actual_base_url = actual_base_url.rsplit("/chat/completions", 1)[0]
 
-        self.client = OpenAI(
-            api_key=actual_api_key,
-            base_url=actual_base_url,
-            timeout=_REQUEST_TIMEOUT,
-        )
+        # If a proxy URL is provided, it can be comma-separated for fallbacks
+        self.clients = []
+        actual_proxies = []
+        if proxy_url:
+            actual_proxies = [p.strip() for p in proxy_url.split(",") if p.strip()]
+            
+        if actual_proxies:
+            import httpx
+            for p_url in actual_proxies:
+                http_client = httpx.Client(proxy=p_url, timeout=_REQUEST_TIMEOUT)
+                self.clients.append(OpenAI(
+                    api_key=actual_api_key,
+                    base_url=actual_base_url,
+                    timeout=_REQUEST_TIMEOUT,
+                    http_client=http_client,
+                ))
+        
+        # If no proxies, add a direct client
+        if not self.clients:
+            self.clients.append(OpenAI(
+                api_key=actual_api_key,
+                base_url=actual_base_url,
+                timeout=_REQUEST_TIMEOUT,
+            ))
+            
+        self.current_client_idx = 0
 
     def generate_sql(
         self, 
@@ -119,6 +137,24 @@ class LLMService:
 
         return self._execute_with_retry(messages, "inference")
 
+    def generate_embeddings(self, texts: list[str]) -> list[list[float]]:
+        """
+        Generates embeddings for a list of texts using OpenAI's embedding model.
+        """
+        if not texts:
+            return []
+            
+        client = self.clients[self.current_client_idx]
+        try:
+            response = client.embeddings.create(
+                input=texts,
+                model="text-embedding-3-small"
+            )
+            return [data.embedding for data in response.data]
+        except Exception as e:
+            logger.error(f"Failed to generate embeddings: {e}")
+            raise e
+
     def generate_chat_title(self, history: list[dict[str, str]]) -> dict[str, Any]:
         """
         Generates a short title based on the chat history.
@@ -139,17 +175,21 @@ class LLMService:
         """
         messages = [{"role": "user", "content": prompt}]
         
-        try:
-            response = self.client.chat.completions.create(
-                model=self.model,
-                messages=messages,
-                response_format={"type": "text"},
-                temperature=0.7,
-            )
-            return response.choices[0].message.content
-        except Exception as e:
-            logger.error(f"Error testing LLM connection: {str(e)}", exc_info=True)
-            raise ValueError(f"Failed to connect to LLM: {str(e)}")
+        for idx, client in enumerate(self.clients):
+            try:
+                response = client.chat.completions.create(
+                    model=self.model,
+                    messages=messages,
+                    response_format={"type": "text"},
+                    temperature=0.7,
+                )
+                return response.choices[0].message.content
+            except Exception as e:
+                if idx == len(self.clients) - 1:
+                    logger.error(f"Error testing LLM connection: {str(e)}", exc_info=True)
+                    raise ValueError(f"Failed to connect to LLM on all proxies: {str(e)}")
+                else:
+                    logger.warning(f"Error on proxy {idx}: {str(e)}. Trying next...")
 
     def _execute_with_retry(self, messages: list[dict[str, str]], task_type: str) -> dict[str, Any]:
         """
@@ -157,11 +197,17 @@ class LLMService:
         """
         last_error: Exception | None = None
         for attempt in range(_MAX_RETRIES):
+            client = self.clients[self.current_client_idx]
             try:
-                result = self._call_llm(messages, task_type)
+                result = self._call_llm(messages, task_type, client)
                 return result
             except _RETRYABLE_ERRORS as e:
                 last_error = e
+                # Switch to the next proxy client if available
+                if len(self.clients) > 1:
+                    self.current_client_idx = (self.current_client_idx + 1) % len(self.clients)
+                    logger.warning("Switched to fallback proxy client due to error.")
+                    
                 delay = _BASE_DELAY * (2 ** attempt)
                 logger.warning(
                     "LLM request failed (attempt %d/%d): %s. Retrying in %.1fs",
@@ -196,19 +242,19 @@ class LLMService:
         logger.error("LLM all %d attempts exhausted. Last error: %s", _MAX_RETRIES, error_msg)
         return {"status": "error", "message": "Service temporarily unavailable. Please try again later."}
 
-    def _call_llm(self, messages: list[dict[str, str]], task_type: str) -> dict[str, Any]:
+    def _call_llm(self, messages: list[dict[str, str]], task_type: str, client: OpenAI) -> dict[str, Any]:
         """
         Single LLM call with parsing and validation.
         Raises: json.JSONDecodeError, ValueError, OpenAIError
         """
-        response = self.client.chat.completions.create(
+        response = client.chat.completions.create(
             model=self.model,
             messages=messages,
             temperature=0.0,
             response_format={"type": "json_object"},
         )
 
-        print(f"LLM response: {response}")
+        logger.debug("LLM response received: model=%s, usage=%s", response.model, response.usage)
 
         raw_response = response.choices[0].message.content
         if not raw_response:

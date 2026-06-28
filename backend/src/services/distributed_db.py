@@ -48,9 +48,10 @@ class DistributedDatabaseService:
             with closing(self._get_connection()) as conn:
                 with closing(conn.cursor()) as cursor:
                     cursor.execute(query)
-                    if cursor.description is None:
+                    try:
+                        return cursor.fetchmany(limit)
+                    except Exception:
                         return []
-                    return cursor.fetchmany(limit)
                     
         return await asyncio.to_thread(_fetch_limited)
 
@@ -62,11 +63,10 @@ class DistributedDatabaseService:
             with closing(conn.cursor()) as cursor:
                 cursor.execute(query)
 
-                if cursor.description is None:
+                try:
+                    return cursor.fetchall()
+                except Exception:
                     return []
-
-                # ВНИМАНИЕ: Возвращено fetchall по требованию. Есть риск OOM при больших данных.
-                return cursor.fetchall()
 
     def execute_query_sync_stream(
         self,
@@ -78,15 +78,22 @@ class DistributedDatabaseService:
             with closing(conn.cursor()) as cursor:
                 cursor.execute(query)
 
-                if cursor.description is None:
-                    return
+                try:
+                    # just to check if it has results, otherwise it will raise on fetchmany
+                    _ = cursor.description
+                except Exception:
+                    # If description itself crashes (the Trino bug), we assume it has results
+                    pass
                 
-                while True:
-                    rows = cursor.fetchmany(chunk_size)
-                    if not rows:
-                        break
-                    for row in rows:
-                        yield row
+                try:
+                    while True:
+                        rows = cursor.fetchmany(chunk_size)
+                        if not rows:
+                            break
+                        for row in rows:
+                            yield row
+                except Exception:
+                    return
 
     async def connect_catalog(
         self,
@@ -152,7 +159,7 @@ class DistributedDatabaseService:
 
         rows = await self.execute_query_async(
             f"""
-            SHOW SCHEMAS FROM {catalog}
+            SHOW SCHEMAS FROM "{catalog}"
             """
         )
         return [row[0] for row in rows]
@@ -166,7 +173,7 @@ class DistributedDatabaseService:
         self._validate_catalog_name(catalog)
 
         rows = await self.execute_query_async(
-            f"SHOW TABLES FROM {catalog}.{namespace}"
+            f'SHOW TABLES FROM "{catalog}"."{namespace}"'
         )
         return [row[0] for row in rows]
 
@@ -186,7 +193,7 @@ class DistributedDatabaseService:
                 data_type,
                 is_nullable,
                 ordinal_position
-            FROM {catalog}.information_schema.columns
+            FROM "{catalog}".information_schema.columns
             WHERE table_schema = '{namespace}'
             AND table_name = '{table}'
             ORDER BY ordinal_position

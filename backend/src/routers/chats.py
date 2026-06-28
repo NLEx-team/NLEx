@@ -1,5 +1,6 @@
-from fastapi import APIRouter, Depends, HTTPException, status, BackgroundTasks
+from fastapi import APIRouter, Depends, HTTPException, status, BackgroundTasks, WebSocket, WebSocketDisconnect
 from fastapi.responses import FileResponse
+from src.services.auth import AuthService
 from uuid import UUID, uuid4
 from datetime import datetime
 from typing import List, Dict, Any
@@ -97,6 +98,98 @@ async def get_chat_messages(
         )
         for m in messages
     ]
+
+
+@router.websocket("/{chat_id}/ws")
+async def chat_websocket(
+    websocket: WebSocket,
+    chat_id: UUID,
+    db: AsyncSession = Depends(get_db),
+    catalog_service: CatalogService = Depends(get_catalog_service)
+):
+    await websocket.accept()
+    
+    token = websocket.cookies.get("access_token")
+    if not token:
+        await websocket.close(code=1008, reason="Authentication required")
+        return
+        
+    payload = AuthService.decode_token(token)
+    if not payload or not payload.get("sub"):
+        await websocket.close(code=1008, reason="Invalid token")
+        return
+        
+    user_id = UUID(payload.get("sub"))
+    
+    chat = await ChatRepository.get_chat_by_id_and_user(db, chat_id, user_id)
+    if not chat:
+        await websocket.close(code=1008, reason="Chat not found")
+        return
+
+    controller = ChatController(catalog_service, db)
+
+    try:
+        while True:
+            data = await websocket.receive_text()
+            import json
+            request_data = json.loads(data)
+            prompt = request_data.get("prompt")
+            catalog_ids = request_data.get("catalog_ids")
+            
+            if catalog_ids is not None and chat.catalog_ids != catalog_ids:
+                chat.catalog_ids = catalog_ids
+                await ChatRepository.update_chat(db, chat)
+            
+            user_blocks = [{"type": "text", "text": prompt}]
+            await ChatRepository.add_message(db, chat_id, "user", user_blocks)
+
+            orch = await controller.get_orchestrator(chat_id, catalog_ids)
+            
+            async def send_status(state_val: str):
+                # Mapping state_val to UI status
+                state_map = {
+                    "IDLE": "idle",
+                    "CATALOG_CONNECTING": "ready_for_prompt",
+                    "RELATIONSHIP_INFERRING": "ready_for_prompt",
+                    "AWAITING_USER_QUERY": "ready_for_prompt",
+                    "GENERATING_SQL": "processing",
+                    "CLARIFICATION_REQUIRED": "awaiting_clarification",
+                    "EXECUTING_SQL": "executing",
+                    "FIXING_SQL": "fixing_sql",
+                    "COMPLETED": "completed",
+                    "FAILED": "error"
+                }
+                status_mapped = state_map.get(state_val, "processing")
+                try:
+                    await websocket.send_json({"type": "status", "status": status_mapped})
+                except:
+                    pass
+                    
+            orch.on_transition = send_status
+            
+            response = await controller.process_prompt(chat_id, prompt, catalog_ids)
+            
+            assistant_blocks = _response_to_blocks(response)
+            export_url = response.get("export_url")
+            total_tokens = response.get("result", {}).get("_usage", {}).get("total_tokens")
+            await ChatRepository.add_message(db, chat_id, "assistant", assistant_blocks, export_url, total_tokens)
+            
+            from fastapi.encoders import jsonable_encoder
+            await websocket.send_json({
+                "type": "result",
+                "response": jsonable_encoder(response)
+            })
+            
+    except WebSocketDisconnect:
+        pass
+    except Exception as e:
+        import logging
+        logging.getLogger(__name__).error(f"WebSocket error: {e}")
+        try:
+            await websocket.send_json({"type": "error", "message": str(e)})
+        except:
+            pass
+
 
 
 @router.get("/{chat_id}/status")

@@ -7,6 +7,7 @@ from datetime import datetime, timedelta
 from src.database.session import get_db
 from src.database.models.user import User, UserRole
 from src.database.models.chat import Chat, ChatMessage
+from src.database.models.catalog import Catalog
 from src.dependencies.auth import get_current_user
 
 router = APIRouter()
@@ -27,6 +28,10 @@ async def get_user_analytics(
     total_chats = result.scalar() or 0
 
     from sqlalchemy.orm import selectinload
+
+    # Fetch catalog names for mapping
+    catalog_result = await db.execute(select(Catalog.id, Catalog.name))
+    catalogs_map = {str(row.id): row.name for row in catalog_result}
 
     # 2. Total Requests & Tokens
     # To get user's messages, we join ChatMessage with Chat
@@ -97,6 +102,9 @@ async def get_user_analytics(
                             break
                         
                 if query:
+                    db_names = [catalogs_map.get(cid, "Unknown") for cid in user_msg.chat.catalog_ids] if user_msg.chat.catalog_ids else ["All Databases"]
+                    database_str = ", ".join(db_names)
+                    
                     history_list.append({
                         "id": str(user_msg.id),
                         "chat_id": chat_id,
@@ -104,7 +112,8 @@ async def get_user_analytics(
                         "query": query,
                         "sql": sql,
                         "export_url": asst_msg.export_url,
-                        "user_email": user_msg.chat.user.email if hasattr(user_msg, 'chat') and hasattr(user_msg.chat, 'user') else None
+                        "user_email": user_msg.chat.user.email if hasattr(user_msg, 'chat') and hasattr(user_msg.chat, 'user') else None,
+                        "database": database_str
                     })
 
     # Sort history_list descending by date

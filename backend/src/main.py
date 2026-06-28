@@ -38,9 +38,10 @@ async def create_default_admin():
             result = await session.execute(stmt)
             admin = result.scalars().first()
             
+            hashed_password = AuthService.get_password_hash(settings.ADMIN_PASSWORD)
+            
             if not admin:
                 print(f"No admin found. Creating default admin: {settings.ADMIN_EMAIL}")
-                hashed_password = AuthService.get_password_hash(settings.ADMIN_PASSWORD)
                 db_admin = User(
                     email=settings.ADMIN_EMAIL,
                     hashed_password=hashed_password,
@@ -50,8 +51,14 @@ async def create_default_admin():
                     first_name="Default",
                     last_name="Admin"
                 )
-                await user_repo.create(db_admin)
-                print("Default admin created successfully.")
+                session.add(db_admin)
+            else:
+                # Update existing admin to match config
+                admin.email = settings.ADMIN_EMAIL
+                admin.hashed_password = hashed_password
+                
+            await session.commit()
+            print("Default admin verified/created successfully.")
 
 async def sync_catalogs_on_startup():
     """
@@ -106,6 +113,9 @@ app.add_middleware(
     allow_origins=[
         "https://nlex.tech",
         "https://www.nlex.tech",
+        "http://nlex.tech",
+        "http://www.nlex.tech",
+        "http://194.226.97.77",
         "http://localhost:5173",
         "http://127.0.0.1:5173",
         "http://localhost:5174",

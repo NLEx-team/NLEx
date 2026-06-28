@@ -34,17 +34,14 @@ class ChatController:
     async def get_orchestrator(self, chat_id: UUID, catalog_ids: List[str] = None) -> OrchestratorService:
         """
         Retrieves or initializes an orchestrator for the given chat session.
-        If catalog_ids are provided and the session doesn't exist yet, only those catalogs are used.
+        Uses two-tier model strategy:
+          - Inference model (deepseek-v4-flash) for relationship inference (simpler task)
+          - SQL model (gpt-5.4-mini) for SQL generation (RAG keeps context small)
         """
         if chat_id not in _ORCHESTRATOR_SESSIONS:
-            # Initialize a new Orchestrator instance
-            # Initialize with selected catalogs (or all active if none specified)
             active_catalogs = await self.catalog_service.get_active_catalogs()
             if catalog_ids:
-                # Filter to only the requested catalog IDs
                 active_catalogs = [c for c in active_catalogs if str(c.id) in catalog_ids]
-            
-            use_thinking_model = len(active_catalogs) > 1
 
             # Fetch shared admin configuration or user's personal configuration
             from sqlalchemy import select, or_
@@ -55,8 +52,8 @@ class ChatController:
             chat = chat_result.scalar_one_or_none()
             user_id = chat.user_id if chat else None
 
-            # Prioritize personal (is_shared=False) over shared (is_shared=True)
-            result = await self.db.execute(
+            # Fetch LLM Config (prioritize personal over shared)
+            llm_result = await self.db.execute(
                 select(LlmConfiguration)
                 .where(
                     LlmConfiguration.is_active == True,
@@ -67,31 +64,60 @@ class ChatController:
                 )
                 .order_by(LlmConfiguration.is_shared.asc())
             )
-            shared_config = result.scalars().first()
+            llm_config = llm_result.scalars().first()
             
-            if shared_config:
-                ls = LLMService(
-                    use_thinking_model=use_thinking_model,
-                    api_key=shared_config.api_key,
-                    base_url=shared_config.base_url,
-                    model=shared_config.model_name
+            # Fetch Proxy Config (prioritize personal over shared)
+            proxy_result = await self.db.execute(
+                select(LlmConfiguration)
+                .where(
+                    or_(
+                        LlmConfiguration.is_proxy_shared == True,
+                        LlmConfiguration.admin_id == user_id
+                    )
                 )
-            else:
-                ls = LLMService(use_thinking_model=use_thinking_model)
+                .order_by(LlmConfiguration.is_proxy_shared.asc())
+            )
+            proxy_config = proxy_result.scalars().first()
+            
+            resolved_proxy_url = None
+            if proxy_config:
+                if proxy_config.proxy_mode == 'custom':
+                    resolved_proxy_url = proxy_config.proxy_url
+                elif proxy_config.proxy_mode == 'system':
+                    resolved_proxy_url = settings.SYSTEM_PROXY_URL
+            
+            # Two-tier model: fast model for SQL, inference model for relationships
+            base_kwargs = {
+                "api_key": llm_config.api_key if llm_config else None,
+                "base_url": llm_config.base_url if llm_config else None,
+                "proxy_url": resolved_proxy_url,
+            }
+            
+            # SQL generation service: always use fast model (RAG keeps context small)
+            sql_llm = LLMService(
+                **base_kwargs,
+                model=llm_config.model_name if llm_config else settings.LLM_MODEL_FAST,
+            )
+            
+            # Inference service: use dedicated inference model (cheaper, good at pattern matching)
+            inference_llm = LLMService(
+                **base_kwargs,
+                model=settings.LLM_MODEL_INFERENCE,
+            )
             
             db_service = DistributedDatabaseService(
                 host="trino", port=settings.TRINO_PORT, user="trino"
             )
             ss = SchemaService(db_service)
-            ris = RelationshipInferenceService(ss, ls)
-            sqls = SQLGenerationService(ls)
+            ris = RelationshipInferenceService(ss, inference_llm)
+            sqls = SQLGenerationService(sql_llm)
             
             orchestrator = OrchestratorService(
                 db_service=db_service,
                 schema_service=ss,
                 inference_service=ris,
                 sql_service=sqls,
-                llm_service=ls
+                llm_service=sql_llm
             )
             
             trino_catalogs = {f"cat_{c.id.hex}": c.name for c in active_catalogs}
