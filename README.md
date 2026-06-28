@@ -5,6 +5,8 @@
 ## Documentation
 
 - **License:** [MIT](LICENSE)
+- **Week 4 report (index):** [reports/week4/README.md](reports/week4/README.md)
+- **Week 3 report (index):** [reports/week3/README.md](reports/week3/README.md)
 - **Week 2 report (index):** [reports/week2/README.md](reports/week2/README.md)
 - **MVP v0 report:** [reports/week2/mvp-v0-report.md](reports/week2/mvp-v0-report.md)
 - **User stories:** [reports/week2/user-stories.md](reports/week2/user-stories.md)
