@@ -41,30 +41,34 @@ function AppLayout() {
   return (
     <>
       <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)}>
-        <ChatHistory
-          sessions={chat.sessions}
-          activeSessionId={chat.activeSessionId}
-          onSelectSession={(id) => {
-             chat.setActiveSessionId(id);
-             navigate('/chat');
-          }}
-          onNewChat={() => {
-             chat.startNewChat();
-             navigate('/chat');
-          }}
-          onRenameChat={chat.renameSession}
-          onDeleteChat={chat.removeSession}
-        />
-        <CatalogManager 
-          selectedIds={selectedCatalogIds}
-          onSelectionChange={(ids) => {
-            setSelectedCatalogIds(ids);
-            if (chat.activeSessionId) {
-              chat.updateSessionCatalogs(chat.activeSessionId, ids);
-            }
-          }}
-          disabled={chat.messages.length > 0}
-        />
+        <div style={{ display: 'flex', flexDirection: 'column', flex: 1, overflowY: 'auto', minHeight: 0, gap: '16px' }}>
+          <ChatHistory
+            sessions={chat.sessions}
+            activeSessionId={chat.activeSessionId}
+            onSelectSession={(id) => {
+               chat.setActiveSessionId(id);
+               navigate('/chat');
+            }}
+            onNewChat={() => {
+               chat.startNewChat();
+               navigate('/chat');
+            }}
+            onRenameChat={chat.renameSession}
+            onDeleteChat={chat.removeSession}
+          />
+        </div>
+        <div style={{ flexShrink: 0, marginTop: '8px' }}>
+          <CatalogManager 
+            selectedIds={selectedCatalogIds}
+            onSelectionChange={(ids) => {
+              setSelectedCatalogIds(ids);
+              if (chat.activeSessionId) {
+                chat.updateSessionCatalogs(chat.activeSessionId, ids);
+              }
+            }}
+            disabled={chat.messages.length > 0}
+          />
+        </div>
       </Sidebar>
       <div className="app-page">
          <Outlet context={{ chat, isSidebarOpen, setIsSidebarOpen }} />

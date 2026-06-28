@@ -65,7 +65,7 @@
   flex-direction: column;
   gap: var(--spacing-sm);
   padding: 20px var(--spacing-md) 20px;
-  overflow-y: auto;
+  overflow: hidden; /* prevent scrolling here so internal areas can scroll */
   min-height: 0;
 }
 

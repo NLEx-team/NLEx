@@ -137,6 +137,11 @@ export function useChat(_userId: string, selectedCatalogIds: string[]) {
   }, [activeSessionId, loadedSessions]);
 
   const initChat = useCallback(() => {
+    // Prevent creating a new chat if the current active session is already empty
+    if (activeSessionId && messagesBySession[activeSessionId] && messagesBySession[activeSessionId].length === 0) {
+      return;
+    }
+
     chatApi.create(selectedCatalogIds).then(chat => {
       const session: ChatSession = { id: chat.id, title: chat.name, catalogIds: chat.catalog_ids || [] };
       setSessions(prev => [session, ...prev]);
@@ -149,7 +154,7 @@ export function useChat(_userId: string, selectedCatalogIds: string[]) {
     }).catch(() => {
       // fallback: keep welcome message only
     });
-  }, [selectedCatalogIds]);
+  }, [selectedCatalogIds, activeSessionId, messagesBySession]);
 
   const handleSendMessage = useCallback(async () => {
     const text = inputValue.trim();
