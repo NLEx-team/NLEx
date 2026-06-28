@@ -1,4 +1,5 @@
 from typing import Any
+import asyncio
 from src.services.distributed_db import DistributedDatabaseService
 from src.services.relationship_service import RelationshipService
 
@@ -23,34 +24,45 @@ class SchemaService:
         namespaces = await self.db.get_namespaces(catalog)
         db_type = await self.db.get_catalog_type(catalog)
         
+        # Filter out system schemas
+        namespaces = [
+            ns for ns in namespaces
+            if ns.lower() not in IGNORED_SCHEMAS
+            and not ns.lower().startswith("pg_temp")
+            and not ns.lower().startswith("pg_toast_temp")
+        ]
+        
+        # Batch fetch ALL columns for the entire catalog in one query
+        all_columns = await self._batch_get_columns(catalog, namespaces)
+        
         schemas = []
         all_relationships = []
         for namespace in namespaces:
-            if namespace.lower() in IGNORED_SCHEMAS or namespace.lower().startswith("pg_temp") or namespace.lower().startswith("pg_toast_temp"):
-                continue
-                
             tables = await self.db.get_tables(catalog, namespace)
-            tables_data = []
             
-            for table in tables:
-                columns = await self.db.get_columns(catalog, namespace, table)
-                relationships = await self.relationship_service.get_relationships(
-                    catalog, namespace, table, db_type
-                )
-                all_relationships.extend(relationships)
+            # Fetch relationships for all tables (these are lightweight metadata queries)
+            rel_tasks = [
+                self.relationship_service.get_relationships(catalog, namespace, table, db_type)
+                for table in tables
+            ]
+            rel_results = await asyncio.gather(*rel_tasks, return_exceptions=True)
+            
+            # Fetch samples for all tables IN PARALLEL
+            sample_tasks = [
+                self._fetch_samples(catalog, namespace, table)
+                for table in tables
+            ]
+            sample_results = await asyncio.gather(*sample_tasks)
+            
+            tables_data = []
+            for table, rels, sample_rows in zip(tables, rel_results, sample_results):
+                # Handle relationship exceptions gracefully
+                if isinstance(rels, Exception):
+                    rels = []
+                all_relationships.extend(rels)
                 
-                # Fetch samples
-                # We fetch a few rows and then map them to columns
-                # SELECT * should match the ordinal_position order in Trino
-                sample_rows = []
-                try:
-                    sample_rows = await self.db.execute_query_async(
-                        f'SELECT * FROM "{catalog}"."{namespace}"."{table}" LIMIT 30'
-                    )
-                except Exception as e:
-                    # Log error or just skip samples for this table
-                    # Some tables might be views or unpopulated materialized views
-                    print(f"Error fetching samples for {catalog}.{namespace}.{table}: {e}")
+                # Get columns from batch result
+                columns = all_columns.get((namespace, table), [])
                 
                 formatted_columns = []
                 for i, col in enumerate(columns):
@@ -83,3 +95,56 @@ class SchemaService:
             "schemas": schemas,
             "relationships": all_relationships
         }
+
+    async def _batch_get_columns(
+        self, catalog: str, namespaces: list[str]
+    ) -> dict[tuple[str, str], list[dict[str, Any]]]:
+        """
+        Fetch columns for ALL tables in all given namespaces with a single query.
+        Returns a dict mapping (schema_name, table_name) -> [column_dicts]
+        """
+        if not namespaces:
+            return {}
+        
+        # Build WHERE clause for all namespaces
+        ns_list = ", ".join(f"'{ns}'" for ns in namespaces)
+        query = f"""
+            SELECT
+                table_schema,
+                table_name,
+                column_name,
+                data_type,
+                is_nullable,
+                ordinal_position
+            FROM "{catalog}".information_schema.columns
+            WHERE table_schema IN ({ns_list})
+            ORDER BY table_schema, table_name, ordinal_position
+        """
+        
+        rows = await self.db.execute_query_async(query)
+        
+        result: dict[tuple[str, str], list[dict[str, Any]]] = {}
+        for row in rows:
+            key = (row[0], row[1])
+            if key not in result:
+                result[key] = []
+            result[key].append({
+                "name": row[2],
+                "type": row[3],
+                "nullable": row[4] == "YES",
+                "position": row[5],
+            })
+        
+        return result
+
+    async def _fetch_samples(
+        self, catalog: str, namespace: str, table: str
+    ) -> list:
+        """Fetch sample rows for a single table. Returns empty list on error."""
+        try:
+            return await self.db.execute_query_async(
+                f'SELECT * FROM "{catalog}"."{namespace}"."{table}" LIMIT 5'
+            )
+        except Exception as e:
+            print(f"Error fetching samples for {catalog}.{namespace}.{table}: {e}")
+            return []

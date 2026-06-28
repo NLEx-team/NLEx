@@ -29,23 +29,70 @@ async def get_catalog_service(db = Depends(get_db)) -> CatalogService:
     return CatalogService(repo, db_service)
 
 async def background_cache_schema(catalog_id: str):
-    from src.database.session import SessionLocal
-    from src.controllers.chat_controller import ChatController
-    import uuid
+    """
+    Pre-warms the schema cache for a catalog: fetches schema, infers relationships,
+    and generates embeddings in the background so the first user query is fast.
+    """
+    from src.database.session import AsyncSessionLocal
+    from src.services.schema_service import SchemaService
+    from src.services.relationship_inference_service import RelationshipInferenceService
+    from src.services.llm_service import LLMService
     
     try:
-        async with SessionLocal() as db:
+        async with AsyncSessionLocal() as db:
             repo = CatalogRepository(db)
             db_service = DistributedDatabaseService(host="trino", port=settings.TRINO_PORT, user="trino")
-            catalog_service = CatalogService(repo, db_service)
             
-            controller = ChatController(catalog_service, db)
-            dummy_chat_id = uuid.uuid4()
-            orchestrator = await controller.get_orchestrator(dummy_chat_id, catalog_ids=[catalog_id])
-            await orchestrator.infer_relationships()
-            logger.info(f"Successfully background cached schema for catalog {catalog_id}")
+            # Get the catalog to find its Trino name
+            catalog = await repo.get_by_id(catalog_id)
+            if not catalog:
+                logger.warning(f"Pre-warm: catalog {catalog_id} not found")
+                return
+            
+            trino_name = f"cat_{catalog.id.hex}"
+            
+            # Fetch LLM config for inference (use shared config)
+            from sqlalchemy import select
+            from src.database.models.llm_config import LlmConfiguration
+            
+            llm_result = await db.execute(
+                select(LlmConfiguration).where(
+                    LlmConfiguration.is_active == True,
+                    LlmConfiguration.is_shared == True
+                )
+            )
+            llm_config = llm_result.scalars().first()
+            
+            # Resolve proxy
+            proxy_result = await db.execute(
+                select(LlmConfiguration).where(
+                    LlmConfiguration.is_proxy_shared == True
+                )
+            )
+            proxy_config = proxy_result.scalars().first()
+            resolved_proxy_url = None
+            if proxy_config:
+                if proxy_config.proxy_mode == 'custom':
+                    resolved_proxy_url = proxy_config.proxy_url
+                elif proxy_config.proxy_mode == 'system':
+                    resolved_proxy_url = settings.SYSTEM_PROXY_URL
+            
+            # Use fast inference model for pre-warm
+            inference_llm = LLMService(
+                api_key=llm_config.api_key if llm_config else None,
+                base_url=llm_config.base_url if llm_config else None,
+                model=settings.LLM_MODEL_INFERENCE,
+                proxy_url=resolved_proxy_url,
+            )
+            
+            ss = SchemaService(db_service)
+            ris = RelationshipInferenceService(ss, inference_llm)
+            
+            # This caches the result in _GLOBAL_SCHEMA_CACHE
+            await ris.get_augmented_schema(trino_name)
+            logger.info(f"Pre-warm: successfully cached schema for catalog '{catalog.name}' ({trino_name})")
     except Exception as e:
-        logger.error(f"Failed background cache for catalog {catalog_id}: {e}", exc_info=True)
+        logger.error(f"Pre-warm failed for catalog {catalog_id}: {e}", exc_info=True)
 
 @router.post("", response_model=CatalogRead, status_code=status.HTTP_201_CREATED)
 async def create_catalog(

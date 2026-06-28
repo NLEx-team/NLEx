@@ -34,6 +34,7 @@ class Settings(BaseSettings):
     OPENAI_BASE_URL: str = "https://api.openai.com/v1"
     LLM_MODEL_FAST: str = "gpt-5.4-mini"
     LLM_MODEL_THINKING: str = "gpt-5.5"
+    LLM_MODEL_INFERENCE: str = "deepseek-v4-flash"
     MAX_SQL_RETRIES: int = 3
     SYSTEM_PROXY_URL: str | None = None
     

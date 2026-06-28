@@ -34,7 +34,7 @@ exclude = [
 ]
 
 # Mail and tel links are not real URLs to check.
-include_mail = false
+# include_mail = false
 
 # Do not check anchor fragments on remote pages.
-include_fragments = false
+# include_fragments = false

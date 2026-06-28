@@ -48,7 +48,6 @@ _REQUEST_TIMEOUT = 120.0  # seconds
 class LLMService:
     def __init__(
         self, 
-        use_thinking_model: bool = False,
         api_key: str = None,
         base_url: str = None,
         model: str = None,
@@ -58,10 +57,7 @@ class LLMService:
         if not actual_api_key:
             raise ValueError("OPENAI_API_KEY is not configured")
 
-        if model:
-            self.model = model
-        else:
-            self.model = settings.LLM_MODEL_THINKING if use_thinking_model else settings.LLM_MODEL_FAST
+        self.model = model or settings.LLM_MODEL_FAST
 
         actual_base_url = base_url or settings.OPENAI_BASE_URL
         # Remove /chat/completions from base_url if it's there, as SDK will add it
@@ -140,6 +136,24 @@ class LLMService:
         ]
 
         return self._execute_with_retry(messages, "inference")
+
+    def generate_embeddings(self, texts: list[str]) -> list[list[float]]:
+        """
+        Generates embeddings for a list of texts using OpenAI's embedding model.
+        """
+        if not texts:
+            return []
+            
+        client = self.clients[self.current_client_idx]
+        try:
+            response = client.embeddings.create(
+                input=texts,
+                model="text-embedding-3-small"
+            )
+            return [data.embedding for data in response.data]
+        except Exception as e:
+            logger.error(f"Failed to generate embeddings: {e}")
+            raise e
 
     def generate_chat_title(self, history: list[dict[str, str]]) -> dict[str, Any]:
         """
@@ -240,7 +254,7 @@ class LLMService:
             response_format={"type": "json_object"},
         )
 
-        print(f"LLM response: {response}")
+        logger.debug("LLM response received: model=%s, usage=%s", response.model, response.usage)
 
         raw_response = response.choices[0].message.content
         if not raw_response:
