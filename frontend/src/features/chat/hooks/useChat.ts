@@ -136,11 +136,24 @@ export function useChat(_userId: string, selectedCatalogIds: string[]) {
       });
   }, [activeSessionId, loadedSessions]);
 
+  const isCreatingChat = useRef(false);
+
   const initChat = useCallback(() => {
     // Prevent creating a new chat if the current active session is already empty
-    if (activeSessionId && messagesBySession[activeSessionId] && messagesBySession[activeSessionId].length === 0) {
+    const currentMessages = activeSessionId ? messagesBySession[activeSessionId] : undefined;
+    const currentSession = sessions.find(s => s.id === activeSessionId);
+    
+    // If it's a newly created chat (no messages or still loading) and it's named "New Chat", prevent duplicates
+    if (
+      activeSessionId && 
+      (!currentMessages || currentMessages.length === 0) &&
+      currentSession?.title === 'New Chat'
+    ) {
       return;
     }
+
+    if (isCreatingChat.current) return;
+    isCreatingChat.current = true;
 
     chatApi.create(selectedCatalogIds).then(chat => {
       const session: ChatSession = { id: chat.id, title: chat.name, catalogIds: chat.catalog_ids || [] };
@@ -153,8 +166,10 @@ export function useChat(_userId: string, selectedCatalogIds: string[]) {
       setInputValue('');
     }).catch(() => {
       // fallback: keep welcome message only
+    }).finally(() => {
+      isCreatingChat.current = false;
     });
-  }, [selectedCatalogIds, activeSessionId, messagesBySession]);
+  }, [selectedCatalogIds, activeSessionId, messagesBySession, sessions]);
 
   const handleSendMessage = useCallback(async () => {
     const text = inputValue.trim();
