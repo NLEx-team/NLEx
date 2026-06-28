@@ -21,7 +21,7 @@ def mock_inference_service():
 @pytest.fixture
 def mock_sql_service():
     service = MagicMock()
-    service.generate_sql = MagicMock()
+    service.generate_sql = AsyncMock()
     return service
 
 @pytest.fixture

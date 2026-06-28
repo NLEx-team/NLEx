@@ -23,7 +23,7 @@ async def test_get_full_schema(schema_service, mock_db):
     ]
 
     async def execute_query_side_effect(query):
-        if "LIMIT 30" in query:
+        if "LIMIT " in query:
             return [
                 [123, 456],
                 [124, 457],
@@ -32,6 +32,11 @@ async def test_get_full_schema(schema_service, mock_db):
         if "information_schema.key_column_usage" in query:
             return [
                 ["sales", "orders", "customer_id", "sales", "customers", "id"]
+            ]
+        if "information_schema.columns" in query:
+            return [
+                ["sales", "orders", "order_id", "bigint", "NO", 1],
+                ["sales", "orders", "customer_id", "integer", "YES", 2]
             ]
         return []
 
