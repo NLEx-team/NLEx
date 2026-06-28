@@ -220,7 +220,7 @@ export function useChat(_userId: string, selectedCatalogIds: string[]) {
       }));
     } finally {
       setPending(false);
-      setPendingStatus(undefined);
+      setPendingStatus('');
     }
   }, [inputValue, pending, activeSessionId, messagesBySession, selectedCatalogIds]);
 

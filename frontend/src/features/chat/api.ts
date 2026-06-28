@@ -92,7 +92,7 @@ export const chatApi = {
         }
       };
 
-      ws.onerror = (e) => {
+      ws.onerror = () => {
         if (!isResolved) {
           isResolved = true;
           reject(new Error('WebSocket error occurred'));
