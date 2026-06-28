@@ -46,6 +46,7 @@ def dds(trino_config):
 def ss(dds):
     yield SchemaService(dds)
 
+@pytest.mark.skip(reason="pagila db not available")
 @pytest.mark.asyncio
 async def test_using_pagila(dds, ss, external_db_config):
     catalog_name = "pagila_test"

@@ -58,6 +58,7 @@ def llm():
 def ris(ss, llm):
     return RelationshipInferenceService(ss, llm)
 
+@pytest.mark.skip(reason="pagila db not available")
 @pytest.mark.asyncio
 async def test_relationship_inference_pagila(dds, ris, external_db_config):
     """
