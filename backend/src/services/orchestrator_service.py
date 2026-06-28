@@ -101,8 +101,8 @@ class OrchestratorService:
                 for schema in catalog_schema["schemas"]:
                     combined_schemas.append({
                         **schema,
-                        "catalog": catalog_name,
-                        "catalog_alias": catalog_alias
+                        "sql_catalog_name": catalog_name,
+                        "ui_display_name": catalog_alias
                     })
                 all_relationships.extend(catalog_schema.get("relationships", []))
             
