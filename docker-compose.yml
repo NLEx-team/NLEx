@@ -33,6 +33,7 @@ services:
       start_period: 30s
     volumes:
       - ./trino-config.properties:/etc/trino/config.properties:ro
+      - trino_catalogs:/etc/trino/catalog
     networks:
       - app-net
       - shared-net
@@ -215,6 +216,7 @@ volumes:
   postgres_data:
   testbd_data:
   exports_data:
+  trino_catalogs:
 
 networks:
   app-net:
