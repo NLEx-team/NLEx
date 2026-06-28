@@ -1,12 +1,10 @@
 import pytest
 from unittest.mock import AsyncMock, MagicMock
 from src.services.orchestrator_service import OrchestratorService, OrchestratorState
-from src.models.schemas.catalog import CatalogConnection, DatabaseType
 
 @pytest.fixture
 def mock_db_service():
     service = MagicMock()
-    service.connect_catalog = AsyncMock()
     service.execute_query_async = AsyncMock()
     return service
 
@@ -45,7 +43,7 @@ def orchestrator(mock_db_service, mock_schema_service, mock_inference_service, m
 @pytest.mark.asyncio
 async def test_orchestrator_success_path(orchestrator, mock_sql_service, mock_db_service, mock_inference_service):
     # Setup
-    mock_inference_service.get_augmented_schema.return_value = {"schemas": [], "relationships": []}
+    mock_inference_service.get_augmented_schema.return_value = {"catalog": "test", "schemas": [], "relationships": []}
     mock_sql_service.generate_sql.return_value = {
         "status": "success",
         "sql": "SELECT 1",
@@ -55,19 +53,20 @@ async def test_orchestrator_success_path(orchestrator, mock_sql_service, mock_db
     mock_db_service.execute_query_async.return_value = [[1]]
     
     # Infer
+    await orchestrator.initialize_session({"test_cat": "test"})
     await orchestrator.infer_relationships()
     assert orchestrator.state == OrchestratorState.AWAITING_USER_QUERY
     
     # Execute
     result = await orchestrator.execute_user_query("show me data")
-    
+
     assert result["status"] == "success"
     assert result["data"] == [[1]]
     assert orchestrator.state == OrchestratorState.COMPLETED
 
 @pytest.mark.asyncio
 async def test_orchestrator_retry_path(orchestrator, mock_sql_service, mock_db_service, mock_inference_service):
-    mock_inference_service.get_augmented_schema.return_value = {"schemas": [], "relationships": []}
+    mock_inference_service.get_augmented_schema.return_value = {"catalog": "test", "schemas": [], "relationships": []}
     
     # First SQL call returns a bad query
     # Second SQL call returns a fixed query
@@ -75,16 +74,16 @@ async def test_orchestrator_retry_path(orchestrator, mock_sql_service, mock_db_s
         {"status": "success", "sql": "BAD SQL", "headers": ["h"], "explanation": "e"},
         {"status": "success", "sql": "GOOD SQL", "headers": ["h"], "explanation": "e"}
     ]
-    
-    # First execution fails, second succeeds
+
     mock_db_service.execute_query_async.side_effect = [
         Exception("Syntax error"),
         [[1]]
     ]
     
+    await orchestrator.initialize_session({"test_cat": "test"})
     await orchestrator.infer_relationships()
     result = await orchestrator.execute_user_query("query")
-    
+
     assert result["status"] == "success"
     assert result["sql"] == "GOOD SQL"
     assert result["attempts"] == 2
@@ -92,7 +91,7 @@ async def test_orchestrator_retry_path(orchestrator, mock_sql_service, mock_db_s
 
 @pytest.mark.asyncio
 async def test_orchestrator_clarification_path(orchestrator, mock_sql_service, mock_inference_service):
-    mock_inference_service.get_augmented_schema.return_value = {"schemas": [], "relationships": []}
+    mock_inference_service.get_augmented_schema.return_value = {"catalog": "test", "schemas": [], "relationships": []}
     
     # First call returns clarification
     # Second call returns success
@@ -110,14 +109,16 @@ async def test_orchestrator_clarification_path(orchestrator, mock_sql_service, m
         }
     ]
     
+    await orchestrator.initialize_session({"test_cat": "test"})
     await orchestrator.infer_relationships()
     result = await orchestrator.execute_user_query("query")
+
     assert result["status"] == "clarification"
     assert result["question"] == "Which one?"
     assert orchestrator.state == OrchestratorState.CLARIFICATION_REQUIRED
     
     # User provides answer
-    result2 = await orchestrator.submit_clarification_answer("question_123", ["A"], None)
+    result2 = await orchestrator.handle_clarification("A")
     
     assert result2["status"] == "success"
     assert result2["sql"] == "SELECT A"
