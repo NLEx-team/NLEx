@@ -5,7 +5,8 @@ from src.services.orchestrator_service import OrchestratorService, OrchestratorS
 @pytest.fixture
 def mock_db_service():
     service = MagicMock()
-    service.execute_query_async = AsyncMock()
+    service.execute_query_async = AsyncMock(return_value=[[1]])
+    service.execute_query_async_preview = AsyncMock(return_value=[[1]])
     return service
 
 @pytest.fixture
