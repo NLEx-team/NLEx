@@ -21,7 +21,7 @@
 
 ## Planned response
 - **Sprint 2 CI Expansion:** Add GitHub Actions workflows for backend tests (`pytest`), frontend build (`tsc -b && vite build`), and frontend linting (`eslint`). These will be required to pass before any PR can be merged.
-- **Oracle Connector ([PBI-032](PBI_plan.md)):** Prioritize Oracle DBMS support as the first Sprint 2 deliverable to unblock customer validation on production data.
+- **Oracle Connector:** Prioritize Oracle DBMS support as the first Sprint 2 deliverable to unblock customer validation on production data.
 - **Chat Persistence Migration:** Wire the existing `Chat` and `Draft` database models into the chat controller to replace the in-memory `MOCK_CHATS` store.
 - **Credential Encryption:** Implement encryption-at-rest for catalog connection passwords using `cryptography.fernet` or equivalent.
 - **Frontend Testing Foundation:** Introduce `vitest` and `@testing-library/react` for component-level tests on critical UI paths (chat input, clarification buttons, database selector).

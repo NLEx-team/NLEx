@@ -163,19 +163,18 @@ We use **ISO/IEC 25010** as the quality model framework. Three quality requireme
 | [test_orchestrator_integration.py](../../backend/tests/test_orchestrator_integration.py) | Integration | Full orchestrator pipeline with real services |
 | [test_schema_service_using_real_db.py](../../backend/tests/test_schema_service_using_real_db.py) | Integration | Schema extraction against real PostgreSQL (pagila) |
 | [test_relationship_inference_real_db.py](../../backend/tests/test_relationship_inference_real_db.py) | Integration | AI-powered relationship inference on real data |
-| [test_workflow_e2e.py](../../backend/tests/test_workflow_e2e.py) | E2E | End-to-end: register → login → create chat → send prompt |
 | [conftest.py](../../backend/tests/conftest.py) | Fixture | Test DB setup, session management, AsyncClient fixture |
 
 **Critical modules and coverage:**
 
 | Module | Role | Coverage Status |
 |--------|------|----------------|
-| `services/orchestrator_service.py` | Core NL2SQL state machine | Covered by unit + integration tests (82%) |
-| `services/auth.py` | JWT + bcrypt authentication | Covered by unit + API tests (95%) |
-| `services/schema_service.py` | Schema extraction from Trino | Covered by unit + real-DB tests (88%) |
-| `services/distributed_db.py` | Trino query execution | Covered by unit + integration tests (75%) |
-| `routers/auth.py` | Auth API endpoints | Covered by API tests (90%) |
-| `routers/users.py` | User management endpoints | Covered by API tests (85%) |
+| `services/orchestrator_service.py` | Core NL2SQL state machine | Covered by unit + integration tests |
+| `services/auth.py` | JWT + bcrypt authentication | Covered by unit + API tests |
+| `services/schema_service.py` | Schema extraction from Trino | Covered by unit + real-DB tests |
+| `services/distributed_db.py` | Trino query execution | Covered by unit + integration tests |
+| `routers/auth.py` | Auth API endpoints | Covered by API tests |
+| `routers/users.py` | User management endpoints | Covered by API tests |
 
 ### Frontend Testing
 * **Linting:** ESLint with `typescript-eslint`, `react-hooks`, `react-refresh` plugins
@@ -223,8 +222,8 @@ All tests, CI checks, quality requirement tests, and the Definition of Done esta
 
 ## 10. Release
 
-* **Current Release:** [v1.0.0](https://github.com/NLEx-team/NLEx/releases/tag/v1.0.0) — MVP v1.0
-* **Release Tag:** `v1.0.0` on the `main` branch
+* **Current Release:** [v1.2.0](https://github.com/NLEx-team/NLEx/releases/tag/v1.2.0) — MVP v1.2i
+* **Release Tag:** `v1.2.0` on the `main` branch
 * **Changelog:** [CHANGELOG.md](../../CHANGELOG.md)
 
 ---
@@ -306,7 +305,6 @@ MVP v1.2.0 is delivered, deployed, and customer-tested. The product successfully
 |----------|------|
 | Customer Review Transcript | [customer-review-transcript.md](customer-review-transcript.md) |
 | Customer Review Summary | [customer-review-summary.md](customer-review-summary.md) |
-| PBI Plan (from customer feedback) | [PBI_plan.md](PBI_plan.md) |
 | Sprint Retrospective | [retrospective.md](retrospective.md) |
 | Sprint Reflection | [reflection.md](reflection.md) |
 | LLM Usage Report | [llm-report.md](llm-report.md) |
@@ -338,6 +336,3 @@ MVP v1.2.0 is delivered, deployed, and customer-tested. The product successfully
 ![PR Example 1](images/PR_example(1).png)
 ![PR Example 2](images/PR_example(2).png)
 ![PR Example 3](images/PR_example(3).png)
-
-### H. Additional QA & Linting Checks
-![QA and Linting Evidence](images/Latest_CI_run.png)

@@ -114,4 +114,3 @@ The customer (Nikita Maksimenko) performed live, unscripted testing of the deplo
 * **15 new PBIs added:** PBI-019 through PBI-033 (56 Story Points total).
 * **Sprint 2 scope:** 13 PBIs covering bug fixes, UI features, Oracle connector, and deployment guide.
 * **Deferred to MVP v3:** PBI-030 (admin analytics dashboard) and PBI-031 (LLM config in admin panel).
-* **Backlog documented in:** [PBI_plan.md](PBI_plan.md).
