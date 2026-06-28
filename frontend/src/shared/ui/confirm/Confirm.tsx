@@ -22,7 +22,7 @@ export function Confirm({
           {cancelText}
         </Button>
         <Button
-          variant="primary"
+          variant={variant}
           onClick={onConfirm}
         >
           {confirmText}

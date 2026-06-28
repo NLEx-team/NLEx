@@ -4,6 +4,8 @@ from src.routers.auth import router as auth_router
 from src.routers.users import router as users_router
 from src.routers.chats import router as chats_router
 from src.routers.catalogs import router as catalogs_router
+from src.routers.analytics import router as analytics_router
+from src.routers.admin import router as admin_router
 from src.middleware.auth import AuthMiddleware
 from src.database.session import engine, Base
 from rich.traceback import install
@@ -36,9 +38,10 @@ async def create_default_admin():
             result = await session.execute(stmt)
             admin = result.scalars().first()
             
+            hashed_password = AuthService.get_password_hash(settings.ADMIN_PASSWORD)
+            
             if not admin:
                 print(f"No admin found. Creating default admin: {settings.ADMIN_EMAIL}")
-                hashed_password = AuthService.get_password_hash(settings.ADMIN_PASSWORD)
                 db_admin = User(
                     email=settings.ADMIN_EMAIL,
                     hashed_password=hashed_password,
@@ -48,8 +51,40 @@ async def create_default_admin():
                     first_name="Default",
                     last_name="Admin"
                 )
-                await user_repo.create(db_admin)
-                print("Default admin created successfully.")
+                session.add(db_admin)
+            else:
+                # Update existing admin to match config
+                admin.email = settings.ADMIN_EMAIL
+                admin.hashed_password = hashed_password
+                
+            await session.commit()
+            print("Default admin verified/created successfully.")
+
+async def sync_catalogs_on_startup():
+    """
+    Synchronizes all existing catalogs from the database to Trino on startup.
+    This ensures Trino knows about dynamic catalogs even after container restart.
+    """
+    async with engine.begin() as conn:
+        from src.database.session import AsyncSessionLocal
+        from src.repositories.catalog_repo import CatalogRepository
+        from src.services.catalog_service import CatalogService
+        from src.services.distributed_db import DistributedDatabaseService
+        
+        async with AsyncSessionLocal() as session:
+            repo = CatalogRepository(session)
+            db_service = DistributedDatabaseService(
+                host="trino", # Should be settings.TRINO_HOST if exists, but we'll use "trino" to match catalogs router
+                port=settings.TRINO_PORT,
+                user="trino"
+            )
+            catalog_service = CatalogService(repo, db_service)
+            
+            catalogs = await catalog_service.list_catalogs()
+            for catalog in catalogs:
+                print(f"Syncing catalog '{catalog.name}' to Trino...")
+                await catalog_service.sync_catalog(catalog.id)
+            print("Catalog synchronization complete.")
 
 async def sync_catalogs_on_startup():
     """
@@ -104,8 +139,13 @@ app.add_middleware(
     allow_origins=[
         "https://nlex.tech",
         "https://www.nlex.tech",
+        "http://nlex.tech",
+        "http://www.nlex.tech",
+        "http://194.226.97.77",
         "http://localhost:5173",
-        "http://127.0.0.1:5173"
+        "http://127.0.0.1:5173",
+        "http://localhost:5174",
+        "http://127.0.0.1:5174"
     ],
     allow_credentials=True,
     allow_methods=["*"],
@@ -117,6 +157,8 @@ app.include_router(auth_router, prefix="/auth", tags=["auth"])
 app.include_router(users_router, prefix="/users", tags=["users"])
 app.include_router(chats_router, prefix="/chats", tags=["chats"])
 app.include_router(catalogs_router, prefix="/catalogs", tags=["catalogs"])
+app.include_router(analytics_router, prefix="/analytics", tags=["analytics"])
+app.include_router(admin_router, prefix="", tags=["admin"])
 
 @app.get("/")
 async def root() -> dict[str, str]:

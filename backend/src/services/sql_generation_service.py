@@ -26,7 +26,7 @@ class SQLGenerationService:
     def __init__(self, llm_service: LLMService | None = None):
         self.llm_service = llm_service or LLMService()
 
-    def generate_sql(
+    async def generate_sql(
         self, 
         user_prompt: str | None, 
         schema: str, 
@@ -36,6 +36,8 @@ class SQLGenerationService:
         Генерирует SQL-запрос для Trino на основе вопроса пользователя.
         Схема (schema) содержит структуру всех таблиц из всех каталогов.
         """
+        import asyncio
+        
         # Валидация входных данных
         if (not user_prompt or not user_prompt.strip()) and not history:
             return {"status": "error", "message": "Вопрос не может быть пустым."}
@@ -46,7 +48,8 @@ class SQLGenerationService:
         start_time = time.perf_counter()
 
         # Вызов LLM
-        result = self.llm_service.generate_sql(
+        result = await asyncio.to_thread(
+            self.llm_service.generate_sql,
             user_prompt=user_prompt, 
             schema=schema, 
             history=history
@@ -58,11 +61,14 @@ class SQLGenerationService:
         if isinstance(result, dict) and result.get("status") == "success":
             sql = result.get("sql", "")
 
-            # Проверка на запрещённые операции
-            if _FORBIDDEN_PATTERN.search(sql):
+            # Проверка на запрещённые операции (игнорируем слова в кавычках)
+            sql_no_quotes = re.sub(r"'[^']*'", '', sql)
+            sql_no_quotes = re.sub(r'"[^"]*"', '', sql_no_quotes)
+            
+            if _FORBIDDEN_PATTERN.search(sql_no_quotes):
                 logger.warning(
                     "LLM generated forbidden SQL operation. Query rejected. Prompt: %s",
-                    user_prompt[:200],
+                    user_prompt[:200] if user_prompt else "",
                 )
                 return {
                     "status": "error",

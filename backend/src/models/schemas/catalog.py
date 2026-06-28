@@ -9,6 +9,7 @@ class DatabaseType(str, Enum):
     SQLITE = "sqlite"
     MYSQL = "mysql"
     CLICKHOUSE = "clickhouse"
+    ORACLE = "oracle"
 
 class CatalogStatus(str, Enum):
     ACTIVE = "active"

@@ -186,3 +186,11 @@
   font-size: var(--font-size-error);
   color: var(--color-error);
 }
+
+.field__hint {
+  font: inherit;
+  font-size: var(--font-size-error);
+  color: #6b7280;
+  margin-top: 4px;
+  display: block;
+}

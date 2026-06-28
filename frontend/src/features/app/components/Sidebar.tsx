@@ -2,6 +2,7 @@ import { useEffect, useRef, type ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../auth/hooks/useAuth';
 import { Avatar } from '../../../shared/ui/avatar';
+import { Logo } from '../../../shared/ui/logo';
 import { Icon } from '@iconify/react';
 import './Sidebar.css';
 
@@ -36,7 +37,9 @@ export function Sidebar({ isOpen, onClose, children }: SidebarProps) {
       className={`sidebar ${isOpen ? 'sidebar--open' : 'sidebar--closed'}`}
     >
       <div className="sidebar__header">
-        <div className="sidebar__logo">NLEx</div>
+        <div className="sidebar__logo-container">
+          <Logo variant="full" />
+        </div>
         <button
           type="button"
           className="sidebar__menu-btn"

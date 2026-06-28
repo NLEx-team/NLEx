@@ -3,7 +3,7 @@ from fastapi.security import HTTPBearer
 from src.database.models.user import UserRole, User
 
 # security_scheme is defined here because it's a FastAPI/Web-specific concept
-security_scheme = HTTPBearer()
+security_scheme = HTTPBearer(auto_error=False)
 
 def get_current_user(request: Request, auth = Depends(security_scheme)) -> User:
     """

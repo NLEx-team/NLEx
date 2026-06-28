@@ -1,55 +1,87 @@
 import React, { useState } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { Field, PasswordField, Button } from '../../../shared/ui';
+import { isValidEmail } from '../../../utils/validation';
 
 export const LoginForm: React.FC = () => {
   const { login } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  
+  const [emailError, setEmailError] = useState<string | null>(null);
+  const [passwordError, setPasswordError] = useState<string | null>(null);
+  const [generalError, setGeneralError] = useState<string | null>(null);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!email || !password) {
-      setError('Please enter both email and password');
-      return;
+  const submitLogic = async () => {
+    let hasError = false;
+    setEmailError(null);
+    setPasswordError(null);
+    setGeneralError(null);
+
+    if (!email) {
+      setEmailError('Email is required');
+      hasError = true;
+    } else if (!isValidEmail(email)) {
+      setEmailError('Invalid email format');
+      hasError = true;
     }
 
+    if (!password) {
+      setPasswordError('Password is required');
+      hasError = true;
+    }
+
+    if (hasError) return;
+
     setLoading(true);
-    setError(null);
     try {
       await login({ email, password });
     } catch (err: any) {
-      setError(err.message || 'Failed to login. Please check your credentials.');
+      setGeneralError(err.message || 'Failed to login. Please check your credentials.');
     } finally {
       setLoading(false);
     }
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      submitLogic();
+    }
+  };
+
   return (
-    <form onSubmit={handleSubmit} className="auth-form">
+    <div onKeyDown={handleKeyDown} className="auth-form">
+      {generalError && <div style={{ color: 'var(--color-error)', marginBottom: '10px' }}>{generalError}</div>}
       <Field
         label="Email"
         type="email"
         placeholder="Email"
         value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        mode={error ? 'error' : 'default'}
+        onChange={(e) => {
+          setEmail(e.target.value);
+          setEmailError(null);
+        }}
+        mode={emailError ? 'error' : 'default'}
+        errorText={emailError || undefined}
         disabled={loading}
       />
       <PasswordField
         label="Password"
         placeholder="Password"
         value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        mode={error ? 'error' : 'default'}
-        errorText={error || undefined}
+        onChange={(e) => {
+          setPassword(e.target.value);
+          setPasswordError(null);
+        }}
+        mode={passwordError ? 'error' : 'default'}
+        errorText={passwordError || undefined}
         disabled={loading}
       />
-      <Button type="submit" disabled={loading}>
+      <Button type="button" onClick={submitLogic} disabled={loading}>
         {loading ? 'Wait...' : 'Continue'}
       </Button>
-    </form>
+    </div>
   );
 };

@@ -29,7 +29,11 @@ class RelationshipInferenceService:
         llm_input = self._prepare_llm_input(schema)
         
         # 3. Call LLM to infer relationships
-        inference_result = self.llm_service.infer_relationships(json.dumps(llm_input, ensure_ascii=False))
+        import asyncio
+        inference_result = await asyncio.to_thread(
+            self.llm_service.infer_relationships,
+            json.dumps(llm_input, ensure_ascii=False)
+        )
         
         if "relationships" in inference_result:
             inferred_rels = inference_result["relationships"]
@@ -74,6 +78,26 @@ class RelationshipInferenceService:
                 if rel_key not in existing_rels_keys:
                     schema["relationships"].append(formatted_rel)
                     existing_rels_keys.add(rel_key)
+                    
+        # 5. Generate embeddings for all tables to be used in RAG
+        table_docs = []
+        for s in schema["schemas"]:
+            for t in s["tables"]:
+                cols = ", ".join([f"{c['name']} ({c['type']})" for c in t["columns"]])
+                doc = f"Table: {s['name']}.{t['name']}\nColumns: {cols}"
+                table_docs.append(doc)
+        
+        if table_docs:
+            try:
+                embeddings = await asyncio.to_thread(self.llm_service.generate_embeddings, table_docs)
+                idx = 0
+                for s in schema["schemas"]:
+                    for t in s["tables"]:
+                        t["embedding"] = embeddings[idx]
+                        idx += 1
+            except Exception as e:
+                import logging
+                logging.getLogger(__name__).error(f"Failed to generate table embeddings for catalog {catalog}: {e}")
                     
         self._cache[catalog] = schema
         return schema

@@ -7,13 +7,24 @@ function TextBlockView({ text }: { text: string }) {
   return <div className="chat-message__text">{text}</div>;
 }
 
-function OptionsBlockView({ block, onClarify }: { block: OptionsBlock; onClarify?: (questionId: string, selectedOptions: string[]) => void }) {
+function OptionsBlockView({ block, onClarify, isLastMessage }: { block: OptionsBlock; onClarify?: (questionId: string, selectedOptions: string[]) => void; isLastMessage?: boolean }) {
   const [selected, setSelected] = useState<string | null>(null);
+  const [showCustom, setShowCustom] = useState(false);
+  const [customValue, setCustomValue] = useState('');
 
   const handleSelect = (option: string) => {
     setSelected(option);
     onClarify?.(block.questionId, [option]);
   };
+
+  const handleCustomSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!customValue.trim()) return;
+    setSelected('custom');
+    onClarify?.(block.questionId, [customValue.trim()]);
+  };
+
+  const isActive = selected === null && isLastMessage;
 
   return (
     <div className="chat-message__options">
@@ -24,12 +35,41 @@ function OptionsBlockView({ block, onClarify }: { block: OptionsBlock; onClarify
             key={option}
             className={`chat-message__option-btn ${selected === option ? 'chat-message__option-btn--selected' : ''}`}
             onClick={() => handleSelect(option)}
-            disabled={selected !== null}
+            disabled={!isActive}
             type="button"
           >
             {option}
           </button>
         ))}
+        {!showCustom && isActive && (
+          <button
+            className="chat-message__option-btn chat-message__option-btn--outline"
+            onClick={() => setShowCustom(true)}
+            type="button"
+          >
+            Другое (написать своё)
+          </button>
+        )}
+        {showCustom && isActive && (
+          <form onSubmit={handleCustomSubmit} className="chat-message__custom-form">
+            <input
+              type="text"
+              value={customValue}
+              onChange={(e) => setCustomValue(e.target.value)}
+              placeholder="Введите ваш ответ..."
+              className="chat-message__custom-input"
+              autoFocus
+            />
+            <button type="submit" className="chat-message__custom-submit" disabled={!customValue.trim()}>
+              <Icon icon="mdi:send-outline" width="20" height="20" />
+            </button>
+          </form>
+        )}
+        {selected === 'custom' && (
+          <div className="chat-message__option-btn chat-message__option-btn--selected">
+            {customValue}
+          </div>
+        )}
       </div>
     </div>
   );
@@ -58,10 +98,18 @@ function TableBlockView({ block, exportUrl, onExport }: { block: TableBlock; exp
               ))}
             </tbody>
           </table>
-          {block.rows.length > 5 && (
-            <div style={{ padding: '8px', fontSize: '13px', color: 'var(--color-text-secondary)', textAlign: 'center', fontStyle: 'italic' }}>
-              Showing 5 of {block.rows.length} rows
-            </div>
+          {block.totalRows !== undefined ? (
+            block.totalRows > block.rows.length && (
+              <div style={{ padding: '8px', fontSize: '13px', color: 'var(--color-text-secondary)', textAlign: 'center', fontStyle: 'italic' }}>
+                Showing {block.rows.length} of {block.totalRows} rows
+              </div>
+            )
+          ) : (
+            block.rows.length > 5 && (
+              <div style={{ padding: '8px', fontSize: '13px', color: 'var(--color-text-secondary)', textAlign: 'center', fontStyle: 'italic' }}>
+                Showing 5 of {block.rows.length} rows
+              </div>
+            )
           )}
         </div>
         <div className="chat-message__table-actions">
@@ -108,7 +156,7 @@ function ErrorBlockView({ block }: { block: ErrorBlock }) {
   );
 }
 
-export function ChatMessage({ role, blocks, exportUrl, onClarify, onExport }: ChatMessageProps) {
+export function ChatMessage({ role, blocks, exportUrl, onClarify, onExport, isLastMessage }: ChatMessageProps) {
   return (
     <div className={`chat-message chat-message--${role}`}>
       <div className="chat-message__bubble">
@@ -117,7 +165,7 @@ export function ChatMessage({ role, blocks, exportUrl, onClarify, onExport }: Ch
             case 'text':
               return <TextBlockView key={idx} text={block.text} />;
             case 'options':
-              return <OptionsBlockView key={idx} block={block} onClarify={onClarify} />;
+              return <OptionsBlockView key={idx} block={block} onClarify={onClarify} isLastMessage={isLastMessage} />;
             case 'table':
               return <TableBlockView key={idx} block={block} exportUrl={exportUrl} onExport={onExport} />;
             case 'error':

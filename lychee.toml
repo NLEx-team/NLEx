@@ -24,6 +24,7 @@ accept = [200, 201, 202, 203, 204, 206, 301, 302, 303, 304, 307, 308, 401, 403, 
 exclude = [
     # Local backend on an Innopolis VM, only reachable from RU networks.
     "^http://194\\.226\\.97\\.77",
+    "^https?://(www\\.)?nlex\\.tech",
     # Local development URLs.
     "^http://localhost",
     "^http://127\\.0\\.0\\.1",
@@ -34,7 +35,7 @@ exclude = [
 ]
 
 # Mail and tel links are not real URLs to check.
-include_mail = false
+# include_mail = false
 
 # Do not check anchor fragments on remote pages.
-include_fragments = false
+# include_fragments = false

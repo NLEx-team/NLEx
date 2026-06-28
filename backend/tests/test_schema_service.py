@@ -23,7 +23,12 @@ async def test_get_full_schema(schema_service, mock_db):
     ]
 
     async def execute_query_side_effect(query):
-        if "LIMIT 30" in query:
+        if "information_schema.columns" in query and "WHERE" in query:
+            return [
+                ["sales", "orders", "order_id", "bigint", "NO", 1],
+                ["sales", "orders", "customer_id", "integer", "YES", 2],
+            ]
+        if "LIMIT 5" in query:
             return [
                 [123, 456],
                 [124, 457],
@@ -32,6 +37,11 @@ async def test_get_full_schema(schema_service, mock_db):
         if "information_schema.key_column_usage" in query:
             return [
                 ["sales", "orders", "customer_id", "sales", "customers", "id"]
+            ]
+        if "information_schema.columns" in query:
+            return [
+                ["sales", "orders", "order_id", "bigint", "NO", 1],
+                ["sales", "orders", "customer_id", "integer", "YES", 2]
             ]
         return []
 
@@ -71,6 +81,5 @@ async def test_get_full_schema(schema_service, mock_db):
     mock_db.get_namespaces.assert_called_once_with("hive")
     mock_db.get_catalog_type.assert_called_once_with("hive")
     mock_db.get_tables.assert_called_once_with("hive", "sales")
-    mock_db.get_columns.assert_called_once_with("hive", "sales", "orders")
-    mock_db.execute_query_async.assert_any_call("SELECT * FROM hive.sales.orders LIMIT 30")
+    mock_db.execute_query_async.assert_any_call('SELECT * FROM "hive"."sales"."orders" LIMIT 5')
 

@@ -28,11 +28,16 @@
   letter-spacing: -0.5px;
 }
 
+.sidebar__logo-container {
+  margin-top: 16px; /* Push logo down as requested */
+}
+
 .sidebar__header {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
-  padding: 25px var(--spacing-md);
+  padding: calc((60px - var(--icon-btn-size)) / 2) var(--spacing-md) 16px var(--spacing-md);
+  height: auto;
   flex-shrink: 0;
 }
 
@@ -59,8 +64,8 @@
   display: flex;
   flex-direction: column;
   gap: var(--spacing-sm);
-  padding: 20px var(--spacing-md) 0;
-  overflow-y: auto;
+  padding: 20px var(--spacing-md) 20px;
+  overflow: hidden; /* prevent scrolling here so internal areas can scroll */
   min-height: 0;
 }
 
