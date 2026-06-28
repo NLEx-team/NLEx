@@ -57,6 +57,57 @@ export const chatApi = {
   sendPrompt: (chatId: string, prompt: string, catalogIds?: string[]) =>
     api.post<PromptResponse>(`/chats/${chatId}/prompt`, { prompt, catalog_ids: catalogIds || [] }),
 
+  sendPromptStream: (
+    chatId: string, 
+    prompt: string, 
+    catalogIds: string[] | undefined,
+    onStatus: (status: string) => void
+  ): Promise<PromptResponse> => {
+    return new Promise((resolve, reject) => {
+      let isResolved = false;
+      const wsUrl = config.apiUrl.replace('http', 'ws') + `/chats/${chatId}/ws`;
+      // By default browser sends cookies with WebSocket connection
+      const ws = new WebSocket(wsUrl);
+
+      ws.onopen = () => {
+        ws.send(JSON.stringify({ prompt, catalog_ids: catalogIds || [] }));
+      };
+
+      ws.onmessage = (event) => {
+        try {
+          const data = JSON.parse(event.data);
+          if (data.type === 'status') {
+            onStatus(data.status);
+          } else if (data.type === 'result') {
+            isResolved = true;
+            ws.close();
+            resolve(data.response);
+          } else if (data.type === 'error') {
+            isResolved = true;
+            ws.close();
+            reject(new Error(data.message));
+          }
+        } catch (e) {
+          console.error('Failed to parse WS message', e);
+        }
+      };
+
+      ws.onerror = (e) => {
+        if (!isResolved) {
+          isResolved = true;
+          reject(new Error('WebSocket error occurred'));
+        }
+      };
+
+      ws.onclose = (e) => {
+        if (!isResolved && !e.wasClean) {
+          isResolved = true;
+          reject(new Error('WebSocket closed unexpectedly'));
+        }
+      };
+    });
+  },
+
   sendClarification: (chatId: string, questionId: string, selectedOptions: string[], customAnswer?: string) =>
     api.post<PromptResponse>(`/chats/${chatId}/clarify`, {
       question_id: questionId,

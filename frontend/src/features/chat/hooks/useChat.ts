@@ -179,7 +179,12 @@ export function useChat(_userId: string, selectedCatalogIds: string[]) {
     setPending(true);
 
     try {
-      const response = await chatApi.sendPrompt(activeSessionId, text, selectedCatalogIds);
+      const response = await chatApi.sendPromptStream(
+        activeSessionId, 
+        text, 
+        selectedCatalogIds,
+        (status) => setPendingStatus(status)
+      );
       const blocks = parseBlocks(response);
       const assistantMsg: ChatMessage = {
         id: generateId(),
@@ -210,6 +215,7 @@ export function useChat(_userId: string, selectedCatalogIds: string[]) {
       }));
     } finally {
       setPending(false);
+      setPendingStatus(undefined);
     }
   }, [inputValue, pending, activeSessionId, messagesBySession, selectedCatalogIds]);
 

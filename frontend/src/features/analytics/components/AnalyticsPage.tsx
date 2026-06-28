@@ -34,6 +34,7 @@ interface AnalyticsData {
     sql: string | null;
     export_url: string | null;
     user_email?: string | null;
+    database: string;
   }[];
 }
 
@@ -214,6 +215,7 @@ export function AnalyticsPage() {
                   <tr>
                     <th>Date</th>
                     {scope === 'global' && <th>Account</th>}
+                    <th>Database</th>
                     <th>User Query</th>
                     <th>Generated SQL</th>
                     <th className="analytics-table__action-header">Action</th>
@@ -230,6 +232,9 @@ export function AnalyticsPage() {
                           {item.user_email || 'Unknown'}
                         </td>
                       )}
+                      <td className="analytics-table__database" style={{ color: 'var(--color-primary-dark)', fontSize: '13px', fontWeight: 500 }}>
+                        {item.database}
+                      </td>
                       <td className="analytics-table__query">{item.query}</td>
                       <td className="analytics-table__sql">
                         {item.sql ? (

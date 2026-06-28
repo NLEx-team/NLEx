@@ -21,6 +21,7 @@ const DB_OPTIONS = [
   { label: 'SQLite', value: 'sqlite' },
   { label: 'MySQL', value: 'mysql' },
   { label: 'ClickHouse', value: 'clickhouse' },
+  { label: 'Oracle', value: 'oracle' },
 ];
 
 const STATUS_LABELS: Record<string, string> = {

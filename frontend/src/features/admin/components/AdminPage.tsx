@@ -12,6 +12,9 @@ interface LlmConfig {
   model_name: string;
   is_shared: boolean;
   is_active: boolean;
+  proxy_mode: string;
+  proxy_url?: string;
+  is_proxy_shared: boolean;
 }
 
 interface UserStats {
@@ -29,12 +32,16 @@ export function AdminPage() {
   const [activeTab, setActiveTab] = useState<'llm' | 'users'>('llm');
   
   // LLM State
-  const [llmConfig, setLlmConfig] = useState<LlmConfig>({ base_url: '', api_key: '', model_name: '', is_shared: false, is_active: true });
+  const [llmConfig, setLlmConfig] = useState<LlmConfig>({ base_url: '', api_key: '', model_name: '', is_shared: false, is_active: true, proxy_mode: 'system', proxy_url: '', is_proxy_shared: false });
   const [llmLoading, setLlmLoading] = useState(false);
   const [llmMessage, setLlmMessage] = useState('');
   
   const [testPingLoading, setTestPingLoading] = useState(false);
   const [testPingResult, setTestPingResult] = useState<{success: boolean, text: string} | null>(null);
+
+  const [testProxyLoading, setTestProxyLoading] = useState(false);
+  const [testProxyResult, setTestProxyResult] = useState<{success: boolean, text: string} | null>(null);
+  const [proxyMessage, setProxyMessage] = useState('');
 
   // Users State
   const [users, setUsers] = useState<UserStats[]>([]);
@@ -68,15 +75,22 @@ export function AdminPage() {
     }
   };
 
-  const saveLlmConfig = async (configToSave = llmConfig) => {
+  const saveLlmConfig = async (configToSave = llmConfig, source: 'llm' | 'proxy' = 'llm') => {
     setLlmLoading(true);
-    setLlmMessage('');
+    if (source === 'llm') setLlmMessage('');
+    else setProxyMessage('');
     try {
       await api.post('/admin/llm-config', configToSave);
-      setLlmMessage('Configuration saved successfully!');
-      setTimeout(() => setLlmMessage(''), 3000);
+      if (source === 'llm') {
+        setLlmMessage('Configuration saved successfully!');
+        setTimeout(() => setLlmMessage(''), 3000);
+      } else {
+        setProxyMessage('Configuration saved successfully!');
+        setTimeout(() => setProxyMessage(''), 3000);
+      }
     } catch (err: any) {
-      setLlmMessage('Failed to save configuration.');
+      if (source === 'llm') setLlmMessage('Failed to save configuration.');
+      else setProxyMessage('Failed to save configuration.');
     } finally {
       setLlmLoading(false);
     }
@@ -85,7 +99,7 @@ export function AdminPage() {
   const handleToggleActive = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newConfig = { ...llmConfig, is_active: e.target.checked };
     setLlmConfig(newConfig);
-    void saveLlmConfig(newConfig);
+    void saveLlmConfig(newConfig, 'llm');
   };
 
   const testLlmConnection = async () => {
@@ -101,7 +115,8 @@ export function AdminPage() {
         base_url: llmConfig.base_url,
         api_key: llmConfig.api_key,
         model_name: llmConfig.model_name,
-        prompt: 'Привет'
+        prompt: 'Привет',
+        proxy_url: llmConfig.proxy_url || null
       });
       
       if (res && res.success) {
@@ -113,6 +128,33 @@ export function AdminPage() {
       setTestPingResult({ success: false, text: err.message || 'Failed to connect to the API' });
     } finally {
       setTestPingLoading(false);
+    }
+  };
+
+  const testProxyConnection = async () => {
+    if (llmConfig.proxy_mode === 'custom' && !llmConfig.proxy_url) {
+      setTestProxyResult({ success: false, text: 'Please enter a proxy URL first.' });
+      return;
+    }
+    
+    setTestProxyLoading(true);
+    setTestProxyResult(null);
+    try {
+      const res = await api.post<{success: boolean, error?: string}>('/admin/proxy-config/test', {
+        proxy_mode: llmConfig.proxy_mode,
+        proxy_url: llmConfig.proxy_url || null
+      });
+      
+      if (res && res.success) {
+        setTestProxyResult({ success: true, text: 'Proxy connection successful' });
+      } else {
+        setTestProxyResult({ success: false, text: res?.error || 'Proxy connection failed' });
+      }
+      setTimeout(() => setTestProxyResult(null), 3000);
+    } catch (err: any) {
+      setTestProxyResult({ success: false, text: err.message || 'Failed to connect to proxy' });
+    } finally {
+      setTestProxyLoading(false);
     }
   };
 
@@ -225,7 +267,7 @@ export function AdminPage() {
                   </Button>
                   <Button 
                     variant="primary" 
-                    onClick={() => saveLlmConfig()} 
+                    onClick={() => saveLlmConfig(llmConfig, 'llm')} 
                     disabled={llmLoading}
                     style={{ padding: '12px 24px', fontSize: '15px' }}
                   >
@@ -247,6 +289,109 @@ export function AdminPage() {
                 )}
               </div>
             </div>
+            </div>
+
+            <div className="admin-panel" style={{ marginTop: '24px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+                <h2>Proxy Configuration</h2>
+              </div>
+              <p className="admin-panel__desc">Configure proxy settings for outbound requests (e.g. LLM API calls).</p>
+
+              <div className="admin-form">
+                <div style={{ display: 'flex', gap: '16px', marginBottom: '16px' }}>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+                    <input 
+                      type="radio" 
+                      name="proxy_mode"
+                      value="off"
+                      checked={llmConfig.proxy_mode === 'off'}
+                      onChange={e => setLlmConfig({...llmConfig, proxy_mode: e.target.value})}
+                      disabled={llmLoading}
+                    />
+                    Proxy Off
+                  </label>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+                    <input 
+                      type="radio" 
+                      name="proxy_mode"
+                      value="system"
+                      checked={llmConfig.proxy_mode === 'system'}
+                      onChange={e => setLlmConfig({...llmConfig, proxy_mode: e.target.value})}
+                      disabled={llmLoading}
+                    />
+                    Standard Proxy
+                  </label>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+                    <input 
+                      type="radio" 
+                      name="proxy_mode"
+                      value="custom"
+                      checked={llmConfig.proxy_mode === 'custom'}
+                      onChange={e => setLlmConfig({...llmConfig, proxy_mode: e.target.value})}
+                      disabled={llmLoading}
+                    />
+                    Custom Proxy
+                  </label>
+                </div>
+
+                {llmConfig.proxy_mode === 'custom' && (
+                  <Field
+                    label="Proxy URL"
+                    value={llmConfig.proxy_url || ''}
+                    onChange={e => setLlmConfig({...llmConfig, proxy_url: e.target.value})}
+                    disabled={llmLoading}
+                    placeholder="http://login:password@ip:port"
+                  />
+                )}
+
+                <label className="admin-checkbox" style={{ marginTop: '16px' }}>
+                  <input 
+                    type="checkbox" 
+                    checked={llmConfig.is_proxy_shared}
+                    onChange={e => setLlmConfig({...llmConfig, is_proxy_shared: e.target.checked})}
+                    disabled={llmLoading}
+                  />
+                  <span>Allow users to use this proxy configuration globally?</span>
+                </label>
+
+                <div className="admin-form__actions" style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginTop: '16px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '12px' }}>
+                    {llmConfig.proxy_mode !== 'off' && (
+                      <Button 
+                        variant="secondary" 
+                        onClick={testProxyConnection} 
+                        disabled={testProxyLoading || llmLoading}
+                        style={{ padding: '12px 24px', fontSize: '15px' }}
+                      >
+                        <Icon icon={testProxyLoading ? "mdi:loading" : "mdi:connection"} className={testProxyLoading ? "spin" : ""} />
+                        {testProxyLoading ? 'Testing...' : 'Test Connection'}
+                      </Button>
+                    )}
+                    <Button 
+                      variant="primary" 
+                      onClick={() => saveLlmConfig(llmConfig, 'proxy')} 
+                      disabled={llmLoading}
+                      style={{ padding: '12px 24px', fontSize: '15px' }}
+                    >
+                      {llmLoading ? 'Saving...' : 'Save Configuration'}
+                    </Button>
+                  </div>
+                  
+                  {proxyMessage && <div style={{ textAlign: 'right' }}><span className="admin-message">{proxyMessage}</span></div>}
+
+                  {testProxyResult && (
+                    <div className={`admin-ping-result ${testProxyResult.success ? 'success' : 'error'}`}>
+                      <div className="admin-ping-result__header">
+                        <Icon icon={testProxyResult.success ? "mdi:check-circle-outline" : "mdi:alert-circle-outline"} />
+                        <strong>{testProxyResult.success ? 'Connection Successful' : 'Connection Failed'}</strong>
+                      </div>
+                      <div className="admin-ping-result__body">
+                        {testProxyResult.text}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
           </div>
         )}
