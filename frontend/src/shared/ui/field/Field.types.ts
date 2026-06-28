@@ -7,6 +7,7 @@ export interface FieldProps
   mode?: FieldMode;
   label?: string;
   errorText?: string;
+  hintText?: ReactNode;
   /** Icon slot — pass a node already wrapped in `IconWrapper`.
    *  Icons are decorative overlays inside the wrapper padding area;
    *  when absent, layout is unchanged. When present, Field adjusts input

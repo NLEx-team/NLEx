@@ -2,6 +2,8 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 from functools import lru_cache
 
 class Settings(BaseSettings):
+    ENVIRONMENT: str = "development"
+    
     # Backend
     BACKEND_PORT: int = 8000
     
@@ -30,8 +32,11 @@ class Settings(BaseSettings):
     # LLM
     OPENAI_API_KEY: str | None = None
     OPENAI_BASE_URL: str = "https://api.openai.com/v1"
-    LLM_MODEL: str = "gpt-4o-mini"
+    LLM_MODEL_FAST: str = "gpt-5.4-mini"
+    LLM_MODEL_THINKING: str = "gpt-5.5"
+    LLM_MODEL_INFERENCE: str = "deepseek-v4-flash"
     MAX_SQL_RETRIES: int = 3
+    SYSTEM_PROXY_URL: str | None = None
     
     @property
     def SQLALCHEMY_DATABASE_URL(self) -> str:

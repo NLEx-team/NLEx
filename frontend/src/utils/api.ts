@@ -15,13 +15,8 @@ class ApiError extends Error {
 }
 
 async function request<T>(endpoint: string, options: RequestInit & { timeout?: number } = {}): Promise<T> {
-  const { timeout = 90000, ...fetchOptions } = options; // 90 seconds default timeout
-  const token = localStorage.getItem('jwt_token');
-  
+  const { timeout = 120000, ...fetchOptions } = options; // 120 seconds default timeout
   const headers = new Headers(fetchOptions.headers);
-  if (token) {
-    headers.set('Authorization', `Bearer ${token}`);
-  }
   if (!(fetchOptions.body instanceof FormData) && !headers.has('Content-Type')) {
     headers.set('Content-Type', 'application/json');
   }
@@ -33,6 +28,7 @@ async function request<T>(endpoint: string, options: RequestInit & { timeout?: n
     const response = await fetch(`${API_BASE}${endpoint}`, {
       ...fetchOptions,
       headers,
+      credentials: 'include',
       signal: controller.signal,
     });
 

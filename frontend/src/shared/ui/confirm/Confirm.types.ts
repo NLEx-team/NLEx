@@ -7,6 +7,6 @@ export interface ConfirmProps {
   title?: string;
   confirmText?: string;
   cancelText?: string;
-  variant?: 'danger' | 'primary';
+  variant?: 'secondary' | 'primary';
   children: ReactNode;
 }

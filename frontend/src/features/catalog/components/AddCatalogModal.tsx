@@ -3,6 +3,7 @@ import { Modal } from '../../../shared/ui/modal';
 import { Field } from '../../../shared/ui/field';
 import { Dropdown } from '../../../shared/ui/dropdown';
 import { Button } from '../../../shared/ui/button';
+import { useAuth } from '../../auth/hooks/useAuth';
 import { catalogApi } from '../api';
 import type { DatabaseType, CatalogCreate, CatalogRead } from '../types';
 import './AddCatalogModal.css';
@@ -20,6 +21,7 @@ const DB_OPTIONS = [
   { label: 'SQLite', value: 'sqlite' },
   { label: 'MySQL', value: 'mysql' },
   { label: 'ClickHouse', value: 'clickhouse' },
+  { label: 'Oracle', value: 'oracle' },
 ];
 
 const STATUS_LABELS: Record<string, string> = {
@@ -31,6 +33,8 @@ const STATUS_LABELS: Record<string, string> = {
 type ModalMode = 'create' | 'view' | 'edit';
 
 export function AddCatalogModal({ isOpen, onClose, onSubmit, initialData, onDelete }: AddCatalogModalProps) {
+  const { user: authUser } = useAuth();
+  const isAdmin = authUser?.role === 'admin';
   const [mode, setMode] = useState<ModalMode>('create');
   const [name, setName] = useState('');
   const [type, setType] = useState<DatabaseType>('postgresql');
@@ -93,6 +97,21 @@ export function AddCatalogModal({ isOpen, onClose, onSubmit, initialData, onDele
   }, [isOpen, initialData]);
 
   const handleCheckConnection = async () => {
+    if (initialData && mode === 'view') {
+      // In view mode, use ping (lightweight, available to all users)
+      setLoading(true);
+      setTestResult(null);
+      setError(null);
+      try {
+        const res = await catalogApi.ping(initialData.id);
+        setTestResult(res);
+      } catch (err: any) {
+        setTestResult({ success: false, latency_ms: null, error: err.message || 'Ping failed' });
+      } finally {
+        setLoading(false);
+      }
+      return;
+    }
     if (!url.trim()) {
       setError('URL is required to test connection');
       return;
@@ -131,10 +150,7 @@ export function AddCatalogModal({ isOpen, onClose, onSubmit, initialData, onDele
     }
   };
 
-  const handleEditStart = () => {
-    initFromData(initialData!);
-    setMode('edit');
-  };
+
 
   const handleCancelEdit = () => {
     initFromData(initialData!);
@@ -165,23 +181,29 @@ export function AddCatalogModal({ isOpen, onClose, onSubmit, initialData, onDele
           <Field mode="readonly" label="Database type" value={type} />
           <Field mode="readonly" label="Database user" value={user} />
           {renderStatus()}
-          <div className="add-catalog-modal__actions">
-            <Button type="button" variant="secondary" onClick={handleCheckConnection} disabled={loading}>
-              Check connection
-            </Button>
-            <div className="add-catalog-modal__actions-right">
-              {onDelete && (
-                <Button type="button" onClick={() => { onDelete(); handleClose(); }} disabled={loading} style={{ background: '#2B6A4C', color: 'white' }}>
-                  Delete
-                </Button>
+          {isAdmin && (
+            <>
+              {testResult && (
+                <div className={`field field--${testResult.success ? 'success' : 'error'}`} style={{ color: testResult.success ? 'var(--color-accent)' : 'var(--color-error-border)', fontSize: '13px' }}>
+                  {testResult.success 
+                    ? `Connected successfully! Latency: ${testResult.latency_ms}ms`
+                    : `Connection failed: ${testResult.error}`}
+                </div>
               )}
-              {/*
-              <Button type="button" onClick={handleEditStart}>
-                Edit
-              </Button>
-              */}
-            </div>
-          </div>
+              <div className="add-catalog-modal__actions">
+                <Button type="button" variant="secondary" onClick={handleCheckConnection} disabled={loading}>
+                  {loading ? 'Checking...' : 'Check connection'}
+                </Button>
+                <div className="add-catalog-modal__actions-right">
+                  {onDelete && (
+                    <Button type="button" onClick={() => { onDelete(); handleClose(); }} disabled={loading} style={{ background: '#2B6A4C', color: 'white' }}>
+                      Delete
+                    </Button>
+                  )}
+                </div>
+              </div>
+            </>
+          )}
         </div>
       </Modal>
     );

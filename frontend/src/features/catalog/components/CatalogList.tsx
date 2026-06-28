@@ -1,16 +1,20 @@
 import { useState } from 'react';
 import { Icon } from '@iconify/react';
 import { useAuth } from '../../auth/hooks/useAuth';
-import type { CatalogRead } from '../types';
+import type { CatalogRead, CatalogTestResult } from '../types';
 import './CatalogList.css';
 
 interface CatalogListProps {
   catalogs: CatalogRead[];
   loading: boolean;
-  onTest: (id: string) => void;
-  onDelete: (id: string) => void;
+  pingResults: Record<string, CatalogTestResult>;
+  selectedIds: Set<string>;
+  onToggleSelect: (id: string) => void;
+  onPing: (id: string) => Promise<CatalogTestResult>;
+
   onAdd?: () => void;
   onInfo?: (catalog: CatalogRead) => void;
+  disabled?: boolean;
 }
 
 const STATUS_LABELS: Record<string, string> = {
@@ -19,8 +23,8 @@ const STATUS_LABELS: Record<string, string> = {
   error: 'Disconnected',
 };
 
-export function CatalogList({ catalogs, loading, onTest, onDelete, onAdd, onInfo }: CatalogListProps) {
-  const [testingId, setTestingId] = useState<string | null>(null);
+export function CatalogList({ catalogs, loading, pingResults, selectedIds, onToggleSelect, onPing, onAdd, onInfo, disabled }: CatalogListProps) {
+  const [pingingId, setPingingId] = useState<string | null>(null);
   const { user } = useAuth();
   const isAdmin = user?.role === 'admin';
 
@@ -28,17 +32,39 @@ export function CatalogList({ catalogs, loading, onTest, onDelete, onAdd, onInfo
     return <div className="catalog-list__empty">Loading catalogs...</div>;
   }
 
-  const handleTest = async (id: string) => {
-    setTestingId(id);
+  const handlePing = async (e: React.MouseEvent, id: string) => {
+    e.stopPropagation(); // Don't toggle selection
+    setPingingId(id);
     try {
-      await onTest(id);
+      await onPing(id);
     } finally {
-      setTestingId(null);
+      setPingingId(null);
     }
   };
 
-  const handleDelete = (id: string) => {
-    onDelete(id);
+  const handleInfo = (e: React.MouseEvent, catalog: CatalogRead) => {
+    e.stopPropagation(); // Don't toggle selection
+    onInfo?.(catalog);
+  };
+
+  const getStatusText = (catalog: CatalogRead) => {
+    if (pingingId === catalog.id) return 'Pinging...';
+    const pingResult = pingResults[catalog.id];
+    if (pingResult) {
+      if (pingResult.success) {
+        return `${pingResult.latency_ms}ms`;
+      }
+      return 'Disconnected';
+    }
+    return STATUS_LABELS[catalog.status];
+  };
+
+  const getStatusClass = (catalog: CatalogRead) => {
+    const pingResult = pingResults[catalog.id];
+    if (pingResult) {
+      return pingResult.success ? 'active' : 'error';
+    }
+    return catalog.status;
   };
 
   return (
@@ -49,40 +75,60 @@ export function CatalogList({ catalogs, loading, onTest, onDelete, onAdd, onInfo
           <Icon icon="mdi:plus" />
         </button>
       )}
+
+      <div className="catalog-list__note">
+        <Icon icon="mdi:information-outline" />
+        <span>If no database is selected, all will be used.</span>
+      </div>
       
       {catalogs.length === 0 ? (
         <div className="catalog-list__empty" style={{ paddingTop: '16px' }}>No catalogs connected</div>
       ) : (
-        catalogs.map(catalog => (
-          <div key={catalog.id} className="catalog-item">
-            <span className={`catalog-item__status catalog-item__status--${catalog.status}`} />
-            <div className="catalog-item__info">
-              <span className="catalog-item__name">{catalog.name}</span>
-              <span className="catalog-item__meta">{testingId === catalog.id ? 'Testing...' : STATUS_LABELS[catalog.status]}</span>
-            </div>
-            <div className="catalog-item__actions">
-              <button
-                type="button"
-                className={
-                  "catalog-item__action-btn catalog-item__action-btn--test" + 
-                  (testingId === catalog.id ? " catalog-item__action-btn--loading" : "")
+        catalogs.map(catalog => {
+          const isSelected = selectedIds.has(catalog.id);
+          const isDisabled = disabled && !isSelected;
+          return (
+            <div
+              key={catalog.id}
+              className={`catalog-item${isSelected ? ' catalog-item--selected' : ''}${isDisabled ? ' catalog-item--disabled' : ''}`}
+              onClick={() => {
+                if (!disabled) {
+                  onToggleSelect(catalog.id);
                 }
-                onClick={() => handleTest(catalog.id)}
-                title="Test connection"
-              >
-                <Icon icon="mdi:refresh" />
-              </button>
-              <button
-                type="button"
-                className="catalog-item__action-btn"
-                onClick={() => onInfo?.(catalog)}
-                title="Database info"
-              >
-                <Icon icon="mdi:information-outline" />
-              </button>
+              }}
+              style={{ cursor: disabled ? 'not-allowed' : 'pointer', opacity: isDisabled ? 0.5 : 1 }}
+            >
+              <span className={`catalog-item__status catalog-item__status--${getStatusClass(catalog)}`} />
+              <div className="catalog-item__info">
+                <span className="catalog-item__name">{catalog.name}</span>
+                <span className="catalog-item__meta">{getStatusText(catalog)}</span>
+              </div>
+              {!isDisabled && (
+                <div className="catalog-item__actions">
+                  <button
+                    type="button"
+                    className={
+                      "catalog-item__action-btn catalog-item__action-btn--test" + 
+                      (pingingId === catalog.id ? " catalog-item__action-btn--loading" : "")
+                    }
+                    onClick={(e) => handlePing(e, catalog.id)}
+                    title="Ping connection"
+                  >
+                    <Icon icon="mdi:refresh" />
+                  </button>
+                  <button
+                    type="button"
+                    className="catalog-item__action-btn"
+                    onClick={(e) => handleInfo(e, catalog)}
+                    title="Database info"
+                  >
+                    <Icon icon="mdi:information-outline" />
+                  </button>
+                </div>
+              )}
             </div>
-          </div>
-        ))
+          );
+        })
       )}
     </div>
   );

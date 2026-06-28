@@ -18,6 +18,7 @@ export interface TableBlock {
   rows: any[][];
   sql?: string;
   explanation?: string;
+  totalRows?: number;
 }
 
 export interface ErrorBlock {
@@ -39,4 +40,5 @@ export interface ChatMessage {
 export interface ChatSession {
   id: string;
   title: string;
+  catalogIds: string[];
 }

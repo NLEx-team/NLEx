@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef } from 'react';
-import { Icon } from '@iconify/react';
+
 import { ChatInput } from '../../../shared/ui/chat-input';
 import { ChatMessage } from '../../../shared/ui/chat-message';
 import { Logo } from '../../../shared/ui/logo';
@@ -14,7 +14,20 @@ interface ChatProps {
   handleSendMessage: () => void;
   handleClarification: (questionId: string, selectedOptions: string[]) => void;
   pending: boolean;
+  pendingStatus?: string;
 }
+
+const STATUS_MESSAGES: Record<string, { text: string }> = {
+  unknown: { text: 'Starting...' },
+  IDLE: { text: 'Starting...' },
+  CATALOG_CONNECTING: { text: 'Connecting to database...' },
+  RELATIONSHIP_INFERRING: { text: 'Analyzing schema...' },
+  GENERATING_SQL: { text: 'Writing SQL query...' },
+  EXECUTING_SQL: { text: 'Executing query...' },
+  FIXING_SQL: { text: 'Fixing SQL error...' },
+  COMPLETED: { text: 'Formatting results...' },
+  FAILED: { text: 'Failed.' },
+};
 
 export function Chat({
   messages,
@@ -23,6 +36,7 @@ export function Chat({
   handleSendMessage,
   handleClarification,
   pending,
+  pendingStatus,
 }: ChatProps) {
   const handleExport = useCallback((exportUrl: string) => {
     chatApi.downloadExport(exportUrl).catch((err) => {
@@ -34,7 +48,11 @@ export function Chat({
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+  }, [messages, pendingStatus]);
+
+  const currentStatusInfo = pendingStatus 
+    ? STATUS_MESSAGES[pendingStatus] || STATUS_MESSAGES.unknown 
+    : STATUS_MESSAGES.unknown;
 
   return (
     <div className="chat">
@@ -47,7 +65,7 @@ export function Chat({
                 <p className="chat__welcome-text">Ask a question about your data</p>
               </div>
             )}
-            {messages.map((msg) => (
+            {messages.map((msg, index) => (
               <ChatMessage
                 key={msg.id}
                 role={msg.role}
@@ -55,14 +73,15 @@ export function Chat({
                 exportUrl={msg.exportUrl}
                 onClarify={handleClarification}
                 onExport={handleExport}
+                isLastMessage={index === messages.length - 1}
               />
             ))}
             {pending && (
               <div className="chat-message chat-message--assistant">
                 <div className="chat-message__bubble">
                   <div className="chat-message__pending">
-                    <Icon icon="mdi:loading" className="chat-message__pending-icon" />
-                    <span>Processing...</span>
+                    <div className="loader"></div>
+                    <span className="chat-message__pending-text">{currentStatusInfo.text}</span>
                   </div>
                 </div>
               </div>

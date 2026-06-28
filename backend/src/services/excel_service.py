@@ -36,71 +36,97 @@ class ExcelExportService:
             return path
         return None
 
-    def generate_excel(
+    def _get_metadata_path(self, export_id: str) -> str:
+        return os.path.join(self.exports_dir, f"{export_id}.meta.json")
+
+    def save_export_metadata(
         self,
         export_id: str,
+        sql: str,
         headers: List[str],
-        data: List[List[Any]],
-    ) -> str:
-        """
-        Generates a styled .xlsx file from query results,
-        saves it to the exports volume, and returns the file path.
-        """
-        if not headers:
-            raise ValueError("Headers list cannot be empty")
+        catalog_mapping: Dict[str, str] = None
+    ) -> None:
+        import json
+        meta_path = self._get_metadata_path(export_id)
+        with open(meta_path, "w", encoding="utf-8") as f:
+            json.dump({
+                "sql": sql, 
+                "headers": headers,
+                "catalog_mapping": catalog_mapping or {}
+            }, f)
 
-        wb = Workbook()
-        ws = wb.active
-        ws.title = "Query Results"
+    def generate_and_get_excel(self, export_id: str, db_service) -> str:
+        file_path = self._get_file_path(export_id)
+        if os.path.exists(file_path):
+            return file_path
+            
+        import json
+        meta_path = self._get_metadata_path(export_id)
+        if not os.path.exists(meta_path):
+            raise ValueError("Export metadata not found.")
+            
+        with open(meta_path, "r", encoding="utf-8") as f:
+            meta = json.load(f)
+            
+        sql = meta["sql"]
+        headers = meta["headers"]
+        catalog_mapping = meta.get("catalog_mapping", {})
+        
+        # Use WriteOnlyWorkbook for memory efficiency
+        wb = Workbook(write_only=True)
+        ws = wb.create_sheet("Query Results")
 
         # --- Header styling ---
+        # Note: In write-only mode, we write Cell objects to apply styles
+        from openpyxl.cell import WriteOnlyCell
+        
         header_font = Font(name="Calibri", bold=True, color="FFFFFF", size=11)
-        header_fill = PatternFill(
-            start_color="4472C4", end_color="4472C4", fill_type="solid"
-        )
+        header_fill = PatternFill(start_color="4472C4", end_color="4472C4", fill_type="solid")
         header_alignment = Alignment(horizontal="center", vertical="center")
         thin_border = Border(
-            left=Side(style="thin"),
-            right=Side(style="thin"),
-            top=Side(style="thin"),
-            bottom=Side(style="thin"),
+            left=Side(style="thin"), right=Side(style="thin"),
+            top=Side(style="thin"), bottom=Side(style="thin")
         )
+        data_alignment = Alignment(vertical="center")
 
-        # Write headers
-        ws.append(headers)
-        for col_idx, _ in enumerate(headers, start=1):
-            cell = ws.cell(row=1, column=col_idx)
+        # Apply default column widths (can't auto-fit easily in write_only mode)
+        for col_idx, column_name in enumerate(headers, start=1):
+            from openpyxl.utils import get_column_letter
+            ws.column_dimensions[get_column_letter(col_idx)].width = max(len(str(column_name)) + 4, 15)
+
+        # Write header row
+        header_cells = []
+        for h in headers:
+            cell = WriteOnlyCell(ws, value=h)
             cell.font = header_font
             cell.fill = header_fill
             cell.alignment = header_alignment
             cell.border = thin_border
+            header_cells.append(cell)
+        ws.append(header_cells)
+        
+        # Stream data from DB
+        row_count = 0
+        for row_data in db_service.execute_query_sync_stream(sql, chunk_size=2000):
+            data_cells = []
+            for val in row_data:
+                # Openpyxl doesn't support UUIDs, Decimals, dicts natively
+                if val is not None and not isinstance(val, (int, float, str, bool)):
+                    val = str(val)
+                
+                if isinstance(val, str) and catalog_mapping:
+                    for t_name, d_name in catalog_mapping.items():
+                        if t_name in val:
+                            val = val.replace(t_name, d_name)
 
-        # --- Data rows ---
-        data_alignment = Alignment(vertical="center")
-        for row_data in data:
-            ws.append(row_data)
-            current_row = ws.max_row
-            for col_idx in range(1, len(headers) + 1):
-                cell = ws.cell(row=current_row, column=col_idx)
+                cell = WriteOnlyCell(ws, value=val)
                 cell.border = thin_border
                 cell.alignment = data_alignment
-
-        # Auto-fit column widths
-        for col_idx, column_name in enumerate(headers, start=1):
-            max_length = len(str(column_name))
-            for row in ws.iter_rows(min_row=2, min_col=col_idx, max_col=col_idx):
-                for cell in row:
-                    if cell.value is not None:
-                        max_length = max(max_length, len(str(cell.value)))
-            col_letter = ws.cell(row=1, column=col_idx).column_letter
-            ws.column_dimensions[col_letter].width = min(max_length + 4, 50)
-
-        # Freeze header row
-        ws.freeze_panes = "A2"
-
-        # Save to volume
-        file_path = self._get_file_path(export_id)
+                data_cells.append(cell)
+            ws.append(data_cells)
+            row_count += 1
+            
+        # Freeze panes is not supported in write_only mode
         wb.save(file_path)
-        logger.info(f"Excel file generated and saved: {file_path}")
-
+        logger.info(f"Excel file streamed and saved: {file_path} ({row_count} rows)")
         return file_path

@@ -39,6 +39,22 @@ class DistributedDatabaseService:
             query,
         )
 
+    async def execute_query_async_preview(
+        self,
+        query: str,
+        limit: int = 5
+    ) -> list[list[Any]]:
+        def _fetch_limited():
+            with closing(self._get_connection()) as conn:
+                with closing(conn.cursor()) as cursor:
+                    cursor.execute(query)
+                    try:
+                        return cursor.fetchmany(limit)
+                    except Exception:
+                        return []
+                    
+        return await asyncio.to_thread(_fetch_limited)
+
     def execute_query_sync(
         self,
         query: str,
@@ -47,10 +63,37 @@ class DistributedDatabaseService:
             with closing(conn.cursor()) as cursor:
                 cursor.execute(query)
 
-                if cursor.description is None:
+                try:
+                    return cursor.fetchall()
+                except Exception:
                     return []
 
-                return cursor.fetchall()
+    def execute_query_sync_stream(
+        self,
+        query: str,
+        chunk_size: int = 1000
+    ):
+        """Yields results in chunks for memory-efficient processing."""
+        with closing(self._get_connection()) as conn:
+            with closing(conn.cursor()) as cursor:
+                cursor.execute(query)
+
+                try:
+                    # just to check if it has results, otherwise it will raise on fetchmany
+                    _ = cursor.description
+                except Exception:
+                    # If description itself crashes (the Trino bug), we assume it has results
+                    pass
+                
+                try:
+                    while True:
+                        rows = cursor.fetchmany(chunk_size)
+                        if not rows:
+                            break
+                        for row in rows:
+                            yield row
+                except Exception:
+                    return
 
     async def connect_catalog(
         self,
@@ -59,13 +102,17 @@ class DistributedDatabaseService:
     ) -> None:
         self._validate_catalog_name(name)
 
+        url = catalog.url.replace("'", "''")
+        user = catalog.user.replace("'", "''")
+        password = catalog.password.replace("'", "''")
+
         sql = f"""
         CREATE CATALOG {name}
         USING {catalog.type.value}
         WITH (
-            "connection-url" = '{catalog.url}',
-            "connection-user" = '{catalog.user}',
-            "connection-password" = '{catalog.password}'
+            "connection-url" = '{url}',
+            "connection-user" = '{user}',
+            "connection-password" = '{password}'
         )
         """
 
@@ -112,7 +159,7 @@ class DistributedDatabaseService:
 
         rows = await self.execute_query_async(
             f"""
-            SHOW SCHEMAS FROM {catalog}
+            SHOW SCHEMAS FROM "{catalog}"
             """
         )
         return [row[0] for row in rows]
@@ -126,7 +173,7 @@ class DistributedDatabaseService:
         self._validate_catalog_name(catalog)
 
         rows = await self.execute_query_async(
-            f"SHOW TABLES FROM {catalog}.{namespace}"
+            f'SHOW TABLES FROM "{catalog}"."{namespace}"'
         )
         return [row[0] for row in rows]
 
@@ -146,7 +193,7 @@ class DistributedDatabaseService:
                 data_type,
                 is_nullable,
                 ordinal_position
-            FROM {catalog}.information_schema.columns
+            FROM "{catalog}".information_schema.columns
             WHERE table_schema = '{namespace}'
             AND table_name = '{table}'
             ORDER BY ordinal_position

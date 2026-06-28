@@ -6,23 +6,31 @@ export function NavSelectItem({
   active = false,
   onClick,
   className = "",
+  actions,
 }: NavSelectItemProps) {
   const classNames = [
-    "nav-select-item",
-    active ? "nav-select-item--active" : "",
+    "nav-select-item-container",
+    active ? "nav-select-item-container--active" : "",
     className,
   ]
     .filter(Boolean)
     .join(" ");
 
   return (
-    <button
-      type="button"
-      className={classNames}
-      onClick={onClick}
-      aria-current={active ? "true" : undefined}
-    >
-      {label}
-    </button>
+    <div className={classNames}>
+      <button
+        type="button"
+        className="nav-select-item__button"
+        onClick={onClick}
+        aria-current={active ? "true" : undefined}
+      >
+        <span className="nav-select-item__label" title={label}>{label}</span>
+      </button>
+      {actions && (
+        <div className="nav-select-item__actions">
+          {actions}
+        </div>
+      )}
+    </div>
   );
 }
