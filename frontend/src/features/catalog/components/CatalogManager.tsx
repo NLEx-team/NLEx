@@ -9,14 +9,32 @@ import { AddCatalogModal } from './AddCatalogModal';
 import { catalogApi } from '../api';
 import type { CatalogRead, CatalogCreate } from '../types';
 
-export function CatalogManager() {
+interface CatalogManagerProps {
+  selectedIds: string[];
+  onSelectionChange: (selectedIds: string[]) => void;
+  disabled?: boolean;
+}
+
+export function CatalogManager({ selectedIds, onSelectionChange, disabled }: CatalogManagerProps) {
   const { user } = useAuth();
-  const { catalogs, loading, createCatalog, deleteCatalog, testCatalog } = useCatalogs();
+  const { catalogs, loading, pingResults, createCatalog, deleteCatalog, pingCatalog } = useCatalogs();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedCatalog, setSelectedCatalog] = useState<CatalogRead | null>(null);
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
   const { confirm, isOpen: isConfirmOpen, onConfirm, onCancel } = useConfirm();
   const isAdmin = user?.role === 'admin';
+
+  const selectedIdsSet = new Set(selectedIds);
+
+  const handleToggleSelect = useCallback((id: string) => {
+    const next = new Set(selectedIdsSet);
+    if (next.has(id)) {
+      next.delete(id);
+    } else {
+      next.add(id);
+    }
+    onSelectionChange(Array.from(next));
+  }, [selectedIdsSet, onSelectionChange]);
 
   const handleSubmit = async (data: CatalogCreate) => {
     await createCatalog(data);
@@ -27,9 +45,15 @@ export function CatalogManager() {
     const ok = await confirm();
     if (ok) {
       await deleteCatalog(id);
+      // Remove from selection if deleted
+      if (selectedIdsSet.has(id)) {
+        const next = new Set(selectedIdsSet);
+        next.delete(id);
+        onSelectionChange(Array.from(next));
+      }
     }
     setPendingDeleteId(null);
-  }, [confirm, deleteCatalog]);
+  }, [confirm, deleteCatalog, selectedIdsSet, onSelectionChange]);
 
   const handleInfo = useCallback(async (cat: CatalogRead) => {
     try {
@@ -55,10 +79,14 @@ export function CatalogManager() {
         <CatalogList
           catalogs={catalogs}
           loading={loading}
-          onTest={testCatalog}
-          onDelete={handleDelete}
+          pingResults={pingResults}
+          selectedIds={selectedIdsSet}
+          onToggleSelect={handleToggleSelect}
+          onPing={pingCatalog}
+
           onAdd={() => { setSelectedCatalog(null); setIsModalOpen(true); }}
           onInfo={handleInfo}
+          disabled={disabled}
         />
       </SidebarSection>
 
@@ -79,7 +107,7 @@ export function CatalogManager() {
         onClose={() => setIsModalOpen(false)}
         onSubmit={handleSubmit}
         initialData={selectedCatalog || undefined}
-        onDelete={selectedCatalog ? () => handleDelete(selectedCatalog.id) : undefined}
+        onDelete={isAdmin && selectedCatalog ? () => handleDelete(selectedCatalog.id) : undefined}
       />
     </>
   );

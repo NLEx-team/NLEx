@@ -7,7 +7,6 @@ interface SidebarSectionProps {
   title: string;
   children: ReactNode;
   className?: string;
-  onAdd?: () => void;
   defaultCollapsed?: boolean;
 }
 
@@ -15,7 +14,6 @@ export function SidebarSection({
   title,
   children,
   className = '',
-  onAdd,
   defaultCollapsed = true,
 }: SidebarSectionProps) {
   const storageKey = `sidebar-section:${title}`;
@@ -39,9 +37,21 @@ export function SidebarSection({
         aria-expanded={!isCollapsed}
       >
         <span className="sidebar-section__title">{title}</span>
-        <Icon icon={isCollapsed ? 'mdi:chevron-down' : 'mdi:chevron-up'} color="#8A92A6" width="20" height="20" />
+        <Icon 
+          icon="mdi:chevron-down" 
+          color="#8A92A6" 
+          width="20" 
+          height="20" 
+          className="sidebar-section__icon"
+        />
       </div>
-      {!isCollapsed && <div className="sidebar-section__body">{children}</div>}
+      <div className="sidebar-section__content" aria-expanded={!isCollapsed}>
+        <div className="sidebar-section__body">
+          <div className="sidebar-section__body-inner">
+            {children}
+          </div>
+        </div>
+      </div>
     </section>
   );
 }
