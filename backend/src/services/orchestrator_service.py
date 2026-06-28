@@ -264,9 +264,8 @@ class OrchestratorService:
                 count_data = await self.db_service.execute_query_async(count_sql)
                 total_rows = count_data[0][0] if count_data else 0
                 
-                # 2. Get preview data (wrapping in a simple SELECT * LIMIT 5 preserves order)
-                preview_sql = f"SELECT * FROM ({sql}) AS preview_wrap LIMIT 5"
-                preview_data = await self.db_service.execute_query_async(preview_sql)
+                # 2. Get preview data (execute original sql and fetchmany in python to preserve ORDER BY)
+                preview_data = await self.db_service.execute_query_async_preview(sql)
                 
                 await self._transition(OrchestratorState.COMPLETED)
                 success_result = {
