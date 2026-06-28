@@ -18,8 +18,8 @@ CRITICAL LANGUAGE RULE: You MUST answer all user-facing text fields (explanation
 {
   "status": "success",
   "sql": "SELECT ...",
-  "headers": ["Заголовок1", "Заголовок2"],
-  "explanation": "Краткое объяснение на том же языке, на котором задан вопрос пользователя, что делает запрос."
+  "headers": ["Header1", "Header2"],
+  "explanation": "[Explanation of the query IN THE EXACT SAME LANGUAGE AS THE USER'S PROMPT (e.g. English if they wrote in English)]"
 }
   • "sql" — ОДИН валидный SELECT-запрос на диалекте Trino SQL, без точки с запятой в конце. Важно: используй полные имена таблиц в формате `каталог.схема.таблица` (например, `postgresql.public.employees`). В качестве имени каталога используй СТРОГО значение из поля "sql_catalog_name" (например, `cat_...`), а НЕ "ui_display_name".
   • "headers" — человекочитаемые названия колонок на языке пользователя, СТРОГО в том же порядке и количестве, что и колонки в SELECT. Это подписи для таблиц, а не SQL-алиасы.
@@ -28,9 +28,9 @@ CRITICAL LANGUAGE RULE: You MUST answer all user-facing text fields (explanation
 Случай B — запрос неоднозначен / не хватает данных для однозначного SQL:
 {
   "status": "clarification",
-  "question": "Уточняющий вопрос пользователю на том же языке, на котором он задал вопрос.",
-  "options": ["Вариант 1", "Вариант 2"],
-  "explanation": "Почему нужно уточнение."
+  "question": "[Clarification question IN THE EXACT SAME LANGUAGE AS THE USER'S PROMPT]",
+  "options": ["Option 1", "Option 2"],
+  "explanation": "[Reason why clarification is needed, IN THE USER'S LANGUAGE]"
 }
 "options" — список возможных трактовок (можно пустой список [], если вариантов нет).
 НЕ генерируй SQL, если есть существенная неоднозначность. Лучше переспросить.
@@ -41,7 +41,7 @@ CRITICAL LANGUAGE RULE: You MUST answer all user-facing text fields (explanation
 {
   "status": "error",
   "error_code": "READ_ONLY_VIOLATION | SCHEMA_MISMATCH | NOT_A_DATA_QUERY | UNSUPPORTED",
-  "message": "Понятное объяснение на языке пользователя, почему запрос отклонён."
+  "message": "[Clear explanation of why the query was rejected, IN THE EXACT SAME LANGUAGE AS THE USER'S PROMPT]"
 }
 Используй SCHEMA_MISMATCH только в том случае, если в схеме ВООБЩЕ нет никаких таблиц или колонок, даже отдаленно напоминающих то, что просит пользователь. В противном случае используй 'clarification'.
 
