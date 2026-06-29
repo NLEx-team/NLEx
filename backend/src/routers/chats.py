@@ -143,6 +143,10 @@ async def chat_websocket(
             user_blocks = [{"type": "text", "text": prompt}]
             await ChatRepository.add_message(db, chat_id, "user", user_blocks)
 
+            # Check message count to determine titling logic
+            messages = await ChatRepository.get_messages(db, chat_id)
+            user_msg_count = sum(1 for m in messages if m.role == "user")
+
             orch = await controller.get_orchestrator(chat_id, catalog_ids)
             
             async def send_status(state_val: str):
@@ -173,6 +177,39 @@ async def chat_websocket(
             export_url = response.get("export_url")
             total_tokens = response.get("result", {}).get("_usage", {}).get("total_tokens")
             await ChatRepository.add_message(db, chat_id, "assistant", assistant_blocks, export_url, total_tokens)
+            
+            # --- START TITLE LOGIC ---
+            if chat.title == "New Chat" and user_msg_count == 1:
+                new_title = prompt[:30] + "..." if len(prompt) > 30 else prompt
+                await ChatRepository.update_chat_title(db, chat_id, new_title)
+                response["chat_title"] = new_title
+
+            if user_msg_count == 2:
+                try:
+                    history = []
+                    for msg in messages:
+                        text = ""
+                        for block in msg.blocks:
+                            if block.get("type") == "text":
+                                text += block.get("text", "")
+                        if text:
+                            history.append({"role": msg.role, "content": text})
+                    
+                    if response.get("message"):
+                        history.append({"role": "assistant", "content": response["message"]})
+                    elif response.get("question"):
+                        history.append({"role": "assistant", "content": response["question"]})
+                    
+                    import asyncio
+                    title_res = await asyncio.to_thread(orch.llm_service.generate_chat_title, history)
+                    if "title" in title_res:
+                        new_ai_title = title_res["title"][:100]
+                        await ChatRepository.update_chat_title(db, chat_id, new_ai_title)
+                        response["chat_title"] = new_ai_title
+                except Exception as e:
+                    import logging
+                    logging.getLogger(__name__).warning(f"Failed to generate AI title: {e}")
+            # --- END TITLE LOGIC ---
             
             from fastapi.encoders import jsonable_encoder
             await websocket.send_json({
