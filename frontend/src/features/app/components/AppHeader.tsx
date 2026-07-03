@@ -1,5 +1,6 @@
 import { Icon } from '@iconify/react';
 import { ThemeToggle } from './ThemeToggle';
+import { LanguageToggle } from './LanguageToggle';
 import './AppHeader.css';
 
 interface AppHeaderProps {
@@ -46,7 +47,7 @@ export function AppHeader({
       </div>
       <h1 className="app-header__title">{title}</h1>
       <div className="app-header__actions">
-        <div className="app-header__language-slot" aria-hidden="true" />
+        <LanguageToggle className="app-header__icon-btn" />
         <ThemeToggle className="app-header__icon-btn" />
       </div>
     </header>

@@ -30,7 +30,8 @@ class SQLGenerationService:
         self, 
         user_prompt: str | None, 
         schema: str, 
-        history: list[dict[str, str]] | None = None
+        history: list[dict[str, str]] | None = None,
+        language: str = "ru"
     ) -> dict[str, Any]:
         """
         Генерирует SQL-запрос для Trino на основе вопроса пользователя.
@@ -52,7 +53,8 @@ class SQLGenerationService:
             self.llm_service.generate_sql,
             user_prompt=user_prompt, 
             schema=schema, 
-            history=history
+            history=history,
+            language=language
         )
         
         llm_time_ms = int((time.perf_counter() - start_time) * 1000)

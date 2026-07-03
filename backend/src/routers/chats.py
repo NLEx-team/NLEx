@@ -126,6 +126,11 @@ async def chat_websocket(
         await websocket.close(code=1008, reason="Chat not found")
         return
 
+    from src.repositories.user_repo import UserRepository
+    user_repo = UserRepository(db)
+    user_obj = await user_repo.get_user_by_id(user_id)
+    user_language = user_obj.profile.language if user_obj and user_obj.profile else "ru"
+
     controller = ChatController(catalog_service, db)
 
     try:
@@ -171,7 +176,7 @@ async def chat_websocket(
                     
             orch.on_transition = send_status
             
-            response = await controller.process_prompt(chat_id, prompt, catalog_ids)
+            response = await controller.process_prompt(chat_id, prompt, catalog_ids, language=user_language)
             
             assistant_blocks = _response_to_blocks(response)
             export_url = response.get("export_url")
@@ -276,7 +281,8 @@ async def submit_prompt(
         await ChatRepository.update_chat_title(db, chat_id, new_title)
     
     try:
-        response = await controller.process_prompt(chat_id, request.prompt, request.catalog_ids or None)
+        user_language = user.profile.language if user and user.profile else "ru"
+        response = await controller.process_prompt(chat_id, request.prompt, request.catalog_ids or None, language=user_language)
         
         # Save assistant response as message
         assistant_blocks = _response_to_blocks(response)
@@ -340,7 +346,8 @@ async def submit_clarification(
         raise HTTPException(status_code=400, detail="Clarification text is required")
 
     try:
-        response = await controller.process_clarification(chat_id, clarification_text)
+        user_language = user.profile.language if user and user.profile else "ru"
+        response = await controller.process_clarification(chat_id, clarification_text, language=user_language)
         
         # Save assistant response
         assistant_blocks = _response_to_blocks(response)

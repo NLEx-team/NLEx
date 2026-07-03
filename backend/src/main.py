@@ -91,6 +91,8 @@ async def lifespan(app: FastAPI):
     # Create tables on startup
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+        from sqlalchemy import text
+        await conn.execute(text("ALTER TABLE user_profiles ADD COLUMN IF NOT EXISTS language VARCHAR DEFAULT 'ru';"))
     
     # Create default admin if missing
     await create_default_admin()

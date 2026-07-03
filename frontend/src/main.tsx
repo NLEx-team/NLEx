@@ -6,6 +6,7 @@ import { AuthProvider } from './features/auth'
 import App from './features/app/App.tsx'
 import { initTheme } from './shared/hooks'
 import { initIcons } from './shared/icons'
+import './i18n';
 
 initTheme();
 initIcons();

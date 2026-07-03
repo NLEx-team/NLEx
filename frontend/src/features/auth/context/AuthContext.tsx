@@ -11,7 +11,7 @@ export interface AuthContextType {
   register: (data: RegisterData) => Promise<void>;
   logout: () => void;
   refreshUser: () => Promise<void>;
-  updateProfile: (data: { first_name?: string; last_name?: string; avatar_url?: string }) => Promise<void>;
+  updateProfile: (data: { first_name?: string; last_name?: string; avatar_url?: string; language?: string }) => Promise<void>;
 }
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -64,7 +64,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
-  const updateProfile = async (data: { first_name?: string; last_name?: string; avatar_url?: string }) => {
+  const updateProfile = async (data: { first_name?: string; last_name?: string; avatar_url?: string; language?: string }) => {
     try {
       const updatedUser = await api.patch<User>('/users/me', data);
       setUser(updatedUser);

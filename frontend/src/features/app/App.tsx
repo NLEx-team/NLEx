@@ -11,6 +11,7 @@ import { AppHeader } from './components/AppHeader';
 import { Sidebar } from './components/Sidebar';
 import { ThemeToggle } from './components/ThemeToggle';
 import { useLocalStorage } from '../../shared/hooks/useLocalStorage';
+import { useTranslation } from 'react-i18next';
 import './App.css';
 
 import { Outlet, useOutletContext } from 'react-router-dom';
@@ -78,12 +79,13 @@ function AppLayout() {
 }
 
 function ChatPage() {
+  const { t } = useTranslation();
   const { chat, isSidebarOpen, setIsSidebarOpen } = useOutletContext<any>();
 
   return (
     <>
       <AppHeader
-        title={chat.activeSession?.title ?? 'Chat'}
+        title={chat.activeSession?.title ?? t('sidebar.chats', { defaultValue: 'Chat' })}
         variant="chat"
         isSidebarOpen={isSidebarOpen}
         onOpenSidebar={() => setIsSidebarOpen(true)}
@@ -104,12 +106,13 @@ function ChatPage() {
 }
 
 function ProfilePage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   return (
     <>
       <AppHeader
-        title="Profile"
+        title={t('sidebar.settings', { defaultValue: 'Profile' })}
         variant="profile"
         onBack={() => navigate('/chat')}
       />
@@ -137,11 +140,12 @@ function AnalyticsPageWrapper() {
 }
 
 function AdminPageWrapper() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   return (
     <>
       <AppHeader
-        title="Admin Panel"
+        title={t('sidebar.admin', { defaultValue: 'Admin Panel' })}
         variant="profile"
         onBack={() => navigate('/profile')}
       />

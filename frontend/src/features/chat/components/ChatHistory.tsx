@@ -7,6 +7,7 @@ import { Icon } from '@iconify/react';
 import { Confirm } from '../../../shared/ui/confirm';
 import { Modal } from '../../../shared/ui/modal';
 import { Field } from '../../../shared/ui/field';
+import { useTranslation } from 'react-i18next';
 import type { ChatSession } from '../types';
 import './ChatHistory.css';
 
@@ -26,6 +27,7 @@ function ChatActionMenu({
   onRename: () => void; 
   onDelete: () => void;
 }) {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
@@ -84,14 +86,14 @@ function ChatActionMenu({
             type="button" 
             onClick={() => { setOpen(false); onRename(); }}
           >
-            Изменить
+            {t('chat.rename')}
           </button>
           <button 
             type="button" 
             className="chat-action-menu__delete"
             onClick={() => { setOpen(false); onDelete(); }}
           >
-            Удалить
+            {t('chat.delete')}
           </button>
         </div>,
         document.body
@@ -108,6 +110,7 @@ export function ChatHistory({
   onRenameChat,
   onDeleteChat
 }: ChatHistoryProps) {
+  const { t } = useTranslation();
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [renamingSession, setRenamingSession] = useState<{id: string, title: string} | null>(null);
   const [renameInputValue, setRenameInputValue] = useState('');
@@ -138,7 +141,7 @@ export function ChatHistory({
         <span>New chat</span>
       </button>
 
-      <SidebarSection title="History" className="chat-history">
+      <SidebarSection title={t('sidebar.chats', { defaultValue: 'History' })} className="chat-history">
         <nav className="chat-history__sessions">
           {sessions.map(session => (
             <NavSelectItem
@@ -162,21 +165,21 @@ export function ChatHistory({
         isOpen={deletingId !== null}
         onConfirm={handleDeleteSubmit}
         onCancel={() => setDeletingId(null)}
-        title="Удаление чата"
-        confirmText="Удалить"
-        cancelText="Отмена"
+        title={t('chat.delete_chat')}
+        confirmText={t('chat.delete')}
+        cancelText={t('chat.cancel')}
       >
-        Вы уверены, что хотите удалить этот чат? Это действие нельзя отменить.
+        {t('chat.delete_chat_confirm')}
       </Confirm>
 
       {/* Rename Chat Modal */}
       <Modal isOpen={renamingSession !== null} onClose={() => setRenamingSession(null)}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', minWidth: '400px' }}>
-          <h2 style={{ margin: 0, fontSize: '18px' }}>Переименовать чат</h2>
+          <h2 style={{ margin: 0, fontSize: '18px' }}>{t('chat.rename_chat')}</h2>
           <Field 
             value={renameInputValue}
             onChange={(e) => setRenameInputValue(e.target.value)}
-            placeholder="Введите новое название"
+            placeholder={t('chat.enter_new_name')}
             autoFocus
             onKeyDown={(e) => {
               if (e.key === 'Enter') {
@@ -186,8 +189,8 @@ export function ChatHistory({
             }}
           />
           <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px', marginTop: '8px' }}>
-            <Button variant="secondary" onClick={() => setRenamingSession(null)}>Отмена</Button>
-            <Button onClick={handleRenameSubmit} disabled={!renameInputValue.trim()}>Сохранить</Button>
+            <Button variant="secondary" onClick={() => setRenamingSession(null)}>{t('chat.cancel')}</Button>
+            <Button onClick={handleRenameSubmit} disabled={!renameInputValue.trim()}>{t('chat.save')}</Button>
           </div>
         </div>
       </Modal>

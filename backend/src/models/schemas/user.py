@@ -12,6 +12,7 @@ class UserProfileBase(BaseModel):
     first_name: Optional[str] = None
     last_name: Optional[str] = None
     avatar_url: Optional[str] = None
+    language: Optional[str] = "ru"
 
 class UserProfileCreate(UserProfileBase):
     pass

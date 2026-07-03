@@ -1,3 +1,5 @@
-export { AppHeader } from './AppHeader';
-export { Sidebar } from './Sidebar';
-export { SidebarSection } from './SidebarSection';
+export * from './AppHeader';
+export * from './Sidebar';
+export * from './SidebarSection';
+export * from './ThemeToggle';
+export * from './LanguageToggle';

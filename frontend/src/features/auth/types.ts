@@ -5,6 +5,7 @@ export interface UserProfile {
   first_name?: string;
   last_name?: string;
   avatar_url?: string;
+  language?: string;
   updated_at: string;
 }
 

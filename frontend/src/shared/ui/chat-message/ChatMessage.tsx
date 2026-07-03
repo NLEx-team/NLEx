@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Icon } from '@iconify/react';
 import type { ChatMessageProps, OptionsBlock, TableBlock, ErrorBlock } from './ChatMessage.types';
+import { useTranslation } from 'react-i18next';
 import './ChatMessage.css';
 
 function TextBlockView({ text }: { text: string }) {
@@ -8,6 +9,7 @@ function TextBlockView({ text }: { text: string }) {
 }
 
 function OptionsBlockView({ block, onClarify, isLastMessage }: { block: OptionsBlock; onClarify?: (questionId: string, selectedOptions: string[]) => void; isLastMessage?: boolean }) {
+  const { t } = useTranslation();
   const [selected, setSelected] = useState<string | null>(null);
   const [showCustom, setShowCustom] = useState(false);
   const [customValue, setCustomValue] = useState('');
@@ -47,7 +49,7 @@ function OptionsBlockView({ block, onClarify, isLastMessage }: { block: OptionsB
             onClick={() => setShowCustom(true)}
             type="button"
           >
-            Другое (написать своё)
+            {t('chat.other_option', { defaultValue: 'Другое (написать своё)' })}
           </button>
         )}
         {showCustom && isActive && (
@@ -56,7 +58,7 @@ function OptionsBlockView({ block, onClarify, isLastMessage }: { block: OptionsB
               type="text"
               value={customValue}
               onChange={(e) => setCustomValue(e.target.value)}
-              placeholder="Введите ваш ответ..."
+              placeholder={t('chat.enter_reply', { defaultValue: 'Введите ваш ответ...' })}
               className="chat-message__custom-input"
               autoFocus
             />

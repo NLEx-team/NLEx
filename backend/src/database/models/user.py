@@ -29,6 +29,7 @@ class UserProfile(Base):
     first_name = Column(String, nullable=True)
     last_name = Column(String, nullable=True)
     avatar_url = Column(String, nullable=True)
+    language = Column(String, default="ru", nullable=False)
     updated_at = Column(DateTime(timezone=True), onupdate=func.now(), server_default=func.now())
 
     user = relationship("User", back_populates="profile")
