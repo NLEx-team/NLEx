@@ -21,8 +21,8 @@ async def login(data: LoginRequest, response: Response, db: AsyncSession = Depen
         key="access_token",
         value=result.jwt_token,
         httponly=True,
-        samesite="lax",
-        secure=settings.ENVIRONMENT == "production",
+        samesite="none",
+        secure=True, # Always true for samesite=none
         max_age=1440 * 60, # 24 hours in seconds
     )
     return result
