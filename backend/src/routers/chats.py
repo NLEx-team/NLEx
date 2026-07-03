@@ -429,7 +429,7 @@ def _response_to_blocks(response: dict) -> list:
         if "explanation" in r and r["explanation"]:
             blocks.append({"type": "text", "text": r["explanation"]})
         
-        if r.get("data") and r.get("headers"):
+        if "data" in r and "headers" in r:
             blocks.append({
                 "type": "table",
                 "headers": r["headers"],
@@ -438,7 +438,7 @@ def _response_to_blocks(response: dict) -> list:
                 "totalRows": r.get("total_rows"),
                 "explanation": r.get("explanation"),
             })
-        if not r.get("explanation") and not r.get("data"):
+        if not r.get("explanation") and "data" not in r:
             blocks.append({"type": "text", "text": "Request completed successfully."})
     elif r.get("status") == "error":
         blocks.append({
