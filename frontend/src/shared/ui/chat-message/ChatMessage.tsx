@@ -78,6 +78,7 @@ function OptionsBlockView({ block, onClarify, isLastMessage }: { block: OptionsB
 }
 
 function TableBlockView({ block, exportUrl, onExport }: { block: TableBlock; exportUrl?: string; onExport?: (exportUrl: string) => void }) {
+  const { t } = useTranslation();
   return (
     <>
       <div className="chat-message__table-wrapper">
@@ -103,13 +104,13 @@ function TableBlockView({ block, exportUrl, onExport }: { block: TableBlock; exp
           {block.totalRows !== undefined ? (
             block.totalRows > block.rows.length && (
               <div style={{ padding: '8px', fontSize: '13px', color: 'var(--color-text-secondary)', textAlign: 'center', fontStyle: 'italic' }}>
-                Showing {block.rows.length} of {block.totalRows} rows
+                {t('chat.showing_rows', { shown: block.rows.length, total: block.totalRows })}
               </div>
             )
           ) : (
             block.rows.length > 5 && (
               <div style={{ padding: '8px', fontSize: '13px', color: 'var(--color-text-secondary)', textAlign: 'center', fontStyle: 'italic' }}>
-                Showing 5 of {block.rows.length} rows
+                {t('chat.showing_rows', { shown: 5, total: block.rows.length })}
               </div>
             )
           )}
@@ -119,7 +120,7 @@ function TableBlockView({ block, exportUrl, onExport }: { block: TableBlock; exp
             <details className="chat-message__sql-details">
               <summary className="chat-message__sql-summary">
                 <Icon icon="mdi:code-tags" />
-                <span>View SQL</span>
+                <span>{t('chat.view_sql')}</span>
               </summary>
               <pre className="chat-message__sql">{block.sql}</pre>
             </details>
@@ -133,7 +134,7 @@ function TableBlockView({ block, exportUrl, onExport }: { block: TableBlock; exp
           type="button"
         >
           <Icon icon="mdi:file-download-outline" />
-          <span>Export to Excel</span>
+          <span>{t('chat.export_excel')}</span>
         </button>
       )}
     </>
@@ -141,6 +142,7 @@ function TableBlockView({ block, exportUrl, onExport }: { block: TableBlock; exp
 }
 
 function ErrorBlockView({ block }: { block: ErrorBlock }) {
+  const { t } = useTranslation();
   return (
     <div className="chat-message__error">
       <Icon icon="mdi:alert-circle-outline" />
@@ -149,7 +151,7 @@ function ErrorBlockView({ block }: { block: ErrorBlock }) {
         <details className="chat-message__sql-details">
           <summary className="chat-message__sql-summary">
             <Icon icon="mdi:code-tags" />
-            <span>SQL attempted</span>
+            <span>{t('chat.sql_attempted')}</span>
           </summary>
           <pre className="chat-message__sql">{block.sql}</pre>
         </details>

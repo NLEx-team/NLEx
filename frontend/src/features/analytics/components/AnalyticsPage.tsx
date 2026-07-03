@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { useAuth } from '../../auth/hooks/useAuth';
 import { Icon } from '@iconify/react';
@@ -40,6 +41,7 @@ interface AnalyticsData {
 
 export function AnalyticsPage() {
   const { user } = useAuth();
+  const { t, i18n } = useTranslation();
   
   const [data, setData] = useState<AnalyticsData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -101,7 +103,7 @@ export function AnalyticsPage() {
       window.URL.revokeObjectURL(url);
     } catch (err) {
       console.error('Download error:', err);
-      alert('Failed to download file.');
+      alert(t('common.failed_download'));
     } finally {
       setDownloadingId(null);
     }
@@ -111,7 +113,7 @@ export function AnalyticsPage() {
     return (
       <div className="analytics-page__loading">
         <Icon icon="mdi:loading" className="analytics-page__loading-icon" />
-        <span>Loading analytics...</span>
+        <span>{t('analytics.loading')}</span>
       </div>
     );
   }
@@ -120,7 +122,7 @@ export function AnalyticsPage() {
     return (
       <div className="analytics-page__error">
         <Icon icon="mdi:alert-circle-outline" className="analytics-page__error-icon" />
-        <span>{error || 'Failed to load data'}</span>
+        <span>{error || t('analytics.failed_load')}</span>
       </div>
     );
   }
@@ -128,7 +130,7 @@ export function AnalyticsPage() {
   // Format dates for chart
   const chartData = [...data.usage_history].map(item => ({
     ...item,
-    displayDate: new Date(item.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+    displayDate: new Date(item.date).toLocaleDateString(i18n.language === 'ru' ? 'ru-RU' : 'en-US', { month: 'short', day: 'numeric' })
   }));
 
   return (
@@ -140,13 +142,13 @@ export function AnalyticsPage() {
               className={`scope-btn ${scope === 'personal' ? 'active' : ''}`}
                 onClick={() => setScope('personal')}
               >
-                Personal
+                {t('analytics.personal')}
               </button>
               <button 
                 className={`scope-btn ${scope === 'global' ? 'active' : ''}`}
                 onClick={() => setScope('global')}
               >
-                Global
+                {t('analytics.global')}
               </button>
             </div>
           )}
@@ -160,7 +162,7 @@ export function AnalyticsPage() {
             </div>
             <div className="analytics-card__info">
               <div className="analytics-card__value">{data.total_requests}</div>
-              <div className="analytics-card__label">Total Requests</div>
+              <div className="analytics-card__label">{t('analytics.total_requests')}</div>
             </div>
           </div>
           <div className="analytics-card">
@@ -169,7 +171,7 @@ export function AnalyticsPage() {
             </div>
             <div className="analytics-card__info">
               <div className="analytics-card__value">{data.total_tokens.toLocaleString()}</div>
-              <div className="analytics-card__label">Tokens Used</div>
+              <div className="analytics-card__label">{t('analytics.tokens_used')}</div>
             </div>
           </div>
           <div className="analytics-card">
@@ -178,13 +180,13 @@ export function AnalyticsPage() {
             </div>
             <div className="analytics-card__info">
               <div className="analytics-card__value">{data.total_chats}</div>
-              <div className="analytics-card__label">Chats Created</div>
+              <div className="analytics-card__label">{t('analytics.chats_created')}</div>
             </div>
           </div>
         </div>
 
         <div className="analytics-page__chart-section">
-          <h2 className="analytics-page__section-title">Usage Over Time</h2>
+          <h2 className="analytics-page__section-title">{t('analytics.usage_over_time')}</h2>
           <div className="analytics-page__chart-container">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
@@ -197,39 +199,39 @@ export function AnalyticsPage() {
                   cursor={{ fill: 'rgba(33, 115, 70, 0.05)' }}
                 />
                 <Legend iconType="circle" wrapperStyle={{ paddingTop: '20px' }} />
-                <Bar yAxisId="left" name="Requests" dataKey="requests" fill="var(--color-primary)" radius={[4, 4, 0, 0]} maxBarSize={40} />
-                <Bar yAxisId="right" name="Tokens" dataKey="tokens" fill="#ffb74d" radius={[4, 4, 0, 0]} maxBarSize={40} />
+                <Bar yAxisId="left" name={t('analytics.requests')} dataKey="requests" fill="var(--color-primary)" radius={[4, 4, 0, 0]} maxBarSize={40} />
+                <Bar yAxisId="right" name={t('analytics.tokens')} dataKey="tokens" fill="#ffb74d" radius={[4, 4, 0, 0]} maxBarSize={40} />
               </BarChart>
             </ResponsiveContainer>
           </div>
         </div>
 
         <div className="analytics-page__history-section">
-          <h2 className="analytics-page__section-title">Query History</h2>
+          <h2 className="analytics-page__section-title">{t('analytics.query_history')}</h2>
           {data.history_list.length === 0 ? (
-            <div className="analytics-page__empty-history">No history found.</div>
+            <div className="analytics-page__empty-history">{t('analytics.no_history')}</div>
           ) : (
             <div className="analytics-page__table-wrapper">
               <table className="analytics-table">
                 <thead>
                   <tr>
-                    <th>Date</th>
-                    {scope === 'global' && <th>Account</th>}
-                    <th>Database</th>
-                    <th>User Query</th>
-                    <th>Generated SQL</th>
-                    <th className="analytics-table__action-header">Action</th>
+                    <th>{t('analytics.date')}</th>
+                    {scope === 'global' && <th>{t('analytics.account')}</th>}
+                    <th>{t('analytics.database')}</th>
+                    <th>{t('analytics.user_query')}</th>
+                    <th>{t('analytics.generated_sql')}</th>
+                    <th className="analytics-table__action-header">{t('analytics.action')}</th>
                   </tr>
                 </thead>
                 <tbody>
                   {data.history_list.map((item) => (
                     <tr key={item.id}>
                       <td className="analytics-table__date">
-                        {new Date(item.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                        {new Date(item.date).toLocaleDateString(i18n.language === 'ru' ? 'ru-RU' : 'en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
                       </td>
                       {scope === 'global' && (
                         <td className="analytics-table__account" style={{ color: 'var(--color-text-secondary)', fontSize: '13px' }}>
-                          {item.user_email || 'Unknown'}
+                          {item.user_email || t('common.unknown')}
                         </td>
                       )}
                       <td className="analytics-table__database" style={{ color: 'var(--color-primary-dark)', fontSize: '13px', fontWeight: 500 }}>
@@ -244,7 +246,7 @@ export function AnalyticsPage() {
                               className="analytics-table__view-btn" 
                               onClick={() => setSelectedSql(item.sql)}
                             >
-                              <Icon icon="mdi:eye-outline" /> Просмотреть
+                              <Icon icon="mdi:eye-outline" /> {t('analytics.view')}
                             </button>
                           </div>
                         ) : (
@@ -259,7 +261,7 @@ export function AnalyticsPage() {
                             disabled={downloadingId === item.id}
                           >
                             <Icon icon={downloadingId === item.id ? "mdi:loading" : "mdi:file-excel-outline"} className={downloadingId === item.id ? "spin" : ""} />
-                            {downloadingId === item.id ? "Downloading..." : "Download File"}
+                            {downloadingId === item.id ? t('analytics.downloading') : t('analytics.download_file')}
                           </button>
                         )}
                       </td>
@@ -274,11 +276,11 @@ export function AnalyticsPage() {
 
       <Modal isOpen={!!selectedSql} onClose={() => { setSelectedSql(null); setCopied(false); }} className="sql-modal">
         <div className="sql-modal__header">
-          <h3>Generated SQL</h3>
+          <h3>{t('analytics.generated_sql')}</h3>
           <div className="sql-modal__actions">
             <button className="sql-modal__copy-btn" onClick={() => handleCopySql(selectedSql!)}>
               <Icon icon={copied ? "mdi:check" : "mdi:content-copy"} />
-              {copied ? "Copied!" : "Copy SQL"}
+              {copied ? t('analytics.copied') : t('analytics.copy_sql')}
             </button>
             <button className="sql-modal__close-btn" onClick={() => { setSelectedSql(null); setCopied(false); }}>
               <Icon icon="mdi:close" />

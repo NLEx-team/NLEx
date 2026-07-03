@@ -124,11 +124,12 @@ function ProfilePage() {
 }
 
 function AnalyticsPageWrapper() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   return (
     <>
       <AppHeader
-        title="Analytics"
+        title={t('analytics.title')}
         variant="profile"
         onBack={() => navigate('/profile')}
       />
@@ -157,6 +158,7 @@ function AdminPageWrapper() {
 }
 
 export default function App() {
+  const { t } = useTranslation();
   const { isAuthenticated, isLoading } = useAuth();
   const location = useLocation();
   const showThemeToggle = isLoading || location.pathname === '/auth';
@@ -165,7 +167,7 @@ export default function App() {
     return (
       <div className="app-container">
         {showThemeToggle && <ThemeToggle />}
-        <div className="app-loading">Loading...</div>
+        <div className="app-loading">{t('common.loading')}</div>
       </div>
     );
   }

@@ -15,7 +15,7 @@
   align-items: center;
   gap: var(--spacing-lg);
   width: 100%;
-  max-width: 480px;
+  max-width: 560px;
 }
 
 .profile-page__avatar {
@@ -30,10 +30,8 @@
 }
 
 .profile-page__actions {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
   gap: 8px;
   width: 100%;
   padding-top: var(--spacing-xl);
@@ -45,15 +43,14 @@
   align-items: center;
   justify-content: center;
   gap: 6px;
-  padding: 8px 12px;
+  padding: 8px 6px;
   border-radius: 8px;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
   white-space: nowrap;
-  width: auto !important;
-  flex: 1;
+  box-sizing: border-box;
 }
 
 .profile-btn--outline {

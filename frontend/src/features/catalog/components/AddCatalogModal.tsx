@@ -5,6 +5,7 @@ import { Dropdown } from '../../../shared/ui/dropdown';
 import { Button } from '../../../shared/ui/button';
 import { useAuth } from '../../auth/hooks/useAuth';
 import { catalogApi } from '../api';
+import { useTranslation } from 'react-i18next';
 import type { DatabaseType, CatalogCreate, CatalogRead } from '../types';
 import './AddCatalogModal.css';
 
@@ -24,16 +25,11 @@ const DB_OPTIONS = [
   { label: 'Oracle', value: 'oracle' },
 ];
 
-const STATUS_LABELS: Record<string, string> = {
-  active: 'Connected',
-  inactive: 'Inactive',
-  error: 'Disconnected',
-};
-
 type ModalMode = 'create' | 'view' | 'edit';
 
 export function AddCatalogModal({ isOpen, onClose, onSubmit, initialData, onDelete }: AddCatalogModalProps) {
   const { user: authUser } = useAuth();
+  const { t } = useTranslation();
   const isAdmin = authUser?.role === 'admin';
   const [mode, setMode] = useState<ModalMode>('create');
   const [name, setName] = useState('');
@@ -44,6 +40,12 @@ export function AddCatalogModal({ isOpen, onClose, onSubmit, initialData, onDele
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [testResult, setTestResult] = useState<{ success: boolean; latency_ms: number | null; error: string | null } | null>(null);
+
+  const STATUS_LABELS: Record<string, string> = {
+    active: t('catalog.connected'),
+    inactive: t('catalog.inactive'),
+    error: t('catalog.disconnected'),
+  };
 
   const isEdit = !!initialData;
 
@@ -113,7 +115,7 @@ export function AddCatalogModal({ isOpen, onClose, onSubmit, initialData, onDele
       return;
     }
     if (!url.trim()) {
-      setError('URL is required to test connection');
+      setError(t('catalog.url_required'));
       return;
     }
     setLoading(true);
@@ -135,7 +137,7 @@ export function AddCatalogModal({ isOpen, onClose, onSubmit, initialData, onDele
     setError(null);
 
     if (!name.trim() || !url.trim()) {
-      setError('Name and URL are required');
+      setError(t('catalog.name_url_required'));
       return;
     }
 
@@ -173,31 +175,31 @@ export function AddCatalogModal({ isOpen, onClose, onSubmit, initialData, onDele
     return (
       <Modal isOpen={isOpen} onClose={handleClose} className="add-catalog-modal">
         <div className="add-catalog-modal__header">
-          <h2 className="add-catalog-modal__title">Database info</h2>
+          <h2 className="add-catalog-modal__title">{t('catalog.db_info')}</h2>
         </div>
         <div className="add-catalog-modal__form">
-          <Field mode="readonly" label="Alias" value={name} />
-          <Field mode="readonly" label="URL" value={url} />
-          <Field mode="readonly" label="Database type" value={type} />
-          <Field mode="readonly" label="Database user" value={user} />
+          <Field mode="readonly" label={t('catalog.alias')} value={name} />
+          <Field mode="readonly" label={t('catalog.url')} value={url} />
+          <Field mode="readonly" label={t('catalog.db_type')} value={type} />
+          <Field mode="readonly" label={t('catalog.db_user')} value={user} />
           {renderStatus()}
           {isAdmin && (
             <>
               {testResult && (
                 <div className={`field field--${testResult.success ? 'success' : 'error'}`} style={{ color: testResult.success ? 'var(--color-accent)' : 'var(--color-error-border)', fontSize: '13px' }}>
                   {testResult.success 
-                    ? `Connected successfully! Latency: ${testResult.latency_ms}ms`
-                    : `Connection failed: ${testResult.error}`}
+                    ? t('catalog.connected_success', { ms: testResult.latency_ms })
+                    : t('catalog.connection_failed', { error: testResult.error })}
                 </div>
               )}
               <div className="add-catalog-modal__actions">
                 <Button type="button" variant="secondary" onClick={handleCheckConnection} disabled={loading}>
-                  {loading ? 'Checking...' : 'Check connection'}
+                  {loading ? t('catalog.checking') : t('catalog.check_connection')}
                 </Button>
                 <div className="add-catalog-modal__actions-right">
                   {onDelete && (
                     <Button type="button" onClick={() => { onDelete(); handleClose(); }} disabled={loading} style={{ background: '#2B6A4C', color: 'white' }}>
-                      Delete
+                      {t('common.delete')}
                     </Button>
                   )}
                 </div>
@@ -212,25 +214,25 @@ export function AddCatalogModal({ isOpen, onClose, onSubmit, initialData, onDele
   return (
     <Modal isOpen={isOpen} onClose={handleClose} className="add-catalog-modal">
       <div className="add-catalog-modal__header">
-        <h2 className="add-catalog-modal__title">{isEdit ? 'Edit database' : 'Add database'}</h2>
+        <h2 className="add-catalog-modal__title">{isEdit ? t('catalog.edit_database') : t('catalog.add_database')}</h2>
       </div>
       <form className="add-catalog-modal__form" onSubmit={handleSubmit}>
         <Field
-          label="Alias"
+          label={t('catalog.alias')}
           placeholder="My Database"
           value={name}
           onChange={e => setName(e.target.value)}
           disabled={loading}
         />
         <Field
-          label="URL"
+          label={t('catalog.url')}
           placeholder="jdbc:postgresql://localhost:5432/mydb"
           value={url}
           onChange={e => setUrl(e.target.value)}
           disabled={loading}
         />
         <div className="add-catalog-modal__field">
-          <label className="add-catalog-modal__label">Database type</label>
+          <label className="add-catalog-modal__label">{t('catalog.db_type')}</label>
           <Dropdown
             options={DB_OPTIONS}
             value={type}
@@ -239,16 +241,16 @@ export function AddCatalogModal({ isOpen, onClose, onSubmit, initialData, onDele
           />
         </div>
         <Field
-          label="Database user"
+          label={t('catalog.db_user')}
           placeholder="admin"
           value={user}
           onChange={e => setUser(e.target.value)}
           disabled={loading}
         />
         <Field
-          label="Database password"
+          label={t('catalog.db_password')}
           type="password"
-          placeholder="Enter password"
+          placeholder={t('catalog.enter_password')}
           value={password}
           onChange={e => setPassword(e.target.value)}
           disabled={loading}
@@ -261,27 +263,27 @@ export function AddCatalogModal({ isOpen, onClose, onSubmit, initialData, onDele
         {testResult && (
           <div className={`field field--${testResult.success ? 'success' : 'error'}`} style={{ color: testResult.success ? 'var(--color-accent)' : 'var(--color-error-border)', fontSize: '13px' }}>
             {testResult.success 
-              ? `Connected successfully! Latency: ${testResult.latency_ms}ms`
-              : `Connection failed: ${testResult.error}`}
+              ? t('catalog.connected_success', { ms: testResult.latency_ms })
+              : t('catalog.connection_failed', { error: testResult.error })}
           </div>
         )}
         <div className="add-catalog-modal__actions">
           <Button type="button" variant="secondary" onClick={handleCheckConnection} disabled={loading}>
-            Check connection
+            {t('catalog.check_connection')}
           </Button>
           <div className="add-catalog-modal__actions-right">
             {isEdit ? (
               <>
                 <Button type="button" variant="secondary" onClick={handleCancelEdit} disabled={loading}>
-                  Cancel
+                  {t('common.cancel')}
                 </Button>
                 <Button type="submit" disabled={loading || !isDirty}>
-                  Save
+                  {t('common.save')}
                 </Button>
               </>
             ) : (
               <Button type="submit" disabled={loading}>
-                Add
+                {t('common.add')}
               </Button>
             )}
           </div>

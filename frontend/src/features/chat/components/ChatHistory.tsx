@@ -138,7 +138,7 @@ export function ChatHistory({
     <>
       <button className="sidebar__new-chat-btn" onClick={onNewChat} type="button">
         <Icon icon="mdi:plus" width="20" height="20" />
-        <span>New chat</span>
+        <span>{t('sidebar.new_chat')}</span>
       </button>
 
       <SidebarSection title={t('sidebar.chats', { defaultValue: 'History' })} className="chat-history">

@@ -50,7 +50,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const login = async (credentials: LoginCredentials) => {
     try {
       await api.post<{ user: User }>('/auth/login', credentials);
-      await refreshUser();
+      try {
+        const userData = await api.get<User>('/users/me');
+        setUser(userData);
+      } catch (err) {
+        throw new Error('Успешный вход, но не удалось получить данные пользователя. Проверьте настройки cookies.');
+      }
     } catch (error: any) {
       throw error;
     }

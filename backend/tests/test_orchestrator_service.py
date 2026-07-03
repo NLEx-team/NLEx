@@ -6,6 +6,7 @@ from src.services.orchestrator_service import OrchestratorService, OrchestratorS
 def mock_db_service():
     service = MagicMock()
     service.execute_query_async = AsyncMock()
+    service.execute_query_async_preview = AsyncMock()
     return service
 
 @pytest.fixture
@@ -21,7 +22,7 @@ def mock_inference_service():
 @pytest.fixture
 def mock_sql_service():
     service = MagicMock()
-    service.generate_sql = MagicMock()
+    service.generate_sql = AsyncMock()
     return service
 
 @pytest.fixture
@@ -51,6 +52,7 @@ async def test_orchestrator_success_path(orchestrator, mock_sql_service, mock_db
         "explanation": "test"
     }
     mock_db_service.execute_query_async.return_value = [[1]]
+    mock_db_service.execute_query_async_preview.return_value = [[1]]
     
     # Infer
     await orchestrator.initialize_session({"test_cat": "test"})
@@ -77,6 +79,9 @@ async def test_orchestrator_retry_path(orchestrator, mock_sql_service, mock_db_s
 
     mock_db_service.execute_query_async.side_effect = [
         Exception("Syntax error"),
+        [[1]]
+    ]
+    mock_db_service.execute_query_async_preview.side_effect = [
         [[1]]
     ]
     

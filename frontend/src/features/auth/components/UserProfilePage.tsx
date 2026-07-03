@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { Field, Button, Avatar } from '../../../shared/ui';
@@ -15,6 +16,7 @@ interface ProfileFormState {
 export function UserProfilePage() {
   const { user, updateProfile, logout } = useAuth();
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
   const [formState, setFormState] = useState<ProfileFormState>({
@@ -72,9 +74,9 @@ export function UserProfilePage() {
   };
 
   const fields: { key: keyof ProfileFormState; label: string; value: string }[] = [
-    { key: 'first_name', label: 'First name', value: profile?.first_name || '' },
-    { key: 'last_name', label: 'Last name', value: profile?.last_name || '' },
-    { key: 'email', label: 'Email', value: user.email },
+    { key: 'first_name', label: t('profile.first_name'), value: profile?.first_name || '' },
+    { key: 'last_name', label: t('profile.last_name'), value: profile?.last_name || '' },
+    { key: 'email', label: t('profile.email'), value: user.email },
   ];
 
   return (
@@ -100,44 +102,44 @@ export function UserProfilePage() {
                 label={field.label}
                 value={field.value}
                 mode="readonly"
-                placeholder="Not set"
+                placeholder={t('common.not_set')}
               />
             ),
           )}
 
           {isEditing && (
             <Field
-              label="Avatar URL"
+              label={t('profile.avatar_url')}
               value={formState.avatar_url}
               onChange={(e) => updateField('avatar_url', e.target.value)}
               disabled={loading}
             />
           )}
 
-          <Field label="Role" value={user.role} mode="readonly" />
+          <Field label={t('profile.role')} value={user.role} mode="readonly" />
         </div>
 
         <div className="profile-page__actions">
           <Button className="profile-btn profile-btn--outline" onClick={() => navigate('/analytics')} disabled={loading}>
             <Icon icon="mdi:chart-bar" />
-            <span>Analytics</span>
+            <span>{t('profile.analytics')}</span>
           </Button>
           
           {user.role === 'admin' && (
             <Button className="profile-btn profile-btn--outline" onClick={() => navigate('/admin')} disabled={loading}>
               <Icon icon="mdi:shield-account-outline" />
-              <span>Admin Panel</span>
+              <span>{t('profile.admin_panel')}</span>
             </Button>
           )}
           
           <Button className="profile-btn profile-btn--outline" onClick={handleModeToggle} disabled={loading}>
             <Icon icon={isEditing ? "mdi:content-save" : "mdi:pencil"} />
-            <span>{loading ? 'Saving...' : isEditing ? 'Save' : 'Edit'}</span>
+            <span>{loading ? t('common.saving') : isEditing ? t('common.save') : t('common.edit')}</span>
           </Button>
 
           <Button className="profile-btn profile-btn--outline profile-btn--danger" onClick={handleLogout} disabled={loading}>
             <Icon icon="mdi:logout" />
-            <span>Log out</span>
+            <span>{t('profile.log_out')}</span>
           </Button>
         </div>
       </div>
