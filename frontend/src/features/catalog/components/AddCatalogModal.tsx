@@ -19,10 +19,12 @@ interface AddCatalogModalProps {
 
 const DB_OPTIONS = [
   { label: 'PostgreSQL', value: 'postgresql' },
-  { label: 'SQLite', value: 'sqlite' },
   { label: 'MySQL', value: 'mysql' },
   { label: 'ClickHouse', value: 'clickhouse' },
   { label: 'Oracle', value: 'oracle' },
+  { label: 'MongoDB', value: 'mongodb' },
+  { label: 'MinIO (S3)', value: 'minio' },
+  { label: 'SQLite', value: 'sqlite' },
 ];
 
 type ModalMode = 'create' | 'view' | 'edit';
@@ -48,6 +50,18 @@ export function AddCatalogModal({ isOpen, onClose, onSubmit, initialData, onDele
   };
 
   const isEdit = !!initialData;
+
+  // Per-type placeholders and hints so each DB kind gets sensible guidance.
+  const FIELD_HINTS: Record<string, { url: string; user: string; note?: string }> = {
+    postgresql: { url: 'jdbc:postgresql://host:5432/db', user: 'admin' },
+    mysql: { url: 'jdbc:mysql://host:3306/db', user: 'admin' },
+    clickhouse: { url: 'jdbc:clickhouse://host:8123/db', user: 'default' },
+    oracle: { url: 'jdbc:oracle:thin:@host:1521/db', user: 'system' },
+    sqlite: { url: 'jdbc:sqlite:/path/to.db', user: '' },
+    mongodb: { url: 'mongodb://host:27017/db', user: 'user (optional)', note: t('catalog.note_mongodb') },
+    minio: { url: 'http://minio:9000', user: 'Access Key', note: t('catalog.note_minio') },
+  };
+  const hint = FIELD_HINTS[type] ?? FIELD_HINTS.postgresql;
 
   const isDirty = useMemo(() => {
     if (!initialData) return true;
@@ -226,7 +240,7 @@ export function AddCatalogModal({ isOpen, onClose, onSubmit, initialData, onDele
         />
         <Field
           label={t('catalog.url')}
-          placeholder="jdbc:postgresql://localhost:5432/mydb"
+          placeholder={hint.url}
           value={url}
           onChange={e => setUrl(e.target.value)}
           disabled={loading}
@@ -239,10 +253,11 @@ export function AddCatalogModal({ isOpen, onClose, onSubmit, initialData, onDele
             onChange={v => setType(v as DatabaseType)}
             disabled={loading}
           />
+          {hint.note && <div className="add-catalog-modal__hint">{hint.note}</div>}
         </div>
         <Field
           label={t('catalog.db_user')}
-          placeholder="admin"
+          placeholder={hint.user}
           value={user}
           onChange={e => setUser(e.target.value)}
           disabled={loading}
@@ -250,7 +265,7 @@ export function AddCatalogModal({ isOpen, onClose, onSubmit, initialData, onDele
         <Field
           label={t('catalog.db_password')}
           type="password"
-          placeholder={t('catalog.enter_password')}
+          placeholder={type === 'minio' ? 'Secret Key' : t('catalog.enter_password')}
           value={password}
           onChange={e => setPassword(e.target.value)}
           disabled={loading}
