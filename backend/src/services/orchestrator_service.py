@@ -11,6 +11,7 @@ from src.services.relationship_inference_service import RelationshipInferenceSer
 from src.services.sql_generation_service import SQLGenerationService
 from src.services.llm_service import LLMService
 from src.services.schema_service import SchemaService
+from src.services.sql_guard import assert_read_only, ReadOnlySQLError
 from src.utils.config import settings
 from src.models.schemas.catalog import CatalogConnection
 
@@ -256,7 +257,24 @@ class OrchestratorService:
             # status == "success"
             sql = result["sql"]
             self.chat_history.append({"role": "assistant", "content": json.dumps(result, ensure_ascii=False)})
-            
+
+            # Read-only guard right before execution (defense-in-depth).
+            # Even if SQL generation was bypassed, a non-read-only query is a
+            # hard stop here — do NOT retry (retrying can't make a write safe).
+            try:
+                assert_read_only(sql)
+            except ReadOnlySQLError as guard_err:
+                logger.error(
+                    "Read-only guard blocked execution (%s). SQL: %s",
+                    guard_err, sql[:200],
+                )
+                await self._transition(OrchestratorState.FAILED)
+                return {
+                    "status": "error",
+                    "message": "Запрос отклонён: сервис работает только на чтение (разрешены только SELECT-запросы).",
+                    "sql": sql,
+                }
+
             # Execute SQL
             await self._transition(OrchestratorState.EXECUTING_SQL)
             try:
