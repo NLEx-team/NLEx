@@ -1,18 +1,25 @@
 .language-toggle {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 4px;
+  gap: 6px;
+  /* Match the height of the neighbouring icon buttons, but size width to the
+     content (icon + label) so the hover background fully covers the label. */
+  height: var(--icon-btn-size);
+  width: auto;
+  padding: 0 10px;
   background: transparent;
   border: none;
+  border-radius: var(--radius);
   color: var(--color-text-secondary);
   cursor: pointer;
-  padding: 8px;
-  border-radius: 8px;
-  transition: all 0.2s ease;
+  transition: background var(--motion-fast) var(--ease-out),
+              color var(--motion-fast) var(--ease-out),
+              transform var(--motion-fast) var(--ease-out);
   font-family: var(--font-family);
   font-size: 14px;
   font-weight: 500;
+  white-space: nowrap;
 }
 
 .language-toggle:hover {
@@ -20,11 +27,44 @@
   color: var(--color-text-primary);
 }
 
+.language-toggle:active {
+  transform: scale(0.94);
+}
+
 .language-toggle:focus-visible {
   outline: 2px solid var(--color-primary);
   outline-offset: 2px;
 }
 
+.language-toggle__icon {
+  display: inline-flex;
+  font-size: 18px;
+  line-height: 0;
+}
+
 .language-toggle__text {
   line-height: 1;
+  display: inline-block;
+  min-width: 20px;
+  text-align: center;
+}
+
+/* --- Switch animation (runs only on an actual language change) --- */
+.language-toggle__icon--switching {
+  animation: lang-flag-in var(--motion-base) var(--ease-out);
+}
+
+.language-toggle__text--switching {
+  animation: lang-text-in var(--motion-base) var(--ease-out);
+}
+
+/* The flag flips + pops in when the language changes. */
+@keyframes lang-flag-in {
+  from { opacity: 0; transform: rotateY(-90deg) scale(0.6); }
+  to   { opacity: 1; transform: rotateY(0deg) scale(1); }
+}
+
+@keyframes lang-text-in {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
 }

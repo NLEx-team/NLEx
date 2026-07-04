@@ -30,22 +30,21 @@
 }
 
 .profile-page__actions {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 8px;
+  display: flex;
+  /* Small gap so the buttons sit almost flush ("почти в притык"). */
+  gap: 6px;
   width: 100%;
-  padding-top: var(--spacing-xl);
-  margin-top: 8px;
+  padding-top: var(--spacing-sm);
 }
 
 .profile-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  padding: 8px 6px;
+  gap: 8px;
+  padding: 0 10px;
   border-radius: 8px;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -82,4 +81,11 @@
 
 .profile-btn--solid:hover {
   opacity: 0.9;
+}
+
+/* Each button takes an equal 1/N share of the row so they span the full width
+   of the fields above (edge to edge). flex-basis:0 (from flex:1) overrides the
+   shared .button { width: 120px }. */
+.profile-page__actions .profile-btn {
+  flex: 1;
 }

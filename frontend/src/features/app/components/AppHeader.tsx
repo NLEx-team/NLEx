@@ -47,7 +47,7 @@ export function AppHeader({
       </div>
       <h1 className="app-header__title">{title}</h1>
       <div className="app-header__actions">
-        <LanguageToggle className="app-header__icon-btn" />
+        <LanguageToggle />
         <ThemeToggle className="app-header__icon-btn" />
       </div>
     </header>

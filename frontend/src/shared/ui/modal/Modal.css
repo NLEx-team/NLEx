@@ -6,6 +6,7 @@
   align-items: center;
   justify-content: center;
   background: var(--overlay-backdrop);
+  animation: fade-in var(--motion-fast) var(--ease-standard) both;
 }
 
 .modal {
@@ -20,4 +21,5 @@
   border-radius: var(--radius);
   background: var(--color-back-components);
   color: var(--color-text-primary);
+  animation: scale-in var(--motion-base) var(--ease-out) both;
 }
