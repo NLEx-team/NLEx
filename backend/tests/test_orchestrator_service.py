@@ -73,8 +73,8 @@ async def test_orchestrator_retry_path(orchestrator, mock_sql_service, mock_db_s
     # First SQL call returns a bad query
     # Second SQL call returns a fixed query
     mock_sql_service.generate_sql.side_effect = [
-        {"status": "success", "sql": "BAD SQL", "headers": ["h"], "explanation": "e"},
-        {"status": "success", "sql": "GOOD SQL", "headers": ["h"], "explanation": "e"}
+        {"status": "success", "sql": "SELECT bad", "headers": ["h"], "explanation": "e"},
+        {"status": "success", "sql": "SELECT good", "headers": ["h"], "explanation": "e"}
     ]
 
     mock_db_service.execute_query_async.side_effect = [
@@ -90,7 +90,7 @@ async def test_orchestrator_retry_path(orchestrator, mock_sql_service, mock_db_s
     result = await orchestrator.execute_user_query("query")
 
     assert result["status"] == "success"
-    assert result["sql"] == "GOOD SQL"
+    assert result["sql"] == "SELECT good"
     assert result["attempts"] == 2
     assert orchestrator.state == OrchestratorState.COMPLETED
 

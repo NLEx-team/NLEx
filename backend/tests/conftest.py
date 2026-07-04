@@ -54,3 +54,29 @@ async def client(db_session):
         yield ac
     
     app.dependency_overrides.clear()
+
+
+# --- Integration test auto-marking -------------------------------------------
+# These modules require live external services (Trino, real target databases,
+# or the LLM API) and are excluded from the fast PR CI via `-m "not integration"`.
+# The full suite still runs them (e.g. via the docker-compose `test` profile).
+import pathlib
+
+_INTEGRATION_MODULES = {
+    "test_distributed_db",
+    "test_distributed_db_catalogs",
+    "test_distributed_db_integration",
+    "test_llm_service",
+    "test_orchestrator_integration",
+    "test_qa_automation",
+    "test_relationship_inference_real_db",
+    "test_schema_service",
+    "test_schema_service_using_real_db",
+}
+
+
+def pytest_collection_modifyitems(config, items):
+    for item in items:
+        module_stem = pathlib.Path(str(item.fspath)).stem
+        if module_stem in _INTEGRATION_MODULES:
+            item.add_marker(pytest.mark.integration)
