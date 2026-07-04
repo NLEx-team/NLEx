@@ -10,6 +10,7 @@ import { CatalogManager } from '../catalog';
 import { AppHeader } from './components/AppHeader';
 import { Sidebar } from './components/Sidebar';
 import { ThemeToggle } from './components/ThemeToggle';
+import { BlockedBanner } from './components/BlockedBanner';
 import { useLocalStorage } from '../../shared/hooks/useLocalStorage';
 import { useTranslation } from 'react-i18next';
 import './App.css';
@@ -19,8 +20,9 @@ import { Outlet, useOutletContext } from 'react-router-dom';
 function AppLayout() {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const blocked = !!user?.is_blocked;
   const [selectedCatalogIds, setSelectedCatalogIds] = useState<string[]>([]);
-  const chat = useChat(user!.id, selectedCatalogIds);
+  const chat = useChat(user!.id, selectedCatalogIds, blocked);
   const [isSidebarOpen, setIsSidebarOpen] = useLocalStorage('sidebar:open', false);
 
   const prevSessionIdRef = useRef(chat.activeSessionId);
@@ -56,6 +58,7 @@ function AppLayout() {
             }}
             onRenameChat={chat.renameSession}
             onDeleteChat={chat.removeSession}
+            blocked={blocked}
           />
         </div>
         <div style={{ flexShrink: 0, marginTop: '8px' }}>
@@ -67,12 +70,13 @@ function AppLayout() {
                 chat.updateSessionCatalogs(chat.activeSessionId, ids);
               }
             }}
-            disabled={chat.messages.length > 0}
+            disabled={chat.messages.length > 0 || blocked}
           />
         </div>
       </Sidebar>
       <div className="app-page">
-         <Outlet context={{ chat, isSidebarOpen, setIsSidebarOpen }} />
+         {blocked && <BlockedBanner />}
+         <Outlet context={{ chat, isSidebarOpen, setIsSidebarOpen, blocked }} />
       </div>
     </>
   );
@@ -80,7 +84,7 @@ function AppLayout() {
 
 function ChatPage() {
   const { t } = useTranslation();
-  const { chat, isSidebarOpen, setIsSidebarOpen } = useOutletContext<any>();
+  const { chat, isSidebarOpen, setIsSidebarOpen, blocked } = useOutletContext<any>();
 
   return (
     <>
@@ -99,6 +103,7 @@ function ChatPage() {
           handleClarification={chat.handleClarification}
           pending={chat.pending}
           pendingStatus={chat.pendingStatus}
+          blocked={blocked}
         />
       </div>
     </>

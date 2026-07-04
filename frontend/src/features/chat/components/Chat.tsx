@@ -16,6 +16,7 @@ interface ChatProps {
   handleClarification: (questionId: string, selectedOptions: string[]) => void;
   pending: boolean;
   pendingStatus?: string;
+  blocked?: boolean;
 }
 
 
@@ -28,6 +29,7 @@ export function Chat({
   handleClarification,
   pending,
   pendingStatus,
+  blocked = false,
 }: ChatProps) {
   const { t } = useTranslation();
 
@@ -102,7 +104,8 @@ export function Chat({
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             onSubmit={handleSendMessage}
-            placeholder={t('chat.placeholder')}
+            placeholder={blocked ? t('blocked.input_disabled') : t('chat.placeholder')}
+            disabled={blocked}
           />
         </div>
       </div>

@@ -16,6 +16,9 @@ class User(Base):
     email = Column(String, unique=True, index=True, nullable=False)
     hashed_password = Column(String, nullable=False)
     role = Column(SQLEnum(UserRole), default=UserRole.VISITOR, nullable=False)
+    # When True the user has read-only access: they can view their own chats
+    # but cannot send AI requests or create/edit/delete chats.
+    is_blocked = Column(Boolean, default=False, nullable=False, server_default="false")
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now(), server_default=func.now())
 

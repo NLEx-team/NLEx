@@ -1,6 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
+from sqlalchemy import func, and_
+from sqlalchemy.orm import selectinload
 from typing import List, Optional
 from pydantic import BaseModel, ConfigDict
 import uuid
@@ -8,7 +10,15 @@ import uuid
 from src.database.session import get_db
 from src.dependencies.auth import get_current_user
 from src.database.models.user import User, UserRole, UserProfile
+from src.database.models.chat import Chat, ChatMessage
 from src.database.models.llm_config import LlmConfiguration
+from src.utils.config import settings
+
+
+def _is_super_admin(user: User) -> bool:
+    """The primary/eternal admin (from ADMIN_EMAIL) is protected: its role
+    can't be changed and it can't be blocked or deleted."""
+    return (user.email or "").lower() == (settings.ADMIN_EMAIL or "").lower()
 
 router = APIRouter(prefix="/admin", tags=["admin"])
 
@@ -36,8 +46,18 @@ class UserStats(BaseModel):
     first_name: Optional[str]
     last_name: Optional[str]
     created_at: Optional[str]
+    is_blocked: bool = False
+    is_super_admin: bool = False
+    chat_count: int = 0
+    request_count: int = 0
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class AdminUserUpdateRequest(BaseModel):
+    """Admin action on a user: block/unblock and/or change role."""
+    is_blocked: Optional[bool] = None
+    role: Optional[str] = None
 
 # --- Endpoints ---
 
@@ -165,28 +185,98 @@ async def test_proxy_config(
     except Exception as e:
         return ProxyTestResponse(success=False, error=str(e))
 
+def _user_to_stats(u: User, chat_count: int = 0, request_count: int = 0) -> UserStats:
+    return UserStats(
+        id=u.id,
+        email=u.email,
+        role=u.role.value if hasattr(u.role, 'value') else u.role,
+        first_name=u.profile.first_name if u.profile else None,
+        last_name=u.profile.last_name if u.profile else None,
+        created_at=u.created_at.isoformat() if u.created_at else None,
+        is_blocked=bool(u.is_blocked),
+        is_super_admin=_is_super_admin(u),
+        chat_count=chat_count,
+        request_count=request_count,
+    )
+
+
 @router.get("/users", response_model=List[UserStats])
 async def get_all_users(
     admin: User = Depends(require_admin),
     db: AsyncSession = Depends(get_db)
 ):
-    from sqlalchemy.orm import selectinload
     result = await db.execute(
         select(User).options(selectinload(User.profile)).order_by(User.created_at.desc())
     )
     users = result.scalars().all()
-    
-    res = []
-    for u in users:
-        res.append(UserStats(
-            id=u.id,
-            email=u.email,
-            role=u.role.value if hasattr(u.role, 'value') else u.role,
-            first_name=u.profile.first_name if u.profile else None,
-            last_name=u.profile.last_name if u.profile else None,
-            created_at=u.created_at.isoformat() if u.created_at else None
-        ))
-    return res
+
+    # Grouped counts (avoid N+1): chats per user and AI requests (user messages) per user.
+    chat_counts_res = await db.execute(
+        select(Chat.user_id, func.count(Chat.id)).group_by(Chat.user_id)
+    )
+    chat_counts = {row[0]: row[1] for row in chat_counts_res.all()}
+
+    req_counts_res = await db.execute(
+        select(Chat.user_id, func.count(ChatMessage.id))
+        .join(ChatMessage, ChatMessage.chat_id == Chat.id)
+        .where(ChatMessage.role == "user")
+        .group_by(Chat.user_id)
+    )
+    req_counts = {row[0]: row[1] for row in req_counts_res.all()}
+
+    return [
+        _user_to_stats(u, chat_counts.get(u.id, 0), req_counts.get(u.id, 0))
+        for u in users
+    ]
+
+
+@router.patch("/users/{user_id}", response_model=UserStats)
+async def admin_update_user(
+    user_id: uuid.UUID,
+    data: AdminUserUpdateRequest,
+    admin: User = Depends(require_admin),
+    db: AsyncSession = Depends(get_db)
+):
+    """Block/unblock a user and/or change their role. Admins cannot modify their own account here."""
+    if user_id == admin.id:
+        raise HTTPException(status_code=400, detail="Cannot modify your own account")
+
+    result = await db.execute(
+        select(User).options(selectinload(User.profile)).where(User.id == user_id)
+    )
+    user = result.scalar_one_or_none()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    # The eternal admin is protected: cannot be demoted or blocked by anyone.
+    if _is_super_admin(user):
+        if data.role is not None and data.role != UserRole.ADMIN.value:
+            raise HTTPException(status_code=403, detail="The primary admin's role cannot be changed")
+        if data.is_blocked:
+            raise HTTPException(status_code=403, detail="The primary admin cannot be blocked")
+
+    if data.is_blocked is not None:
+        user.is_blocked = data.is_blocked
+
+    if data.role is not None:
+        valid_roles = {UserRole.ADMIN.value, UserRole.VISITOR.value}
+        if data.role not in valid_roles:
+            raise HTTPException(status_code=400, detail="Invalid role")
+        user.role = UserRole(data.role)
+
+    await db.commit()
+    await db.refresh(user)
+
+    chat_count = (await db.execute(
+        select(func.count(Chat.id)).where(Chat.user_id == user_id)
+    )).scalar() or 0
+    request_count = (await db.execute(
+        select(func.count(ChatMessage.id))
+        .join(Chat, ChatMessage.chat_id == Chat.id)
+        .where(and_(Chat.user_id == user_id, ChatMessage.role == "user"))
+    )).scalar() or 0
+
+    return _user_to_stats(user, chat_count, request_count)
 
 @router.delete("/users/{user_id}")
 async def delete_user(
@@ -201,7 +291,10 @@ async def delete_user(
     user = result.scalar_one_or_none()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
-        
+
+    if _is_super_admin(user):
+        raise HTTPException(status_code=403, detail="The primary admin cannot be deleted")
+
     from src.database.models.chat import Chat
     from src.database.models.connection import DatabaseConnection
     

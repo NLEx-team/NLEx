@@ -13,6 +13,7 @@ export interface User {
   id: string;
   email: string;
   role: UserRole;
+  is_blocked: boolean;
   created_at: string;
   updated_at: string;
   profile?: UserProfile;

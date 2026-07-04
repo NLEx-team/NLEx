@@ -45,7 +45,7 @@ function parseBlocks(response: { result: { status: string; question?: string; op
   return blocks;
 }
 
-export function useChat(_userId: string, selectedCatalogIds: string[]) {
+export function useChat(_userId: string, selectedCatalogIds: string[], blocked: boolean = false) {
   const [sessions, setSessions] = useState<ChatSession[]>([]);
   const [activeSessionId, setActiveSessionId] = useState<string>('');
   const [messagesBySession, setMessagesBySession] = useState<Record<string, ChatMessage[]>>({});
@@ -70,8 +70,8 @@ export function useChat(_userId: string, selectedCatalogIds: string[]) {
           }));
           setSessions(mapped);
           setActiveSessionId(mapped[0].id);
-        } else {
-          // No chats yet — create one
+        } else if (!blocked) {
+          // No chats yet — create one. Blocked users are read-only, so skip.
           chatApi.create(selectedCatalogIds).then(chat => {
             const session: ChatSession = { id: chat.id, title: chat.name, catalogIds: chat.catalog_ids || [] };
             setSessions([session]);
@@ -80,7 +80,8 @@ export function useChat(_userId: string, selectedCatalogIds: string[]) {
         }
       })
       .catch(() => {
-        // Fallback: create a new chat
+        // Fallback: create a new chat (skip for blocked users)
+        if (blocked) return;
         chatApi.create().then(chat => {
           const session: ChatSession = { id: chat.id, title: chat.name, catalogIds: chat.catalog_ids || [] };
           setSessions([session]);
@@ -139,6 +140,7 @@ export function useChat(_userId: string, selectedCatalogIds: string[]) {
   const isCreatingChat = useRef(false);
 
   const initChat = useCallback(() => {
+    if (blocked) return; // blocked users cannot create chats
     // Prevent creating a new chat if the current active session is already empty
     const currentMessages = activeSessionId ? messagesBySession[activeSessionId] : undefined;
     const currentSession = sessions.find(s => s.id === activeSessionId);
@@ -173,7 +175,7 @@ export function useChat(_userId: string, selectedCatalogIds: string[]) {
 
   const handleSendMessage = useCallback(async () => {
     const text = inputValue.trim();
-    if (!text || pending || !activeSessionId) return;
+    if (blocked || !text || pending || !activeSessionId) return;
 
     setInputValue('');
 

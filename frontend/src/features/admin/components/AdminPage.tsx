@@ -25,6 +25,10 @@ interface UserStats {
   first_name: string | null;
   last_name: string | null;
   created_at?: string | null;
+  is_blocked: boolean;
+  is_super_admin: boolean;
+  chat_count: number;
+  request_count: number;
 }
 
 export function AdminPage() {
@@ -48,6 +52,10 @@ export function AdminPage() {
   // Users State
   const [users, setUsers] = useState<UserStats[]>([]);
   const [usersLoading, setUsersLoading] = useState(false);
+  const [userSearch, setUserSearch] = useState('');
+  const [userActionId, setUserActionId] = useState<string | null>(null);
+  const [userRoleFilter, setUserRoleFilter] = useState<'all' | 'admin' | 'visitor'>('all');
+  const [userStatusFilter, setUserStatusFilter] = useState<'all' | 'active' | 'blocked'>('all');
 
   useEffect(() => {
     if (user?.role !== 'admin') {
@@ -182,6 +190,43 @@ export function AdminPage() {
       alert(t('admin.delete_user_failed'));
     }
   };
+
+  const patchUser = async (id: string, payload: { is_blocked?: boolean; role?: string }) => {
+    setUserActionId(id);
+    try {
+      const updated = await api.patch<UserStats>(`/admin/users/${id}`, payload);
+      setUsers(prev => prev.map(u => (u.id === id ? updated : u)));
+    } catch (e) {
+      console.error(e);
+      alert(t('admin.user_update_failed'));
+    } finally {
+      setUserActionId(null);
+    }
+  };
+
+  const toggleBlock = (u: UserStats) => {
+    if (u.is_blocked) {
+      void patchUser(u.id, { is_blocked: false });
+    } else {
+      if (!window.confirm(t('admin.block_user_confirm'))) return;
+      void patchUser(u.id, { is_blocked: true });
+    }
+  };
+
+  const changeRole = (u: UserStats, role: string) => {
+    if (role === u.role) return;
+    void patchUser(u.id, { role });
+  };
+
+  const filteredUsers = users.filter(u => {
+    if (userRoleFilter !== 'all' && u.role !== userRoleFilter) return false;
+    if (userStatusFilter === 'active' && u.is_blocked) return false;
+    if (userStatusFilter === 'blocked' && !u.is_blocked) return false;
+    const q = userSearch.trim().toLowerCase();
+    if (!q) return true;
+    const name = `${u.first_name || ''} ${u.last_name || ''}`.toLowerCase();
+    return u.email.toLowerCase().includes(q) || name.includes(q);
+  });
 
   if (user?.role !== 'admin') return null;
 
@@ -402,7 +447,38 @@ export function AdminPage() {
 
         {activeTab === 'users' && (
           <div className="admin-panel admin-panel--wide">
-            <h2>{t('admin.registered_users')}</h2>
+            <div className="admin-users__toolbar">
+              <h2>{t('admin.registered_users')}</h2>
+              <div className="admin-users__controls">
+                <select
+                  className="admin-users__filter"
+                  value={userRoleFilter}
+                  onChange={e => setUserRoleFilter(e.target.value as 'all' | 'admin' | 'visitor')}
+                >
+                  <option value="all">{t('admin.filter_role_all')}</option>
+                  <option value="admin">{t('admin.role_admin')}</option>
+                  <option value="visitor">{t('admin.role_visitor')}</option>
+                </select>
+                <select
+                  className="admin-users__filter"
+                  value={userStatusFilter}
+                  onChange={e => setUserStatusFilter(e.target.value as 'all' | 'active' | 'blocked')}
+                >
+                  <option value="all">{t('admin.filter_status_all')}</option>
+                  <option value="active">{t('admin.status_active')}</option>
+                  <option value="blocked">{t('admin.status_blocked')}</option>
+                </select>
+                <div className="admin-users__search">
+                  <Icon icon="mdi:magnify" />
+                  <input
+                    type="text"
+                    value={userSearch}
+                    onChange={e => setUserSearch(e.target.value)}
+                    placeholder={t('admin.search_users')}
+                  />
+                </div>
+              </div>
+            </div>
             {usersLoading ? <p>{t('admin.loading_users')}</p> : (
               <div className="admin-table-container">
                 <table className="admin-table">
@@ -411,28 +487,69 @@ export function AdminPage() {
                       <th>{t('admin.table_email')}</th>
                       <th>{t('admin.table_name')}</th>
                       <th>{t('admin.table_role')}</th>
+                      <th>{t('admin.table_status')}</th>
+                      <th className="admin-table__num">{t('admin.table_chats')}</th>
+                      <th className="admin-table__num">{t('admin.table_requests')}</th>
                       <th>{t('admin.table_reg_date')}</th>
                       <th>{t('admin.table_actions')}</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {users.map(u => (
-                      <tr key={u.id}>
-                        <td>{u.email}</td>
-                        <td>{u.first_name || u.last_name ? `${u.first_name || ''} ${u.last_name || ''}` : '-'}</td>
-                        <td><span className={`role-badge role-${u.role}`}>{u.role}</span></td>
-                        <td>{u.created_at ? new Date(u.created_at).toLocaleDateString(i18n.language === 'ru' ? 'ru-RU' : 'en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '-'}</td>
-                        <td>
-                          {u.id !== user.id && (
-                            <button className="btn-delete" onClick={() => deleteUser(u.id)} title={t('admin.delete_user_title')}>
-                              <Icon icon="mdi:trash-can-outline" />
-                            </button>
-                          )}
-                        </td>
-                      </tr>
-                    ))}
-                    {users.length === 0 && (
-                      <tr><td colSpan={4} style={{textAlign: 'center'}}>{t('admin.no_users')}</td></tr>
+                    {filteredUsers.map(u => {
+                      const isSelf = u.id === user.id;
+                      const busy = userActionId === u.id;
+                      const isSuper = u.is_super_admin;
+                      return (
+                        <tr key={u.id} className={u.is_blocked ? 'admin-table__row--blocked' : ''}>
+                          <td>{u.email}</td>
+                          <td>{u.first_name || u.last_name ? `${u.first_name || ''} ${u.last_name || ''}` : '-'}</td>
+                          <td>
+                            <select
+                              className="admin-role-select"
+                              value={u.role}
+                              disabled={isSelf || busy || isSuper}
+                              onChange={e => changeRole(u, e.target.value)}
+                            >
+                              <option value="admin">{t('admin.role_admin')}</option>
+                              <option value="visitor">{t('admin.role_visitor')}</option>
+                            </select>
+                          </td>
+                          <td>
+                            <span className={`status-badge ${u.is_blocked ? 'status-badge--blocked' : 'status-badge--active'}`}>
+                              {u.is_blocked ? t('admin.status_blocked') : t('admin.status_active')}
+                            </span>
+                          </td>
+                          <td className="admin-table__num">{u.chat_count}</td>
+                          <td className="admin-table__num">{u.request_count}</td>
+                          <td>{u.created_at ? new Date(u.created_at).toLocaleDateString(i18n.language === 'ru' ? 'ru-RU' : 'en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '-'}</td>
+                          <td>
+                            {isSuper ? (
+                              <span className="admin-super-badge" title={t('admin.eternal_admin_hint')}>
+                                <Icon icon="mdi:shield-crown-outline" />
+                                {t('admin.eternal_admin')}
+                              </span>
+                            ) : !isSelf && (
+                              <div className="admin-table__actions">
+                                <button
+                                  className={`btn-action ${u.is_blocked ? 'btn-action--unblock' : 'btn-action--block'}`}
+                                  onClick={() => toggleBlock(u)}
+                                  disabled={busy}
+                                  title={u.is_blocked ? t('admin.unblock_user') : t('admin.block_user')}
+                                >
+                                  <Icon icon={busy ? 'mdi:loading' : (u.is_blocked ? 'mdi:lock-open-variant-outline' : 'mdi:lock-outline')} className={busy ? 'spin' : ''} />
+                                  {u.is_blocked ? t('admin.unblock') : t('admin.block')}
+                                </button>
+                                <button className="btn-delete" onClick={() => deleteUser(u.id)} title={t('admin.delete_user_title')}>
+                                  <Icon icon="mdi:trash-can-outline" />
+                                </button>
+                              </div>
+                            )}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                    {filteredUsers.length === 0 && (
+                      <tr><td colSpan={8} style={{textAlign: 'center'}}>{t('admin.no_users')}</td></tr>
                     )}
                   </tbody>
                 </table>

@@ -7,7 +7,7 @@ from typing import List, Dict, Any
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.dependencies.auth import get_current_user
+from src.dependencies.auth import get_current_user, require_active_user
 from src.database.session import get_db
 from src.database.models.chat import Chat as ChatModel
 from src.database.models.user import User
@@ -35,7 +35,7 @@ def get_chat_controller(
 @router.post("", status_code=status.HTTP_201_CREATED)
 async def create_chat(
     request: ChatCreateRequest, 
-    user: User = Depends(get_current_user),
+    user: User = Depends(require_active_user),
     db: AsyncSession = Depends(get_db),
 ):
     """Create a new chat session for the current user."""
@@ -129,6 +129,15 @@ async def chat_websocket(
     from src.repositories.user_repo import UserRepository
     user_repo = UserRepository(db)
     user_obj = await user_repo.get_user_by_id(user_id)
+
+    # Blocked users have read-only access: refuse the (mutating) prompt channel.
+    if user_obj and getattr(user_obj, "is_blocked", False):
+        try:
+            await websocket.send_json({"type": "error", "message": "ACCOUNT_BLOCKED"})
+        finally:
+            await websocket.close(code=1008, reason="Account blocked")
+        return
+
     user_language = user_obj.profile.language if user_obj and user_obj.profile else "ru"
 
     controller = ChatController(catalog_service, db)
@@ -255,7 +264,7 @@ async def submit_prompt(
     chat_id: UUID, 
     request: PromptRequest, 
     controller: ChatController = Depends(get_chat_controller),
-    user: User = Depends(get_current_user),
+    user: User = Depends(require_active_user),
     db: AsyncSession = Depends(get_db),
 ):
     # Verify ownership
@@ -332,7 +341,7 @@ async def submit_clarification(
     chat_id: UUID, 
     answer: ClarificationAnswer, 
     controller: ChatController = Depends(get_chat_controller),
-    user: User = Depends(get_current_user),
+    user: User = Depends(require_active_user),
     db: AsyncSession = Depends(get_db),
 ):
     # Verify ownership
@@ -395,7 +404,7 @@ async def export_chat_to_excel(
 async def update_chat(
     chat_id: UUID,
     request: ChatUpdateRequest,
-    user: User = Depends(get_current_user),
+    user: User = Depends(require_active_user),
     db: AsyncSession = Depends(get_db),
 ):
     """Update chat title."""
@@ -410,7 +419,7 @@ async def update_chat(
 @router.delete("/{chat_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_chat(
     chat_id: UUID, 
-    user: User = Depends(get_current_user),
+    user: User = Depends(require_active_user),
     db: AsyncSession = Depends(get_db),
 ):
     chat = await ChatRepository.get_chat_by_id_and_user(db, chat_id, user.id)

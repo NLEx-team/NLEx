@@ -46,8 +46,8 @@ class UserService:
         if profile_update_data:
             await self.repository.update_user_profile(user_id, UserProfileBase(**profile_update_data))
             
-        # 3. Update User fields (email, role if admin update)
-        user_fields = {"email", "role"}
+        # 3. Update User fields (email, role, is_blocked if admin update)
+        user_fields = {"email", "role", "is_blocked"}
         user_update_data = {k: v for k, v in update_dict.items() if k in user_fields}
         
         return await self.repository.update_user_fields(user_id, user_update_data)

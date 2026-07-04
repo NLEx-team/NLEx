@@ -35,14 +35,16 @@ class UserCreate(UserBase):
 class UserUpdate(UserProfileBase):
     email: Optional[EmailStr] = None
 
-# For admins to update anyone - includes role
+# For admins to update anyone - includes role and block status
 class UserAdminUpdate(UserUpdate):
     role: Optional[UserRole] = None
+    is_blocked: Optional[bool] = None
 
 class UserRead(UserBase):
     model_config = ConfigDict(from_attributes=True)
 
     id: UUID
+    is_blocked: bool = False
     created_at: datetime
     updated_at: datetime
     profile: Optional[UserProfileRead] = None

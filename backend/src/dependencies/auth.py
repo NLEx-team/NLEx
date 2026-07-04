@@ -28,3 +28,18 @@ def require_admin(request: Request, user: User = Depends(get_current_user)) -> U
             detail="Admin privileges required"
         )
     return user
+
+def require_active_user(user: User = Depends(get_current_user)) -> User:
+    """
+    Ensures the current user is not blocked.
+
+    Blocked users keep read-only access (they can view their own chats), but
+    any mutating action (sending AI requests, creating/editing/deleting chats)
+    must be rejected. Use this on mutating endpoints instead of get_current_user.
+    """
+    if getattr(user, "is_blocked", False):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="ACCOUNT_BLOCKED"
+        )
+    return user
