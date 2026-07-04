@@ -19,6 +19,10 @@
   transition: border-color 0.2s;
 }
 
+.multi-select-dropdown__trigger:hover:not(:disabled) {
+  border-color: var(--color-accent);
+}
+
 .multi-select-dropdown__trigger:focus-visible {
   outline: none;
   border-color: var(--color-accent);
@@ -48,6 +52,13 @@
 .multi-select-dropdown__icon {
   flex-shrink: 0;
   margin-left: var(--spacing-sm);
+  display: inline-flex;
+  transition: transform var(--motion-base) var(--ease-out);
+}
+
+/* Chevron rotates smoothly when the dropdown opens (like the date picker). */
+.multi-select-dropdown--open .multi-select-dropdown__icon {
+  transform: rotate(180deg);
 }
 
 .multi-select-dropdown__list {
@@ -63,6 +74,11 @@
   border-radius: var(--input-radius);
   background: var(--color-back-main);
   box-shadow: var(--shadow-elevated);
+  /* Cap height so a long catalog list scrolls instead of overflowing the viewport. */
+  max-height: 240px;
+  overflow-y: auto;
+  transform-origin: top center;
+  animation: dropdown-in var(--motion-fast) var(--ease-out) both;
 }
 
 .multi-select-dropdown__option {
@@ -77,14 +93,21 @@
   font: inherit;
   text-align: left;
   cursor: pointer;
+  transition: background var(--motion-fast) var(--ease-out),
+              color var(--motion-fast) var(--ease-out);
 }
 
-.multi-select-dropdown__option:not(:first-child) {
-  border-top: var(--border-width) solid var(--color-text-secondary);
+.multi-select-dropdown__option:hover {
+  background: var(--color-back-active);
 }
 
 .multi-select-dropdown__option--selected {
   color: var(--color-accent);
+  background: rgba(33, 115, 70, 0.08);
+}
+
+.multi-select-dropdown__option--selected:hover {
+  background: rgba(33, 115, 70, 0.14);
 }
 
 .multi-select-dropdown__checkbox {
@@ -95,6 +118,7 @@
   width: var(--checkbox-size);
   height: var(--checkbox-size);
   color: var(--color-text-primary);
+  transition: color var(--motion-fast) var(--ease-out);
 }
 
 .multi-select-dropdown__option--selected .multi-select-dropdown__checkbox {
@@ -110,4 +134,53 @@
 
 .multi-select-dropdown__option--selected .multi-select-dropdown__label {
   color: var(--color-accent);
+}
+
+/* --- Optional in-dropdown search --- */
+.multi-select-dropdown__search {
+  position: sticky;
+  top: 0;
+  padding: 6px;
+  background: var(--color-back-main);
+  border-bottom: var(--border-width) solid var(--color-back-active);
+  z-index: 1;
+}
+
+.multi-select-dropdown__search-input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 6px 10px;
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--input-radius);
+  background: var(--color-back-main);
+  color: var(--color-text-primary);
+  font-size: 13px;
+  outline: none;
+}
+
+.multi-select-dropdown__search-input:focus {
+  border-color: var(--color-accent);
+}
+
+.multi-select-dropdown__empty {
+  padding: 12px;
+  text-align: center;
+  color: var(--color-text-secondary);
+  font-size: 13px;
+}
+
+/* --- Optional pinned footer (e.g. a mode toggle) --- */
+.multi-select-dropdown__footer {
+  position: sticky;
+  bottom: 0;
+  background: var(--color-back-main);
+  border-top: var(--border-width) solid var(--color-back-active);
+  padding: 8px 10px;
+  z-index: 1;
+}
+
+/* "Select all" master row */
+.multi-select-dropdown__option--select-all {
+  font-weight: 600;
+  border-bottom: var(--border-width) solid var(--color-back-active);
 }

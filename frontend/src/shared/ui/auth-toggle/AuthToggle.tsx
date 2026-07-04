@@ -1,7 +1,9 @@
+import { useTranslation } from "react-i18next";
 import "./AuthToggle.css";
 import type { AuthToggleProps } from "./AuthToggle.types";
 
 export function AuthToggle({ value, onChange, className = "" }: AuthToggleProps) {
+  const { t } = useTranslation();
   const classNames = ["auth-toggle", className].filter(Boolean).join(" ");
   return (
     <div className={classNames} role="group" aria-label="Authentication mode">
@@ -17,7 +19,7 @@ export function AuthToggle({ value, onChange, className = "" }: AuthToggleProps)
         aria-pressed={value === "login"}
         onClick={() => onChange("login")}
       >
-        Login
+        {t('auth.login')}
       </button>
 
       <button
@@ -26,7 +28,7 @@ export function AuthToggle({ value, onChange, className = "" }: AuthToggleProps)
         aria-pressed={value === "register"}
         onClick={() => onChange("register")}
       >
-        Register
+        {t('auth.register')}
       </button>
     </div>
   );

@@ -297,3 +297,157 @@
 .btn-delete:hover {
   background: rgba(239, 68, 68, 0.1);
 }
+
+/* --- User management: toolbar, search, status, actions --- */
+.admin-users__toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.admin-users__search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--input-radius);
+  background: var(--color-back-main);
+  color: var(--color-text-secondary);
+  min-width: 240px;
+}
+
+.admin-users__search input {
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--color-text-primary);
+  font-size: 14px;
+  width: 100%;
+}
+
+.admin-role-select {
+  padding: 6px 10px;
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--input-radius);
+  background: var(--color-back-main);
+  color: var(--color-text-primary);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.admin-role-select:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.admin-table__num {
+  text-align: center;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.status-badge--active {
+  background: rgba(16, 185, 129, 0.12);
+  color: #10b981;
+}
+
+.status-badge--blocked {
+  background: rgba(217, 83, 79, 0.14);
+  color: #d9534f;
+}
+
+.admin-table__row--blocked td {
+  background: rgba(217, 83, 79, 0.05);
+}
+
+.admin-table__actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: var(--button-radius);
+  border: var(--border-width) solid var(--color-border);
+  background: var(--color-back-main);
+  color: var(--color-text-primary);
+  font-size: 13px;
+  cursor: pointer;
+  transition: background var(--motion-fast) var(--ease-out),
+              border-color var(--motion-fast) var(--ease-out),
+              opacity var(--motion-fast) var(--ease-out);
+  white-space: nowrap;
+}
+
+.btn-action:hover:not(:disabled) {
+  background: var(--color-back-active);
+}
+
+.btn-action:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-action--block {
+  color: #d9534f;
+  border-color: rgba(217, 83, 79, 0.4);
+}
+
+.btn-action--unblock {
+  color: #10b981;
+  border-color: rgba(16, 185, 129, 0.4);
+}
+
+/* Protected/eternal admin badge (shown instead of block/delete actions). */
+.admin-super-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(33, 115, 70, 0.12);
+  color: var(--color-accent);
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* User table: role/status filter controls (next to the search box). */
+.admin-users__controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.admin-users__filter {
+  padding: 8px 12px;
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--input-radius);
+  background: var(--color-back-main);
+  color: var(--color-text-primary);
+  font-size: 14px;
+  cursor: pointer;
+  transition: border-color var(--motion-fast) var(--ease-out);
+}
+
+.admin-users__filter:hover,
+.admin-users__filter:focus {
+  outline: none;
+  border-color: var(--color-accent);
+}

@@ -1,0 +1,186 @@
+{
+  "nodes": [
+    {
+      "id": "figma_artifacts_chatexamplev1",
+      "label": "Chat Example V1 (Figma Mockup)",
+      "file_type": "image",
+      "source_file": "reports/week2/images/figma_artifacts/chatExampleV1.png",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "figma_artifacts_chatexamplev1_nl_query_chat_ui",
+      "label": "Natural Language Data Query Chat UI",
+      "file_type": "concept",
+      "source_file": "reports/week2/images/figma_artifacts/chatExampleV1.png",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "figma_artifacts_chatexamplev1_clarifying_questions",
+      "label": "Clarifying Questions Before Query Execution",
+      "file_type": "concept",
+      "source_file": "reports/week2/images/figma_artifacts/chatExampleV1.png",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "figma_artifacts_chatexamplev1_ambiguity_resolution",
+      "label": "Ambiguity Resolution via Multiple-Choice Options",
+      "file_type": "concept",
+      "source_file": "reports/week2/images/figma_artifacts/chatExampleV1.png",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "figma_artifacts_chatexamplev1_database_connection_context",
+      "label": "Active Database Connection Header (MySQL: Current)",
+      "file_type": "concept",
+      "source_file": "reports/week2/images/figma_artifacts/chatExampleV1.png",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "figma_artifacts_chatexamplev1_revenue_growth_analysis",
+      "label": "Revenue Growth by Country Query Scenario",
+      "file_type": "concept",
+      "source_file": "reports/week2/images/figma_artifacts/chatExampleV1.png",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "figma_artifacts_chatexamplev1_prompt_input_affordance",
+      "label": "Describe-the-Data-You-Want Input Field",
+      "file_type": "concept",
+      "source_file": "reports/week2/images/figma_artifacts/chatExampleV1.png",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    }
+  ],
+  "edges": [
+    {
+      "source": "figma_artifacts_chatexamplev1",
+      "target": "figma_artifacts_chatexamplev1_nl_query_chat_ui",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "reports/week2/images/figma_artifacts/chatExampleV1.png",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "figma_artifacts_chatexamplev1",
+      "target": "figma_artifacts_chatexamplev1_clarifying_questions",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "reports/week2/images/figma_artifacts/chatExampleV1.png",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "figma_artifacts_chatexamplev1",
+      "target": "figma_artifacts_chatexamplev1_ambiguity_resolution",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "reports/week2/images/figma_artifacts/chatExampleV1.png",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "figma_artifacts_chatexamplev1",
+      "target": "figma_artifacts_chatexamplev1_database_connection_context",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "reports/week2/images/figma_artifacts/chatExampleV1.png",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "figma_artifacts_chatexamplev1",
+      "target": "figma_artifacts_chatexamplev1_revenue_growth_analysis",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "reports/week2/images/figma_artifacts/chatExampleV1.png",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "figma_artifacts_chatexamplev1",
+      "target": "figma_artifacts_chatexamplev1_prompt_input_affordance",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "reports/week2/images/figma_artifacts/chatExampleV1.png",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "figma_artifacts_chatexamplev1_clarifying_questions",
+      "target": "figma_artifacts_chatexamplev1_ambiguity_resolution",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.95,
+      "source_file": "reports/week2/images/figma_artifacts/chatExampleV1.png",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "figma_artifacts_chatexamplev1_nl_query_chat_ui",
+      "target": "figma_artifacts_chatexamplev1_database_connection_context",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "reports/week2/images/figma_artifacts/chatExampleV1.png",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "figma_artifacts_chatexamplev1_nl_query_chat_ui",
+      "target": "figma_artifacts_chatexamplev1_prompt_input_affordance",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "reports/week2/images/figma_artifacts/chatExampleV1.png",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "figma_artifacts_chatexamplev1_revenue_growth_analysis",
+      "target": "figma_artifacts_chatexamplev1_clarifying_questions",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "reports/week2/images/figma_artifacts/chatExampleV1.png",
+      "source_location": null,
+      "weight": 1.0
+    }
+  ],
+  "hyperedges": [],
+  "input_tokens": 0,
+  "output_tokens": 0
+}

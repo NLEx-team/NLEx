@@ -41,6 +41,7 @@
   justify-content: center;
   flex: 1;
   gap: 16px;
+  animation: fade-in var(--motion-slow) var(--ease-out) both;
 }
 
 .chat__welcome-text {

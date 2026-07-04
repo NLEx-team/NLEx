@@ -4,22 +4,23 @@
 """
 
 import logging
-import re
 import time
 from typing import Any
 
 from src.services.llm_service import LLMService
+from src.services import sql_guard
 
 logger = logging.getLogger(__name__)
 
-# Запрещённые операции (второй рубеж защиты после промпта)
-_FORBIDDEN_PATTERN = re.compile(
-    r"\b(DROP|DELETE|UPDATE|INSERT|ALTER|TRUNCATE|CREATE|GRANT|REVOKE|MERGE)\b",
-    re.IGNORECASE,
-)
-
-# Максимальная длина SQL (защита от аномально больших ответов)
-_MAX_SQL_LENGTH = 10_000
+# Human-readable messages for read-only violation codes (see sql_guard).
+# Values are user-facing and stay in Russian (shown to the end user).
+_VIOLATION_MESSAGES_RU = {
+    sql_guard.VIOLATION_EMPTY: "Сгенерирован пустой запрос.",
+    sql_guard.VIOLATION_TOO_LONG: "Сгенерированный запрос слишком длинный. Попробуйте упростить вопрос.",
+    sql_guard.VIOLATION_FORBIDDEN: "Сгенерированный запрос содержит запрещённые операции. Разрешены только SELECT-запросы.",
+    sql_guard.VIOLATION_STACKED: "Сгенерированный запрос содержит несколько инструкций. Разрешён только один SELECT-запрос.",
+    sql_guard.VIOLATION_NOT_SELECT: "Разрешены только SELECT-запросы.",
+}
 
 
 class SQLGenerationService:
@@ -30,7 +31,8 @@ class SQLGenerationService:
         self, 
         user_prompt: str | None, 
         schema: str, 
-        history: list[dict[str, str]] | None = None
+        history: list[dict[str, str]] | None = None,
+        language: str = "ru"
     ) -> dict[str, Any]:
         """
         Генерирует SQL-запрос для Trino на основе вопроса пользователя.
@@ -52,38 +54,32 @@ class SQLGenerationService:
             self.llm_service.generate_sql,
             user_prompt=user_prompt, 
             schema=schema, 
-            history=history
+            history=history,
+            language=language
         )
         
         llm_time_ms = int((time.perf_counter() - start_time) * 1000)
 
-        # Санитизация SQL (второй рубеж после промпта)
+        # SQL sanitization via the central read-only guard (see sql_guard).
+        # This is the second line of defense after the system prompt.
         if isinstance(result, dict) and result.get("status") == "success":
             sql = result.get("sql", "")
 
-            # Проверка на запрещённые операции (игнорируем слова в кавычках)
-            sql_no_quotes = re.sub(r"'[^']*'", '', sql)
-            sql_no_quotes = re.sub(r'"[^"]*"', '', sql_no_quotes)
-            
-            if _FORBIDDEN_PATTERN.search(sql_no_quotes):
+            violation = sql_guard.read_only_violation(sql)
+            if violation is not None:
                 logger.warning(
-                    "LLM generated forbidden SQL operation. Query rejected. Prompt: %s",
+                    "LLM SQL rejected by read-only guard (%s). Prompt: %s",
+                    violation,
                     user_prompt[:200] if user_prompt else "",
                 )
                 return {
                     "status": "error",
-                    "message": "Сгенерированный запрос содержит запрещённые операции. Разрешены только SELECT-запросы.",
+                    "message": _VIOLATION_MESSAGES_RU.get(
+                        violation, "Разрешены только SELECT-запросы."
+                    ),
                 }
 
-            # Проверка длины
-            if len(sql) > _MAX_SQL_LENGTH:
-                logger.warning("LLM generated SQL exceeds max length: %d chars", len(sql))
-                return {
-                    "status": "error",
-                    "message": "Сгенерированный запрос слишком длинный. Попробуйте упростить вопрос.",
-                }
-
-            # Нормализация: убираем лишние пробелы и точку с запятой в конце
+            # Normalize: trim whitespace and any trailing semicolon
             result["sql"] = sql.strip().rstrip(";")
 
         # Добавляем отладочную информацию

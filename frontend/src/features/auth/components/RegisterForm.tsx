@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../hooks/useAuth';
 import { Field, PasswordField, Button } from '../../../shared/ui';
 import { isValidEmail, getPasswordValidationErrors } from '../../../utils/validation';
@@ -8,6 +9,7 @@ interface RegisterFormProps {
 }
 
 export const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
+  const { t } = useTranslation();
   const { register } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -31,23 +33,23 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
     setGeneralError(null);
 
     if (!email) {
-      setEmailError('Email is required');
+      setEmailError(t('auth.email_required'));
       hasError = true;
     } else if (!isValidEmail(email)) {
-      setEmailError('Invalid email format');
+      setEmailError(t('auth.invalid_email'));
       hasError = true;
     }
 
     if (!password) {
-      setPasswordError('Password is required');
+      setPasswordError(t('auth.password_required'));
       hasError = true;
     } else if (!passwordValidation.isValid) {
-      setPasswordError('Password does not meet requirements');
+      setPasswordError(t('auth.password_requirements'));
       hasError = true;
     }
 
     if (password && passwordRepeat && password !== passwordRepeat) {
-      setRepeatPasswordError('Passwords do not match');
+      setRepeatPasswordError(t('auth.passwords_not_match'));
       hasError = true;
     }
 
@@ -63,7 +65,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
         onSuccess(email, password);
       }
     } catch (err: any) {
-      setGeneralError(err.message || 'Failed to register. Please try again.');
+      setGeneralError(err.message || t('auth.failed_register'));
     } finally {
       setLoading(false);
     }
@@ -78,20 +80,20 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
 
   useEffect(() => {
     if (password !== passwordRepeat && passwordRepeat.length && password.length) {
-      setRepeatPasswordError('Passwords do not match');
+      setRepeatPasswordError(t('auth.passwords_not_match'));
     } else {
       setRepeatPasswordError(null);
     }
-  }, [password, passwordRepeat]);
+  }, [password, passwordRepeat, t]);
 
   return (
     <div onKeyDown={handleKeyDown} className="auth-form">
       {generalError && <div style={{ color: 'var(--color-error)', marginBottom: '10px' }}>{generalError}</div>}
       
       <Field
-        label="Email"
+        label={t('auth.email')}
         type="email"
-        placeholder="Email"
+        placeholder={t('auth.email')}
         value={email}
         onChange={(e) => {
           setEmail(e.target.value);
@@ -108,8 +110,8 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
           onBlur={() => setIsPasswordFocused(false)}
         >
           <PasswordField
-            label="Password"
-            placeholder="Password"
+            label={t('auth.password')}
+            placeholder={t('auth.password')}
             value={password}
             onChange={(e) => {
               setPassword(e.target.value);
@@ -123,15 +125,15 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
         
         <div className={`password-floating-hint ${(isPasswordFocused || passwordError) ? 'visible' : ''} ${passwordValidation.isValid ? 'success' : ''}`}>
           {passwordValidation.isValid ? (
-            "✅ Password is secure"
+            t('auth.password_secure')
           ) : (
             <>
-              <strong>Password requirements:</strong>
+              <strong>{t('auth.password_requirements_list')}</strong>
               <ul style={{ margin: '4px 0 0', paddingLeft: '20px' }}>
-                <li style={{ color: password.length >= 8 ? 'var(--nlex-success, #10b981)' : 'inherit' }}>At least 8 chars</li>
-                <li style={{ color: /[A-Z]/.test(password) ? 'var(--nlex-success, #10b981)' : 'inherit' }}>1 uppercase letter</li>
-                <li style={{ color: /[a-z]/.test(password) ? 'var(--nlex-success, #10b981)' : 'inherit' }}>1 lowercase letter</li>
-                <li style={{ color: /[0-9]/.test(password) ? 'var(--nlex-success, #10b981)' : 'inherit' }}>1 number</li>
+                <li style={{ color: password.length >= 8 ? 'var(--nlex-success, #10b981)' : 'inherit' }}>{t('auth.req_chars')}</li>
+                <li style={{ color: /[A-Z]/.test(password) ? 'var(--nlex-success, #10b981)' : 'inherit' }}>{t('auth.req_uppercase')}</li>
+                <li style={{ color: /[a-z]/.test(password) ? 'var(--nlex-success, #10b981)' : 'inherit' }}>{t('auth.req_lowercase')}</li>
+                <li style={{ color: /[0-9]/.test(password) ? 'var(--nlex-success, #10b981)' : 'inherit' }}>{t('auth.req_number')}</li>
               </ul>
             </>
           )}
@@ -139,8 +141,8 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
       </div>
 
       <PasswordField
-        label="Repeat password"
-        placeholder="Repeat password"
+        label={t('auth.repeat_password')}
+        placeholder={t('auth.repeat_password')}
         value={passwordRepeat}
         onChange={(e) => setPasswordRepeat(e.target.value)}
         mode={repeatPasswordError ? 'error' : 'default'}
@@ -148,7 +150,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
         disabled={loading}
       />
       <Button type="button" onClick={submitLogic} disabled={loading}>
-        {loading ? 'Wait...' : 'Continue'}
+        {loading ? t('auth.wait') : t('auth.continue')}
       </Button>
     </div>
   );

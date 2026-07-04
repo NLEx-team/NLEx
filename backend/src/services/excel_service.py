@@ -105,9 +105,10 @@ class ExcelExportService:
             header_cells.append(cell)
         ws.append(header_cells)
         
-        # Stream data from DB
+        # Stream data from DB via the read-only guarded path: export must never
+        # execute anything other than a single SELECT/CTE, even on re-run.
         row_count = 0
-        for row_data in db_service.execute_query_sync_stream(sql, chunk_size=2000):
+        for row_data in db_service.execute_readonly_sync_stream(sql, chunk_size=2000):
             data_cells = []
             for val in row_data:
                 # Openpyxl doesn't support UUIDs, Decimals, dicts natively

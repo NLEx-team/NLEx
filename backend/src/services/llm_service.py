@@ -12,10 +12,10 @@ from typing import Any
 from openai import OpenAI, OpenAIError, APITimeoutError, RateLimitError, APIConnectionError
 from src.utils.config import settings
 from src.utils.prompts import (
-    SYSTEM_PROMPT, 
-    USER_PROMPT_TEMPLATE,
-    RELATIONSHIP_INFERENCE_SYSTEM_PROMPT,
-    RELATIONSHIP_INFERENCE_USER_PROMPT_TEMPLATE
+    get_system_prompt, 
+    get_user_prompt_template,
+    get_relationship_inference_system_prompt,
+    get_relationship_inference_user_prompt_template
 )
 
 logger = logging.getLogger(__name__)
@@ -95,26 +95,29 @@ class LLMService:
         self, 
         user_prompt: str | None, 
         schema: str, 
-        history: list[dict[str, str]] | None = None
+        history: list[dict[str, str]] | None = None,
+        language: str = "ru"
     ) -> dict[str, Any]:
         """
         Generates Trino SQL query based on user question and schema.
         Includes retry on transient errors and response validation.
         """
+        system_prompt = get_system_prompt(language)
+        
         if not history:
             # First call: include schema and prompt
-            user_message = USER_PROMPT_TEMPLATE.format(
+            user_message = get_user_prompt_template(language).format(
                 schema=schema,
                 user_prompt=user_prompt or "",
             )
             messages = [
-                {"role": "system", "content": SYSTEM_PROMPT},
+                {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_message},
             ]
         else:
             # Subsequent call: use history and optionally append new prompt
             messages = [
-                {"role": "system", "content": SYSTEM_PROMPT},
+                {"role": "system", "content": system_prompt},
                 *history,
             ]
             if user_prompt:
@@ -122,16 +125,16 @@ class LLMService:
 
         return self._execute_with_retry(messages, "sql")
 
-    def infer_relationships(self, schema_json: str) -> dict[str, Any]:
+    def infer_relationships(self, schema_json: str, language: str = "ru") -> dict[str, Any]:
         """
         Infers relationships between tables based on schema JSON.
         """
-        user_message = RELATIONSHIP_INFERENCE_USER_PROMPT_TEMPLATE.format(
+        user_message = get_relationship_inference_user_prompt_template(language).format(
             schema=schema_json
         )
 
         messages = [
-            {"role": "system", "content": RELATIONSHIP_INFERENCE_SYSTEM_PROMPT},
+            {"role": "system", "content": get_relationship_inference_system_prompt(language)},
             {"role": "user", "content": user_message},
         ]
 
@@ -155,15 +158,22 @@ class LLMService:
             logger.error(f"Failed to generate embeddings: {e}")
             raise e
 
-    def generate_chat_title(self, history: list[dict[str, str]]) -> dict[str, Any]:
+    def generate_chat_title(self, history: list[dict[str, str]], language: str = "ru") -> dict[str, Any]:
         """
         Generates a short title based on the chat history.
         """
-        system_prompt = (
-            "You are a helpful assistant. Based on the following conversation, generate a very short "
-            "and convenient title (max 3-5 words) for this chat. Respond with a JSON object: "
-            "{'title': 'Your Title'}."
-        )
+        if language == "en":
+            system_prompt = (
+                "You are a helpful assistant. Based on the following conversation, generate a very short "
+                "and convenient title (max 3-5 words) for this chat. Respond with a JSON object: "
+                "{'title': 'Your Title'}."
+            )
+        else:
+            system_prompt = (
+                "Ты полезный ассистент. На основе этого разговора сгенерируй очень короткий "
+                "и удобный заголовок (максимум 3-5 слов) для этого чата. Ответь JSON объектом: "
+                "{'title': 'Твой Заголовок'}."
+            )
         
         messages = [{"role": "system", "content": system_prompt}] + history
         return self._execute_with_retry(messages, "title")

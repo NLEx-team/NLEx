@@ -1,0 +1,78 @@
+/* ============================================================
+   Motion system
+   Tokens, keyframes and utility classes for tasteful, performant
+   UI animations. Only `transform` and `opacity` are animated
+   (GPU-friendly, no layout thrash).
+   ============================================================ */
+
+:root {
+  /* durations */
+  --motion-fast: 140ms;
+  --motion-base: 240ms;
+  --motion-slow: 380ms;
+
+  /* easings */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);        /* smooth decelerate */
+  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);    /* material standard */
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1); /* slight overshoot */
+}
+
+/* ---------- keyframes ---------- */
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes fade-in-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fade-in-down {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes scale-in {
+  from { opacity: 0; transform: scale(0.96); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+/* For menus/popovers anchored to a trigger. */
+@keyframes dropdown-in {
+  from { opacity: 0; transform: translateY(-6px) scale(0.98); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* ---------- utility classes ---------- */
+
+.anim-fade-in {
+  animation: fade-in var(--motion-base) var(--ease-out) both;
+}
+
+.anim-fade-in-up {
+  animation: fade-in-up var(--motion-base) var(--ease-out) both;
+}
+
+.anim-fade-in-down {
+  animation: fade-in-down var(--motion-base) var(--ease-out) both;
+}
+
+.anim-scale-in {
+  animation: scale-in var(--motion-base) var(--ease-out) both;
+}
+
+/* ---------- accessibility ----------
+   Respect users who prefer reduced motion: collapse animations and
+   transitions to near-instant so nothing moves/fades noticeably. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

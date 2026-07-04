@@ -232,3 +232,10 @@ test_*.xlsx
 seed_second_db.py
 
 delete_cats.py
+
+# Local secrets / session artifacts (never commit)
+cookies.txt
+backend/venv311/
+
+# Lychee link-checker cache (CI caches this via actions/cache)
+.lycheecache

@@ -10,7 +10,9 @@ import { CatalogManager } from '../catalog';
 import { AppHeader } from './components/AppHeader';
 import { Sidebar } from './components/Sidebar';
 import { ThemeToggle } from './components/ThemeToggle';
+import { BlockedBanner } from './components/BlockedBanner';
 import { useLocalStorage } from '../../shared/hooks/useLocalStorage';
+import { useTranslation } from 'react-i18next';
 import './App.css';
 
 import { Outlet, useOutletContext } from 'react-router-dom';
@@ -18,8 +20,9 @@ import { Outlet, useOutletContext } from 'react-router-dom';
 function AppLayout() {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const blocked = !!user?.is_blocked;
   const [selectedCatalogIds, setSelectedCatalogIds] = useState<string[]>([]);
-  const chat = useChat(user!.id, selectedCatalogIds);
+  const chat = useChat(user!.id, selectedCatalogIds, blocked);
   const [isSidebarOpen, setIsSidebarOpen] = useLocalStorage('sidebar:open', false);
 
   const prevSessionIdRef = useRef(chat.activeSessionId);
@@ -55,6 +58,7 @@ function AppLayout() {
             }}
             onRenameChat={chat.renameSession}
             onDeleteChat={chat.removeSession}
+            blocked={blocked}
           />
         </div>
         <div style={{ flexShrink: 0, marginTop: '8px' }}>
@@ -66,24 +70,26 @@ function AppLayout() {
                 chat.updateSessionCatalogs(chat.activeSessionId, ids);
               }
             }}
-            disabled={chat.messages.length > 0}
+            disabled={chat.messages.length > 0 || blocked}
           />
         </div>
       </Sidebar>
       <div className="app-page">
-         <Outlet context={{ chat, isSidebarOpen, setIsSidebarOpen }} />
+         {blocked && <BlockedBanner />}
+         <Outlet context={{ chat, isSidebarOpen, setIsSidebarOpen, blocked }} />
       </div>
     </>
   );
 }
 
 function ChatPage() {
-  const { chat, isSidebarOpen, setIsSidebarOpen } = useOutletContext<any>();
+  const { t } = useTranslation();
+  const { chat, isSidebarOpen, setIsSidebarOpen, blocked } = useOutletContext<any>();
 
   return (
     <>
       <AppHeader
-        title={chat.activeSession?.title ?? 'Chat'}
+        title={chat.activeSession?.title ?? t('sidebar.chats', { defaultValue: 'Chat' })}
         variant="chat"
         isSidebarOpen={isSidebarOpen}
         onOpenSidebar={() => setIsSidebarOpen(true)}
@@ -97,6 +103,7 @@ function ChatPage() {
           handleClarification={chat.handleClarification}
           pending={chat.pending}
           pendingStatus={chat.pendingStatus}
+          blocked={blocked}
         />
       </div>
     </>
@@ -104,12 +111,13 @@ function ChatPage() {
 }
 
 function ProfilePage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   return (
     <>
       <AppHeader
-        title="Profile"
+        title={t('sidebar.settings', { defaultValue: 'Profile' })}
         variant="profile"
         onBack={() => navigate('/chat')}
       />
@@ -121,11 +129,12 @@ function ProfilePage() {
 }
 
 function AnalyticsPageWrapper() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   return (
     <>
       <AppHeader
-        title="Analytics"
+        title={t('analytics.title')}
         variant="profile"
         onBack={() => navigate('/profile')}
       />
@@ -137,11 +146,12 @@ function AnalyticsPageWrapper() {
 }
 
 function AdminPageWrapper() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   return (
     <>
       <AppHeader
-        title="Admin Panel"
+        title={t('sidebar.admin', { defaultValue: 'Admin Panel' })}
         variant="profile"
         onBack={() => navigate('/profile')}
       />
@@ -153,6 +163,7 @@ function AdminPageWrapper() {
 }
 
 export default function App() {
+  const { t } = useTranslation();
   const { isAuthenticated, isLoading } = useAuth();
   const location = useLocation();
   const showThemeToggle = isLoading || location.pathname === '/auth';
@@ -161,7 +172,7 @@ export default function App() {
     return (
       <div className="app-container">
         {showThemeToggle && <ThemeToggle />}
-        <div className="app-loading">Loading...</div>
+        <div className="app-loading">{t('common.loading')}</div>
       </div>
     );
   }

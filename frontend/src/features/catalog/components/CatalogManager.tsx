@@ -7,6 +7,7 @@ import { useCatalogs } from '../hooks/useCatalogs';
 import { CatalogList } from './CatalogList';
 import { AddCatalogModal } from './AddCatalogModal';
 import { catalogApi } from '../api';
+import { useTranslation } from 'react-i18next';
 import type { CatalogRead, CatalogCreate } from '../types';
 
 interface CatalogManagerProps {
@@ -17,10 +18,10 @@ interface CatalogManagerProps {
 
 export function CatalogManager({ selectedIds, onSelectionChange, disabled }: CatalogManagerProps) {
   const { user } = useAuth();
+  const { t } = useTranslation();
   const { catalogs, loading, pingResults, createCatalog, deleteCatalog, pingCatalog } = useCatalogs();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedCatalog, setSelectedCatalog] = useState<CatalogRead | null>(null);
-  const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
   const { confirm, isOpen: isConfirmOpen, onConfirm, onCancel } = useConfirm();
   const isAdmin = user?.role === 'admin';
 
@@ -41,7 +42,6 @@ export function CatalogManager({ selectedIds, onSelectionChange, disabled }: Cat
   };
 
   const handleDelete = useCallback(async (id: string) => {
-    setPendingDeleteId(id);
     const ok = await confirm();
     if (ok) {
       await deleteCatalog(id);
@@ -52,7 +52,6 @@ export function CatalogManager({ selectedIds, onSelectionChange, disabled }: Cat
         onSelectionChange(Array.from(next));
       }
     }
-    setPendingDeleteId(null);
   }, [confirm, deleteCatalog, selectedIdsSet, onSelectionChange]);
 
   const handleInfo = useCallback(async (cat: CatalogRead) => {
@@ -66,14 +65,10 @@ export function CatalogManager({ selectedIds, onSelectionChange, disabled }: Cat
     setIsModalOpen(true);
   }, []);
 
-  const catalogName = pendingDeleteId
-    ? catalogs.find(c => c.id === pendingDeleteId)?.name
-    : '';
-
   return (
     <>
       <SidebarSection
-        title="Database list"
+        title={t('catalog.database_list')}
         className="catalog-manager"
       >
         <CatalogList
@@ -94,12 +89,10 @@ export function CatalogManager({ selectedIds, onSelectionChange, disabled }: Cat
         isOpen={isConfirmOpen}
         onConfirm={onConfirm}
         onCancel={onCancel}
-        title="Delete catalog"
-        confirmText="Delete"
+        title={t('catalog.delete_catalog')}
+        confirmText={t('common.delete')}
       >
-        Are you sure you want to delete{' '}
-        <strong>{catalogName || 'this catalog'}</strong>? This action cannot
-        be undone.
+        {t('catalog.delete_confirm_generic')}
       </Confirm>
 
       <AddCatalogModal

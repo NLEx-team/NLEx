@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Icon } from '@iconify/react';
 import { useAuth } from '../../auth/hooks/useAuth';
+import { useTranslation } from 'react-i18next';
 import type { CatalogRead, CatalogTestResult } from '../types';
 import './CatalogList.css';
 
@@ -17,19 +18,14 @@ interface CatalogListProps {
   disabled?: boolean;
 }
 
-const STATUS_LABELS: Record<string, string> = {
-  active: 'Connected',
-  inactive: 'Inactive',
-  error: 'Disconnected',
-};
-
 export function CatalogList({ catalogs, loading, pingResults, selectedIds, onToggleSelect, onPing, onAdd, onInfo, disabled }: CatalogListProps) {
   const [pingingId, setPingingId] = useState<string | null>(null);
   const { user } = useAuth();
+  const { t } = useTranslation();
   const isAdmin = user?.role === 'admin';
 
   if (loading) {
-    return <div className="catalog-list__empty">Loading catalogs...</div>;
+    return <div className="catalog-list__empty">{t('catalog.loading')}</div>;
   }
 
   const handlePing = async (e: React.MouseEvent, id: string) => {
@@ -48,14 +44,19 @@ export function CatalogList({ catalogs, loading, pingResults, selectedIds, onTog
   };
 
   const getStatusText = (catalog: CatalogRead) => {
-    if (pingingId === catalog.id) return 'Pinging...';
+    if (pingingId === catalog.id) return t('catalog.pinging');
     const pingResult = pingResults[catalog.id];
     if (pingResult) {
       if (pingResult.success) {
         return `${pingResult.latency_ms}ms`;
       }
-      return 'Disconnected';
+      return t('catalog.disconnected');
     }
+    const STATUS_LABELS: Record<string, string> = {
+      active: t('catalog.connected'),
+      inactive: t('catalog.inactive'),
+      error: t('catalog.disconnected'),
+    };
     return STATUS_LABELS[catalog.status];
   };
 
@@ -71,18 +72,18 @@ export function CatalogList({ catalogs, loading, pingResults, selectedIds, onTog
     <div className="catalog-list">
       {isAdmin && onAdd && (
         <button type="button" className="catalog-item catalog-item--add" onClick={onAdd}>
-          <span>Add new DB</span>
+          <span>{t('catalog.add_new_db')}</span>
           <Icon icon="mdi:plus" />
         </button>
       )}
 
       <div className="catalog-list__note">
         <Icon icon="mdi:information-outline" />
-        <span>If no database is selected, all will be used.</span>
+        <span>{t('catalog.no_selection_hint')}</span>
       </div>
       
       {catalogs.length === 0 ? (
-        <div className="catalog-list__empty" style={{ paddingTop: '16px' }}>No catalogs connected</div>
+        <div className="catalog-list__empty" style={{ paddingTop: '16px' }}>{t('catalog.no_catalogs')}</div>
       ) : (
         catalogs.map(catalog => {
           const isSelected = selectedIds.has(catalog.id);
@@ -112,7 +113,7 @@ export function CatalogList({ catalogs, loading, pingResults, selectedIds, onTog
                       (pingingId === catalog.id ? " catalog-item__action-btn--loading" : "")
                     }
                     onClick={(e) => handlePing(e, catalog.id)}
-                    title="Ping connection"
+                    title={t('catalog.ping_connection')}
                   >
                     <Icon icon="mdi:refresh" />
                   </button>
@@ -120,7 +121,7 @@ export function CatalogList({ catalogs, loading, pingResults, selectedIds, onTog
                     type="button"
                     className="catalog-item__action-btn"
                     onClick={(e) => handleInfo(e, catalog)}
-                    title="Database info"
+                    title={t('catalog.db_info')}
                   >
                     <Icon icon="mdi:information-outline" />
                   </button>

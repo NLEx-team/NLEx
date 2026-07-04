@@ -4,6 +4,7 @@ import { useAuth } from '../../auth/hooks/useAuth';
 import { Avatar } from '../../../shared/ui/avatar';
 import { Logo } from '../../../shared/ui/logo';
 import { Icon } from '@iconify/react';
+import { useTranslation } from 'react-i18next';
 import './Sidebar.css';
 
 interface SidebarProps {
@@ -14,6 +15,7 @@ interface SidebarProps {
 
 export function Sidebar({ isOpen, onClose, children }: SidebarProps) {
   const { user, logout } = useAuth();
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const sidebarRef = useRef<HTMLElement>(null);
 
@@ -66,7 +68,8 @@ export function Sidebar({ isOpen, onClose, children }: SidebarProps) {
         <button
           className="sidebar__logout-btn"
           onClick={handleLogout}
-          aria-label="Log out"
+          aria-label={t('sidebar.logout', { defaultValue: 'Log out' })}
+          title={t('sidebar.logout', { defaultValue: 'Log out' })}
           type="button"
         >
           <Icon icon="mdi:logout" />

@@ -1,6 +1,10 @@
 from typing import Any
 import asyncio
-from src.services.distributed_db import DistributedDatabaseService
+from src.services.distributed_db import (
+    DistributedDatabaseService,
+    quote_identifier,
+    escape_string_literal,
+)
 from src.services.relationship_service import RelationshipService
 
 IGNORED_SCHEMAS = {
@@ -106,8 +110,8 @@ class SchemaService:
         if not namespaces:
             return {}
         
-        # Build WHERE clause for all namespaces
-        ns_list = ", ".join(f"'{ns}'" for ns in namespaces)
+        # Build WHERE clause for all namespaces (escape values to prevent injection)
+        ns_list = ", ".join(f"'{escape_string_literal(ns)}'" for ns in namespaces)
         query = f"""
             SELECT
                 table_schema,
@@ -116,7 +120,7 @@ class SchemaService:
                 data_type,
                 is_nullable,
                 ordinal_position
-            FROM "{catalog}".information_schema.columns
+            FROM {quote_identifier(catalog)}.information_schema.columns
             WHERE table_schema IN ({ns_list})
             ORDER BY table_schema, table_name, ordinal_position
         """
@@ -142,8 +146,9 @@ class SchemaService:
     ) -> list:
         """Fetch sample rows for a single table. Returns empty list on error."""
         try:
+            table_ref = f"{quote_identifier(catalog)}.{quote_identifier(namespace)}.{quote_identifier(table)}"
             return await self.db.execute_query_async(
-                f'SELECT * FROM "{catalog}"."{namespace}"."{table}" LIMIT 5'
+                f'SELECT * FROM {table_ref} LIMIT 5'
             )
         except Exception as e:
             print(f"Error fetching samples for {catalog}.{namespace}.{table}: {e}")

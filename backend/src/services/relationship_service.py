@@ -1,5 +1,5 @@
 from typing import Any
-from src.services.distributed_db import DistributedDatabaseService
+from src.services.distributed_db import DistributedDatabaseService, escape_string_literal
 from src.models.schemas.catalog import DatabaseType
 
 class RelationshipService:
@@ -45,8 +45,8 @@ class RelationshipService:
         JOIN {catalog}.information_schema.key_column_usage kcu2
           ON rc.unique_constraint_name = kcu2.constraint_name
           AND rc.unique_constraint_schema = kcu2.table_schema
-        WHERE kcu1.table_schema = '{namespace}'
-          AND kcu1.table_name = '{table}'
+        WHERE kcu1.table_schema = '{escape_string_literal(namespace)}'
+          AND kcu1.table_name = '{escape_string_literal(table)}'
         """
         try:
             rows = await self.db.execute_query_async(query)
@@ -72,8 +72,8 @@ class RelationshipService:
           ON ccu.constraint_name = tc.constraint_name
           AND ccu.table_schema = tc.table_schema
         WHERE tc.constraint_type = 'FOREIGN KEY'
-          AND tc.table_schema = '{namespace}'
-          AND tc.table_name = '{table}'
+          AND tc.table_schema = '{escape_string_literal(namespace)}'
+          AND tc.table_name = '{escape_string_literal(table)}'
         """
         try:
             rows = await self.db.execute_query_async(query)
@@ -92,8 +92,8 @@ class RelationshipService:
             REFERENCED_TABLE_NAME AS to_table,
             REFERENCED_COLUMN_NAME AS to_column
         FROM {catalog}.information_schema.key_column_usage
-        WHERE table_schema = '{namespace}'
-          AND table_name = '{table}'
+        WHERE table_schema = '{escape_string_literal(namespace)}'
+          AND table_name = '{escape_string_literal(table)}'
           AND referenced_table_name IS NOT NULL
         """
         try:

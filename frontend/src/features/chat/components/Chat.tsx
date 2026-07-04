@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { ChatInput } from '../../../shared/ui/chat-input';
 import { ChatMessage } from '../../../shared/ui/chat-message';
@@ -15,19 +16,10 @@ interface ChatProps {
   handleClarification: (questionId: string, selectedOptions: string[]) => void;
   pending: boolean;
   pendingStatus?: string;
+  blocked?: boolean;
 }
 
-const STATUS_MESSAGES: Record<string, { text: string }> = {
-  unknown: { text: 'Starting...' },
-  IDLE: { text: 'Starting...' },
-  CATALOG_CONNECTING: { text: 'Connecting to database...' },
-  RELATIONSHIP_INFERRING: { text: 'Analyzing schema...' },
-  GENERATING_SQL: { text: 'Writing SQL query...' },
-  EXECUTING_SQL: { text: 'Executing query...' },
-  FIXING_SQL: { text: 'Fixing SQL error...' },
-  COMPLETED: { text: 'Formatting results...' },
-  FAILED: { text: 'Failed.' },
-};
+
 
 export function Chat({
   messages,
@@ -37,13 +29,28 @@ export function Chat({
   handleClarification,
   pending,
   pendingStatus,
+  blocked = false,
 }: ChatProps) {
+  const { t } = useTranslation();
+
+  const STATUS_MESSAGES: Record<string, { text: string }> = {
+    unknown: { text: t('chat.status_starting') },
+    IDLE: { text: t('chat.status_starting') },
+    CATALOG_CONNECTING: { text: t('chat.status_connecting') },
+    RELATIONSHIP_INFERRING: { text: t('chat.status_analyzing') },
+    GENERATING_SQL: { text: t('chat.status_generating') },
+    EXECUTING_SQL: { text: t('chat.status_executing') },
+    FIXING_SQL: { text: t('chat.status_fixing') },
+    COMPLETED: { text: t('chat.status_formatting') },
+    FAILED: { text: t('chat.status_failed') },
+  };
+
   const handleExport = useCallback((exportUrl: string) => {
     chatApi.downloadExport(exportUrl).catch((err) => {
       console.error('Export download failed:', err);
-      alert('Failed to download export. Please try again.');
+      alert(t('common.failed_download'));
     });
-  }, []);
+  }, [t]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -62,7 +69,7 @@ export function Chat({
             {messages.length === 0 && (
               <div className="chat__welcome">
                 <Logo variant="full" />
-                <p className="chat__welcome-text">Ask a question about your data</p>
+                <p className="chat__welcome-text">{t('chat.welcome')}</p>
               </div>
             )}
             {messages.map((msg, index) => (
@@ -97,7 +104,8 @@ export function Chat({
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             onSubmit={handleSendMessage}
-            placeholder="Ask anything about your data..."
+            placeholder={blocked ? t('blocked.input_disabled') : t('chat.placeholder')}
+            disabled={blocked}
           />
         </div>
       </div>

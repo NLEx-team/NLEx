@@ -10,6 +10,8 @@ class DatabaseType(str, Enum):
     MYSQL = "mysql"
     CLICKHOUSE = "clickhouse"
     ORACLE = "oracle"
+    MONGODB = "mongodb"
+    MINIO = "minio"
 
 class CatalogStatus(str, Enum):
     ACTIVE = "active"
@@ -25,12 +27,19 @@ class CatalogConnection(BaseModel):
 class CatalogCreate(CatalogConnection):
     name: str
 
-class CatalogRead(CatalogCreate):
+class CatalogRead(BaseModel):
+    # NOTE: deliberately does NOT expose `password`. GET /catalogs is available
+    # to any authenticated user, so the connection secret must never be
+    # serialized back to clients. Mirrors the frontend CatalogRead contract.
     id: UUID
+    name: str
+    type: DatabaseType
+    url: str
+    user: str
     status: CatalogStatus
     created_at: datetime
     updated_at: datetime
-    
+
     model_config = ConfigDict(from_attributes=True)
 
 class CatalogTestResult(BaseModel):

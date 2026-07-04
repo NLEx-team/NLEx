@@ -20,6 +20,8 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  /* Gentle fade as each route's content mounts. */
+  animation: fade-in var(--motion-base) var(--ease-out) both;
 }
 
 .app-theme-toggle {

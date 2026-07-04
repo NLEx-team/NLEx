@@ -1,3 +1,4 @@
+import asyncio
 import logging
 from typing import List, Optional
 from uuid import UUID
@@ -8,6 +9,17 @@ from src.services.distributed_db import DistributedDatabaseService
 from src.models.schemas.catalog import CatalogCreate, CatalogConnection, DatabaseType
 
 logger = logging.getLogger(__name__)
+
+# Substrings that indicate a transient failure worth retrying (e.g. Trino still
+# starting up, or a brief network blip) rather than a real config error.
+_TRANSIENT_MARKERS = (
+    "server_starting_up",
+    "connection refused",
+    "failed to connect",
+    "timed out",
+    "connection reset",
+    "no route to host",
+)
 
 class CatalogService:
     def __init__(self, repository: CatalogRepository, db_service: DistributedDatabaseService):
@@ -42,31 +54,34 @@ class CatalogService:
         if not catalog:
             raise ValueError("Catalog not found")
 
-        try:
-            # Prepare connection for Trino
-            conn = CatalogConnection(
-                type=DatabaseType(catalog.type),
-                url=catalog.url,
-                user=catalog.user,
-                password=catalog.password
-            )
-            
-            trino_name = f"cat_{catalog.id.hex}"
-            
-            # 1. Drop if exists (to be sure)
-            await self.db_service.disconnect_catalog(trino_name)
-            
-            # 2. Connect
-            await self.db_service.connect_catalog(trino_name, conn)
-            
-            # 3. Verify (try to list schemas)
-            await self.db_service.get_namespaces(trino_name)
-            
-            # Success
-            return await self.repository.update_status(catalog_id, CatalogStatus.ACTIVE)
-        except Exception as e:
-            logger.error(f"Failed to sync catalog {catalog.name}: {e}")
-            return await self.repository.update_status(catalog_id, CatalogStatus.ERROR)
+        # Prepare connection for Trino
+        conn = CatalogConnection(
+            type=DatabaseType(catalog.type),
+            url=catalog.url,
+            user=catalog.user,
+            password=catalog.password
+        )
+        trino_name = f"cat_{catalog.id.hex}"
+
+        # Retry transient failures (e.g. Trino still starting up) with backoff.
+        last_error: Optional[Exception] = None
+        for attempt in range(3):
+            try:
+                # 1. Drop if exists (idempotent), 2. connect, 3. verify.
+                await self.db_service.disconnect_catalog(trino_name)
+                await self.db_service.connect_catalog(trino_name, conn)
+                await self.db_service.get_namespaces(trino_name)
+                return await self.repository.update_status(catalog_id, CatalogStatus.ACTIVE)
+            except Exception as e:
+                last_error = e
+                transient = any(m in str(e).lower() for m in _TRANSIENT_MARKERS)
+                if attempt < 2 and transient:
+                    await asyncio.sleep(1.5 * (attempt + 1))
+                    continue
+                break
+
+        logger.error(f"Failed to sync catalog {catalog.name}: {last_error}")
+        return await self.repository.update_status(catalog_id, CatalogStatus.ERROR)
 
     async def get_active_catalogs(self) -> List[Catalog]:
         return await self.repository.list_active_catalogs()

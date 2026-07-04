@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Icon } from '@iconify/react';
 import type { ChatMessageProps, OptionsBlock, TableBlock, ErrorBlock } from './ChatMessage.types';
+import { useTranslation } from 'react-i18next';
 import './ChatMessage.css';
 
 function TextBlockView({ text }: { text: string }) {
@@ -8,6 +9,7 @@ function TextBlockView({ text }: { text: string }) {
 }
 
 function OptionsBlockView({ block, onClarify, isLastMessage }: { block: OptionsBlock; onClarify?: (questionId: string, selectedOptions: string[]) => void; isLastMessage?: boolean }) {
+  const { t } = useTranslation();
   const [selected, setSelected] = useState<string | null>(null);
   const [showCustom, setShowCustom] = useState(false);
   const [customValue, setCustomValue] = useState('');
@@ -47,7 +49,7 @@ function OptionsBlockView({ block, onClarify, isLastMessage }: { block: OptionsB
             onClick={() => setShowCustom(true)}
             type="button"
           >
-            Другое (написать своё)
+            {t('chat.other_option', { defaultValue: 'Другое (написать своё)' })}
           </button>
         )}
         {showCustom && isActive && (
@@ -56,7 +58,7 @@ function OptionsBlockView({ block, onClarify, isLastMessage }: { block: OptionsB
               type="text"
               value={customValue}
               onChange={(e) => setCustomValue(e.target.value)}
-              placeholder="Введите ваш ответ..."
+              placeholder={t('chat.enter_reply', { defaultValue: 'Введите ваш ответ...' })}
               className="chat-message__custom-input"
               autoFocus
             />
@@ -76,6 +78,7 @@ function OptionsBlockView({ block, onClarify, isLastMessage }: { block: OptionsB
 }
 
 function TableBlockView({ block, exportUrl, onExport }: { block: TableBlock; exportUrl?: string; onExport?: (exportUrl: string) => void }) {
+  const { t } = useTranslation();
   return (
     <>
       <div className="chat-message__table-wrapper">
@@ -101,13 +104,13 @@ function TableBlockView({ block, exportUrl, onExport }: { block: TableBlock; exp
           {block.totalRows !== undefined ? (
             block.totalRows > block.rows.length && (
               <div style={{ padding: '8px', fontSize: '13px', color: 'var(--color-text-secondary)', textAlign: 'center', fontStyle: 'italic' }}>
-                Showing {block.rows.length} of {block.totalRows} rows
+                {t('chat.showing_rows', { shown: block.rows.length, total: block.totalRows })}
               </div>
             )
           ) : (
             block.rows.length > 5 && (
               <div style={{ padding: '8px', fontSize: '13px', color: 'var(--color-text-secondary)', textAlign: 'center', fontStyle: 'italic' }}>
-                Showing 5 of {block.rows.length} rows
+                {t('chat.showing_rows', { shown: 5, total: block.rows.length })}
               </div>
             )
           )}
@@ -117,7 +120,7 @@ function TableBlockView({ block, exportUrl, onExport }: { block: TableBlock; exp
             <details className="chat-message__sql-details">
               <summary className="chat-message__sql-summary">
                 <Icon icon="mdi:code-tags" />
-                <span>View SQL</span>
+                <span>{t('chat.view_sql')}</span>
               </summary>
               <pre className="chat-message__sql">{block.sql}</pre>
             </details>
@@ -131,7 +134,7 @@ function TableBlockView({ block, exportUrl, onExport }: { block: TableBlock; exp
           type="button"
         >
           <Icon icon="mdi:file-download-outline" />
-          <span>Export to Excel</span>
+          <span>{t('chat.export_excel')}</span>
         </button>
       )}
     </>
@@ -139,6 +142,7 @@ function TableBlockView({ block, exportUrl, onExport }: { block: TableBlock; exp
 }
 
 function ErrorBlockView({ block }: { block: ErrorBlock }) {
+  const { t } = useTranslation();
   return (
     <div className="chat-message__error">
       <Icon icon="mdi:alert-circle-outline" />
@@ -147,7 +151,7 @@ function ErrorBlockView({ block }: { block: ErrorBlock }) {
         <details className="chat-message__sql-details">
           <summary className="chat-message__sql-summary">
             <Icon icon="mdi:code-tags" />
-            <span>SQL attempted</span>
+            <span>{t('chat.sql_attempted')}</span>
           </summary>
           <pre className="chat-message__sql">{block.sql}</pre>
         </details>
