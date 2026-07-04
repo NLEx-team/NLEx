@@ -132,6 +132,19 @@
   align-items: center;
   gap: 20px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+  animation: fade-in-up var(--motion-base) var(--ease-out) both;
+  transition: transform var(--motion-fast) var(--ease-out),
+              box-shadow var(--motion-fast) var(--ease-out);
+}
+
+/* Subtle staggered entrance for the row of stat cards. */
+.analytics-card:nth-child(2) { animation-delay: 60ms; }
+.analytics-card:nth-child(3) { animation-delay: 120ms; }
+.analytics-card:nth-child(4) { animation-delay: 180ms; }
+
+.analytics-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
 }
 
 .analytics-card__icon-wrapper {
@@ -179,6 +192,8 @@
   height: 500px;
   display: flex;
   flex-direction: column;
+  animation: fade-in-up var(--motion-base) var(--ease-out) both;
+  animation-delay: 160ms;
 }
 
 .analytics-page__chart-container {
@@ -191,6 +206,8 @@
   border: 1px solid var(--color-border);
   border-radius: 12px;
   padding: 24px;
+  animation: fade-in-up var(--motion-base) var(--ease-out) both;
+  animation-delay: 220ms;
 }
 
 .analytics-page__table-wrapper {
@@ -423,4 +440,188 @@
 @keyframes spin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
+}
+
+/* --- Analytics filters bar --- */
+.analytics-filters {
+  display: flex;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 16px;
+  margin-bottom: 20px;
+  background: var(--color-back-components);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  animation: fade-in-up var(--motion-base) var(--ease-out) both;
+  /* Raise the whole filter bar above the content below. The fade-in-up
+     animation leaves a transform on this element (a stacking context), which
+     otherwise traps the open dropdowns behind the stat cards/chart. */
+  position: relative;
+  z-index: 40;
+}
+
+.analytics-filter {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 150px;
+}
+
+.analytics-filter--search {
+  flex: 0 1 260px;
+  min-width: 200px;
+  max-width: 260px;
+}
+
+.analytics-search {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.analytics-search input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 9px 34px 9px 12px;
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--input-radius);
+  background: var(--color-back-main);
+  color: var(--color-text-primary);
+  font-size: 14px;
+  outline: none;
+  transition: border-color var(--motion-fast) var(--ease-out);
+}
+
+.analytics-search input:focus {
+  border-color: var(--color-accent);
+}
+
+.analytics-search__clear {
+  position: absolute;
+  right: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  font-size: 16px;
+  transition: background var(--motion-fast) var(--ease-out), color var(--motion-fast) var(--ease-out);
+}
+
+.analytics-search__clear:hover {
+  background: var(--color-back-active);
+  color: var(--color-text-primary);
+}
+
+.analytics-catalog-select {
+  min-width: 200px;
+}
+
+/* Match the database dropdown trigger to the neighbouring date/search fields
+   (same 38px height, padding, border colour and font size) so the row lines up. */
+.analytics-catalog-select .multi-select-dropdown__trigger {
+  height: 38px;
+  padding: 0 12px;
+  border-color: var(--color-border);
+  font-size: 14px;
+}
+
+.analytics-filter label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.analytics-filter input,
+.analytics-filter select {
+  padding: 9px 12px;
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--input-radius);
+  background: var(--color-back-main);
+  color: var(--color-text-primary);
+  font-size: 14px;
+  outline: none;
+  transition: border-color var(--motion-fast) var(--ease-out);
+}
+
+.analytics-filter input:focus,
+.analytics-filter select:focus {
+  border-color: var(--color-accent);
+}
+
+.analytics-filters__reset {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 14px;
+  height: fit-content;
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--button-radius);
+  background: var(--color-back-main);
+  color: var(--color-text-secondary);
+  font-size: 14px;
+  cursor: pointer;
+  transition: background var(--motion-fast) var(--ease-out), color var(--motion-fast) var(--ease-out);
+}
+
+.analytics-filters__reset:hover {
+  background: var(--color-back-active);
+  color: var(--color-text-primary);
+}
+
+.analytics-page__content--loading {
+  opacity: 0.55;
+  pointer-events: none;
+  transition: opacity var(--motion-fast) var(--ease-out);
+}
+
+/* --- DB filter: match-mode toggle (rendered inside the dropdown footer) --- */
+.analytics-match-mode {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.analytics-match-mode__opt {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--color-text-primary);
+  cursor: pointer;
+}
+
+.analytics-match-mode__opt input {
+  accent-color: var(--color-accent);
+  cursor: pointer;
+  margin: 0;
+}
+
+.analytics-hint {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--color-back-active);
+  color: var(--color-text-secondary);
+  font-size: 11px;
+  font-weight: 700;
+  cursor: help;
+  flex-shrink: 0;
+  transition: background var(--motion-fast) var(--ease-out), color var(--motion-fast) var(--ease-out);
+}
+
+.analytics-hint:hover {
+  background: var(--color-accent);
+  color: var(--color-on-accent);
 }
