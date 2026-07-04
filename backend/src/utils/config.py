@@ -1,5 +1,10 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic import model_validator
 from functools import lru_cache
+
+# Placeholder value shipped in .env.example. Using it in production is unsafe
+# because anyone who knows it can forge valid JWTs and impersonate any user.
+_INSECURE_JWT_DEFAULT = "your-super-secret-key-change-me"
 
 class Settings(BaseSettings):
     ENVIRONMENT: str = "development"
@@ -19,13 +24,14 @@ class Settings(BaseSettings):
 
     # Admin
     ADMIN_EMAIL: str = "admin@nlex.ai"
-    ADMIN_PASSWORD: str = "admin123"
+    # No default: the admin password must be provided via .env.secret only.
+    ADMIN_PASSWORD: str
 
     # Trino
     TRINO_PORT: int = 8080
     
     # JWT
-    JWT_SECRET_KEY: str = "your-super-secret-key-change-me"
+    JWT_SECRET_KEY: str = _INSECURE_JWT_DEFAULT
     JWT_ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 # 24 hours
 
@@ -38,6 +44,20 @@ class Settings(BaseSettings):
     MAX_SQL_RETRIES: int = 3
     SYSTEM_PROXY_URL: str | None = None
     
+    @model_validator(mode="after")
+    def _reject_insecure_secrets_in_production(self) -> "Settings":
+        """
+        Refuse to boot in production with the placeholder JWT secret.
+        Keeping the default in development/test is fine, but in production it
+        would allow anyone to forge tokens and impersonate any user.
+        """
+        if self.ENVIRONMENT.lower() == "production" and self.JWT_SECRET_KEY == _INSECURE_JWT_DEFAULT:
+            raise ValueError(
+                "JWT_SECRET_KEY is still set to the insecure default placeholder. "
+                "Set a strong random JWT_SECRET_KEY in .env.secret before running in production."
+            )
+        return self
+
     @property
     def SQLALCHEMY_DATABASE_URL(self) -> str:
         if self.DATABASE_URL:
