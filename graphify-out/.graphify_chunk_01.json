@@ -1,0 +1,1022 @@
+{
+  "nodes": [
+    {
+      "id": "readme_nlex",
+      "label": "NLEx — Natural Language to SQL Service",
+      "file_type": "concept",
+      "source_file": "README.md",
+      "source_location": "README.md:1-11",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "Translates natural language requests into SQL queries so business analysts can interact with databases without writing code."
+    },
+    {
+      "id": "readme_docker_profiles",
+      "label": "Docker Profiles Environment Management",
+      "file_type": "rationale",
+      "source_file": "README.md",
+      "source_location": "README.md:22-47",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "A single docker-compose file manages dev (hot-reload), prod (Nginx/Uvicorn optimized builds), and test (isolated, auto-shutdown) environments via Docker Compose profiles instead of separate compose files."
+    },
+    {
+      "id": "contributing_git_workflow",
+      "label": "NLEx Git Workflow (protected main/develop, feature branches)",
+      "file_type": "document",
+      "source_file": "CONTRIBUTING.md",
+      "source_location": "CONTRIBUTING.md:5-82",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "main and develop are protected and only receive code via approved PRs; personal feature/<team>/<task> branches keep work isolated per developer and per team (frontend/backend/ai)."
+    },
+    {
+      "id": "contributing_conventional_commits",
+      "label": "Conventional Commits Standard",
+      "file_type": "concept",
+      "source_file": "CONTRIBUTING.md",
+      "source_location": "CONTRIBUTING.md:84-108",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "docker_compose_db",
+      "label": "Main PostgreSQL Service (db)",
+      "file_type": "code",
+      "source_file": "docker-compose.yml",
+      "source_location": "docker-compose.yml:2-20",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "docker_compose_trino",
+      "label": "Trino Query Engine Service",
+      "file_type": "code",
+      "source_file": "docker-compose.yml",
+      "source_location": "docker-compose.yml:23-39",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "Trino acts as the federated SQL layer with dynamic catalogs (trino_catalogs volume), letting the backend query multiple attached databases through one engine."
+    },
+    {
+      "id": "docker_compose_backend_dev",
+      "label": "Backend Dev Service (backend-dev)",
+      "file_type": "code",
+      "source_file": "docker-compose.yml",
+      "source_location": "docker-compose.yml:43-70",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "docker_compose_frontend_dev",
+      "label": "Frontend Dev Service (frontend-dev)",
+      "file_type": "code",
+      "source_file": "docker-compose.yml",
+      "source_location": "docker-compose.yml:72-92",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "docker_compose_backend_prod",
+      "label": "Backend Prod Service (backend-prod)",
+      "file_type": "code",
+      "source_file": "docker-compose.yml",
+      "source_location": "docker-compose.yml:96-110",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "docker_compose_frontend_prod",
+      "label": "Frontend Prod Service (frontend-prod)",
+      "file_type": "code",
+      "source_file": "docker-compose.yml",
+      "source_location": "docker-compose.yml:112-127",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "docker_compose_postgres_test",
+      "label": "Test PostgreSQL Service (postgres-test)",
+      "file_type": "code",
+      "source_file": "docker-compose.yml",
+      "source_location": "docker-compose.yml:131-145",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "docker_compose_backend_test",
+      "label": "Backend Test Runner Service (backend-test)",
+      "file_type": "code",
+      "source_file": "docker-compose.yml",
+      "source_location": "docker-compose.yml:147-188",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "Runs pytest against a SQLite app DB while pointing TEST_POSTGRES_* at postgres-test for Trino connection tests and TEST_PAGILA_* at a pagila database for schema-extraction tests."
+    },
+    {
+      "id": "docker_compose_testbd_postgres",
+      "label": "Test Company Database Service (testbd-postgres)",
+      "file_type": "code",
+      "source_file": "docker-compose.yml",
+      "source_location": "docker-compose.yml:192-213",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "Dev-profile PostgreSQL on port 5434 seeded with 1000 employees, projects, salaries, and vacations to give the NL-to-SQL pipeline a realistic company database to query."
+    },
+    {
+      "id": "schema_example_pagila_test",
+      "label": "Pagila Schema Extraction Example (schema.example.json)",
+      "file_type": "document",
+      "source_file": "schema.example.json",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "Canonical example of the JSON schema snapshot format (catalog > schemas > tables > columns with types, nullability, and sample values) produced by schema extraction from the Pagila test database; sample values are included so the LLM has concrete data shapes for text-to-SQL generation."
+    },
+    {
+      "id": "db_schema_testbd_ddl",
+      "label": "testbd Company Schema DDL (schema.sql)",
+      "file_type": "code",
+      "source_file": "testbdpostreSQL/db/schema.sql",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "Deliberately uses Russian-language column names (dolzhnost, stavka, otdel) and Russian CHECK-constraint values to test NL-to-SQL behavior on non-English schemas."
+    },
+    {
+      "id": "db_schema_users",
+      "label": "users table (employees)",
+      "file_type": "code",
+      "source_file": "testbdpostreSQL/db/schema.sql",
+      "source_location": "schema.sql:102-123",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "db_schema_projects",
+      "label": "projects table",
+      "file_type": "code",
+      "source_file": "testbdpostreSQL/db/schema.sql",
+      "source_location": "schema.sql:27-39",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "db_schema_salary_history",
+      "label": "salary_history table",
+      "file_type": "code",
+      "source_file": "testbdpostreSQL/db/schema.sql",
+      "source_location": "schema.sql:66-75",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "db_schema_vacations",
+      "label": "vacations table",
+      "file_type": "code",
+      "source_file": "testbdpostreSQL/db/schema.sql",
+      "source_location": "schema.sql:236-248",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "db_schema_v_employees",
+      "label": "v_employees view (employee summary with age, tenure, total compensation)",
+      "file_type": "code",
+      "source_file": "testbdpostreSQL/db/schema.sql",
+      "source_location": "schema.sql:170-191",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "db_schema_v_active_projects",
+      "label": "v_active_projects view",
+      "file_type": "code",
+      "source_file": "testbdpostreSQL/db/schema.sql",
+      "source_location": "schema.sql:150-163",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "db_schema_v_otdely",
+      "label": "v_otdely view (per-department salary stats)",
+      "file_type": "code",
+      "source_file": "testbdpostreSQL/db/schema.sql",
+      "source_location": "schema.sql:198-210",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "db_schema_v_salary_history",
+      "label": "v_salary_history view (raises with percent growth)",
+      "file_type": "code",
+      "source_file": "testbdpostreSQL/db/schema.sql",
+      "source_location": "schema.sql:217-229",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "db_schema_v_vacations",
+      "label": "v_vacations view",
+      "file_type": "code",
+      "source_file": "testbdpostreSQL/db/schema.sql",
+      "source_location": "schema.sql:255-265",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "db_seed_seed_data",
+      "label": "testbd Seed Data (1000 employees, projects, salaries, vacations)",
+      "file_type": "code",
+      "source_file": "testbdpostreSQL/db/seed.sql",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "testbdpostresql_readme_testbd",
+      "label": "testbd Employee Database Documentation",
+      "file_type": "document",
+      "source_file": "testbdpostreSQL/README.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "testbdpostresql_readme_db_roles",
+      "label": "testbd Access Roles (readonly_user / hr_user / dev_user)",
+      "file_type": "concept",
+      "source_file": "testbdpostreSQL/README.md",
+      "source_location": "README.md:57-64",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "Three tiers of DB privileges (read-only, HR read/edit of users and vacations, full dev access) model realistic access control for testing; role passwords live in schema.sql and must be replaced before production."
+    },
+    {
+      "id": "testbdpostresql_docker_compose_db",
+      "label": "Standalone testbd PostgreSQL Service (db)",
+      "file_type": "code",
+      "source_file": "testbdpostreSQL/docker-compose.yml",
+      "source_location": "docker-compose.yml:4-22",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "testbdpostresql_docker_compose_pgadmin",
+      "label": "pgAdmin Service for testbd",
+      "file_type": "code",
+      "source_file": "testbdpostreSQL/docker-compose.yml",
+      "source_location": "docker-compose.yml:24-37",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "frontend_package",
+      "label": "Frontend Package Manifest (React 19, Vite 8, TypeScript 6, react-router-dom 7, recharts)",
+      "file_type": "code",
+      "source_file": "frontend/package.json",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "frontend_vite_config",
+      "label": "Vite Configuration",
+      "file_type": "code",
+      "source_file": "frontend/vite.config.ts",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "frontend_eslint_config",
+      "label": "ESLint Flat Config (typescript-eslint, react-hooks, react-refresh)",
+      "file_type": "code",
+      "source_file": "frontend/eslint.config.js",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "frontend_tsconfig",
+      "label": "Root TypeScript Project References Config",
+      "file_type": "code",
+      "source_file": "frontend/tsconfig.json",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "frontend_tsconfig_app",
+      "label": "App TypeScript Config (src, ES2023, react-jsx)",
+      "file_type": "code",
+      "source_file": "frontend/tsconfig.app.json",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "frontend_tsconfig_node",
+      "label": "Node TypeScript Config (vite.config.ts)",
+      "file_type": "code",
+      "source_file": "frontend/tsconfig.node.json",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "frontend_index",
+      "label": "Frontend HTML Entry with Theme Bootstrap Script",
+      "file_type": "code",
+      "source_file": "frontend/index.html",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "Inline script reads localStorage 'theme' and sets document.documentElement.dataset.theme before React mounts, preventing a light/dark theme flash on first paint; falls back to light on storage errors."
+    },
+    {
+      "id": "frontend_vercel_spa_rewrite",
+      "label": "Vercel SPA Catch-All Rewrite",
+      "file_type": "concept",
+      "source_file": "frontend/vercel.json",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "Rewrites every path to /index.html so client-side routing (react-router-dom) handles deep links instead of Vercel returning 404s."
+    },
+    {
+      "id": "_vercel_project",
+      "label": "Vercel Project Link (nlex)",
+      "file_type": "document",
+      "source_file": "frontend/.vercel/project.json",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "_vercel_readme",
+      "label": "Vercel Folder Explanation",
+      "file_type": "document",
+      "source_file": "frontend/.vercel/README.txt",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "frontend_readme",
+      "label": "React + TypeScript + Vite Template Notes",
+      "file_type": "document",
+      "source_file": "frontend/README.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    }
+  ],
+  "edges": [
+    {
+      "source": "readme_nlex",
+      "target": "contributing_git_workflow",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "README.md",
+      "source_location": "README.md:11",
+      "weight": 1.0
+    },
+    {
+      "source": "readme_nlex",
+      "target": "readme_docker_profiles",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "README.md",
+      "source_location": "README.md:22-47",
+      "weight": 1.0
+    },
+    {
+      "source": "contributing_git_workflow",
+      "target": "contributing_conventional_commits",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "CONTRIBUTING.md",
+      "source_location": "CONTRIBUTING.md:84-99",
+      "weight": 1.0
+    },
+    {
+      "source": "docker_compose_backend_dev",
+      "target": "docker_compose_db",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docker-compose.yml",
+      "source_location": "docker-compose.yml:57-59",
+      "weight": 1.0
+    },
+    {
+      "source": "docker_compose_backend_dev",
+      "target": "docker_compose_trino",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docker-compose.yml",
+      "source_location": "docker-compose.yml:60-61",
+      "weight": 1.0
+    },
+    {
+      "source": "docker_compose_frontend_dev",
+      "target": "docker_compose_backend_dev",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docker-compose.yml",
+      "source_location": "docker-compose.yml:86-89",
+      "weight": 1.0
+    },
+    {
+      "source": "docker_compose_backend_prod",
+      "target": "docker_compose_db",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docker-compose.yml",
+      "source_location": "docker-compose.yml:105-107",
+      "weight": 1.0
+    },
+    {
+      "source": "docker_compose_backend_prod",
+      "target": "docker_compose_trino",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docker-compose.yml",
+      "source_location": "docker-compose.yml:105-107",
+      "weight": 1.0
+    },
+    {
+      "source": "docker_compose_frontend_prod",
+      "target": "docker_compose_backend_prod",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docker-compose.yml",
+      "source_location": "docker-compose.yml:121-124",
+      "weight": 1.0
+    },
+    {
+      "source": "docker_compose_backend_test",
+      "target": "docker_compose_db",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docker-compose.yml",
+      "source_location": "docker-compose.yml:179-181",
+      "weight": 1.0
+    },
+    {
+      "source": "docker_compose_backend_test",
+      "target": "docker_compose_trino",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docker-compose.yml",
+      "source_location": "docker-compose.yml:161-162,182-183",
+      "weight": 1.0
+    },
+    {
+      "source": "docker_compose_backend_test",
+      "target": "docker_compose_postgres_test",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docker-compose.yml",
+      "source_location": "docker-compose.yml:165-168,184-185",
+      "weight": 1.0
+    },
+    {
+      "source": "docker_compose_testbd_postgres",
+      "target": "db_schema_testbd_ddl",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docker-compose.yml",
+      "source_location": "docker-compose.yml:205",
+      "weight": 1.0
+    },
+    {
+      "source": "docker_compose_testbd_postgres",
+      "target": "db_seed_seed_data",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docker-compose.yml",
+      "source_location": "docker-compose.yml:206",
+      "weight": 1.0
+    },
+    {
+      "source": "testbdpostresql_docker_compose_db",
+      "target": "db_schema_testbd_ddl",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "testbdpostreSQL/docker-compose.yml",
+      "source_location": "docker-compose.yml:16",
+      "weight": 1.0
+    },
+    {
+      "source": "testbdpostresql_docker_compose_db",
+      "target": "db_seed_seed_data",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "testbdpostreSQL/docker-compose.yml",
+      "source_location": "docker-compose.yml:17",
+      "weight": 1.0
+    },
+    {
+      "source": "testbdpostresql_docker_compose_pgadmin",
+      "target": "testbdpostresql_docker_compose_db",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "testbdpostreSQL/docker-compose.yml",
+      "source_location": "docker-compose.yml:33-35",
+      "weight": 1.0
+    },
+    {
+      "source": "docker_compose_testbd_postgres",
+      "target": "testbdpostresql_docker_compose_db",
+      "relation": "shares_data_with",
+      "confidence": "INFERRED",
+      "confidence_score": 0.95,
+      "source_file": "docker-compose.yml",
+      "source_location": "docker-compose.yml:205-206",
+      "weight": 1.0
+    },
+    {
+      "source": "db_schema_projects",
+      "target": "db_schema_users",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "testbdpostreSQL/db/schema.sql",
+      "source_location": "schema.sql:472-473",
+      "weight": 1.0
+    },
+    {
+      "source": "db_schema_salary_history",
+      "target": "db_schema_users",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "testbdpostreSQL/db/schema.sql",
+      "source_location": "schema.sql:480-481",
+      "weight": 1.0
+    },
+    {
+      "source": "db_schema_vacations",
+      "target": "db_schema_users",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "testbdpostreSQL/db/schema.sql",
+      "source_location": "schema.sql:488-489",
+      "weight": 1.0
+    },
+    {
+      "source": "db_schema_v_employees",
+      "target": "db_schema_users",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "testbdpostreSQL/db/schema.sql",
+      "source_location": "schema.sql:170-191",
+      "weight": 1.0
+    },
+    {
+      "source": "db_schema_v_employees",
+      "target": "db_schema_salary_history",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "testbdpostreSQL/db/schema.sql",
+      "source_location": "schema.sql:190-191",
+      "weight": 1.0
+    },
+    {
+      "source": "db_schema_v_active_projects",
+      "target": "db_schema_projects",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "testbdpostreSQL/db/schema.sql",
+      "source_location": "schema.sql:160-162",
+      "weight": 1.0
+    },
+    {
+      "source": "db_schema_v_active_projects",
+      "target": "db_schema_users",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "testbdpostreSQL/db/schema.sql",
+      "source_location": "schema.sql:160-161",
+      "weight": 1.0
+    },
+    {
+      "source": "db_schema_v_otdely",
+      "target": "db_schema_users",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "testbdpostreSQL/db/schema.sql",
+      "source_location": "schema.sql:198-210",
+      "weight": 1.0
+    },
+    {
+      "source": "db_schema_v_salary_history",
+      "target": "db_schema_salary_history",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "testbdpostreSQL/db/schema.sql",
+      "source_location": "schema.sql:227-228",
+      "weight": 1.0
+    },
+    {
+      "source": "db_schema_v_salary_history",
+      "target": "db_schema_users",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "testbdpostreSQL/db/schema.sql",
+      "source_location": "schema.sql:227-228",
+      "weight": 1.0
+    },
+    {
+      "source": "db_schema_v_vacations",
+      "target": "db_schema_vacations",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "testbdpostreSQL/db/schema.sql",
+      "source_location": "schema.sql:263-264",
+      "weight": 1.0
+    },
+    {
+      "source": "db_schema_v_vacations",
+      "target": "db_schema_users",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "testbdpostreSQL/db/schema.sql",
+      "source_location": "schema.sql:263-264",
+      "weight": 1.0
+    },
+    {
+      "source": "db_seed_seed_data",
+      "target": "db_schema_users",
+      "relation": "shares_data_with",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "testbdpostreSQL/db/seed.sql",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "db_seed_seed_data",
+      "target": "db_schema_projects",
+      "relation": "shares_data_with",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "testbdpostreSQL/db/seed.sql",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "db_seed_seed_data",
+      "target": "db_schema_salary_history",
+      "relation": "shares_data_with",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "testbdpostreSQL/db/seed.sql",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "db_seed_seed_data",
+      "target": "db_schema_vacations",
+      "relation": "shares_data_with",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "testbdpostreSQL/db/seed.sql",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "testbdpostresql_readme_testbd",
+      "target": "db_schema_testbd_ddl",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "testbdpostreSQL/README.md",
+      "source_location": "README.md:40-64",
+      "weight": 1.0
+    },
+    {
+      "source": "testbdpostresql_readme_testbd",
+      "target": "testbdpostresql_readme_db_roles",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "testbdpostreSQL/README.md",
+      "source_location": "README.md:57-64",
+      "weight": 1.0
+    },
+    {
+      "source": "testbdpostresql_readme_testbd",
+      "target": "testbdpostresql_docker_compose_db",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "testbdpostreSQL/README.md",
+      "source_location": "README.md:24-38,66-83",
+      "weight": 1.0
+    },
+    {
+      "source": "frontend_tsconfig",
+      "target": "frontend_tsconfig_app",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "frontend/tsconfig.json",
+      "source_location": "tsconfig.json:4",
+      "weight": 1.0
+    },
+    {
+      "source": "frontend_tsconfig",
+      "target": "frontend_tsconfig_node",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "frontend/tsconfig.json",
+      "source_location": "tsconfig.json:5",
+      "weight": 1.0
+    },
+    {
+      "source": "frontend_tsconfig_node",
+      "target": "frontend_vite_config",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "frontend/tsconfig.node.json",
+      "source_location": "tsconfig.node.json:23",
+      "weight": 1.0
+    },
+    {
+      "source": "frontend_package",
+      "target": "frontend_vite_config",
+      "relation": "references",
+      "confidence": "INFERRED",
+      "confidence_score": 0.95,
+      "source_file": "frontend/package.json",
+      "source_location": "package.json:7-10",
+      "weight": 1.0
+    },
+    {
+      "source": "frontend_package",
+      "target": "frontend_eslint_config",
+      "relation": "references",
+      "confidence": "INFERRED",
+      "confidence_score": 0.95,
+      "source_file": "frontend/package.json",
+      "source_location": "package.json:9",
+      "weight": 1.0
+    },
+    {
+      "source": "frontend_readme",
+      "target": "frontend_eslint_config",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "frontend/README.md",
+      "source_location": "README.md:14-44",
+      "weight": 1.0
+    },
+    {
+      "source": "_vercel_readme",
+      "target": "_vercel_project",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "frontend/.vercel/README.txt",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "frontend_vercel_spa_rewrite",
+      "target": "_vercel_project",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "frontend/vercel.json",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "frontend_vercel_spa_rewrite",
+      "target": "frontend_package",
+      "relation": "rationale_for",
+      "confidence": "INFERRED",
+      "confidence_score": 0.75,
+      "source_file": "frontend/vercel.json",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "schema_example_pagila_test",
+      "target": "docker_compose_backend_test",
+      "relation": "shares_data_with",
+      "confidence": "INFERRED",
+      "confidence_score": 0.95,
+      "source_file": "docker-compose.yml",
+      "source_location": "docker-compose.yml:170-177",
+      "weight": 1.0
+    },
+    {
+      "source": "schema_example_pagila_test",
+      "target": "docker_compose_trino",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "schema.example.json",
+      "source_location": "schema.example.json:2",
+      "weight": 1.0
+    },
+    {
+      "source": "db_schema_testbd_ddl",
+      "target": "schema_example_pagila_test",
+      "relation": "semantically_similar_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.75,
+      "source_file": "testbdpostreSQL/db/schema.sql",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "testbdpostresql_readme_testbd",
+      "target": "readme_nlex",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.75,
+      "source_file": "testbdpostreSQL/README.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "readme_docker_profiles",
+      "target": "docker_compose_backend_dev",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "README.md",
+      "source_location": "README.md:24-47",
+      "weight": 1.0
+    }
+  ],
+  "hyperedges": [
+    {
+      "id": "testbd_company_database",
+      "label": "testbd Test Company Database (schema + seed + containers)",
+      "nodes": [
+        "db_schema_testbd_ddl",
+        "db_schema_users",
+        "db_schema_projects",
+        "db_schema_salary_history",
+        "db_schema_vacations",
+        "db_seed_seed_data",
+        "docker_compose_testbd_postgres",
+        "testbdpostresql_docker_compose_db"
+      ],
+      "relation": "form",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "testbdpostreSQL/db/schema.sql"
+    },
+    {
+      "id": "docker_profiles_environments",
+      "label": "Docker Compose Profile-Based Environments (dev/prod/test)",
+      "nodes": [
+        "docker_compose_backend_dev",
+        "docker_compose_frontend_dev",
+        "docker_compose_backend_prod",
+        "docker_compose_frontend_prod",
+        "docker_compose_backend_test",
+        "docker_compose_postgres_test",
+        "docker_compose_testbd_postgres"
+      ],
+      "relation": "participate_in",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docker-compose.yml"
+    },
+    {
+      "id": "frontend_build_toolchain",
+      "label": "Frontend Build and Lint Toolchain",
+      "nodes": [
+        "frontend_package",
+        "frontend_vite_config",
+        "frontend_tsconfig",
+        "frontend_tsconfig_app",
+        "frontend_tsconfig_node",
+        "frontend_eslint_config"
+      ],
+      "relation": "form",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "frontend/package.json"
+    }
+  ],
+  "input_tokens": 52000,
+  "output_tokens": 7500
+}

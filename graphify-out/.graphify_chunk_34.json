@@ -1,0 +1,404 @@
+{
+  "nodes": [
+    {
+      "id": "images_milestone_and_sprint_backlog",
+      "label": "Milestone and Sprint Backlog Screenshot (GitHub Sprint 2)",
+      "file_type": "image",
+      "source_file": "reports/week3/images/Milestone_and_Sprint_Backlog.png",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": "SerafimSoldatov",
+      "contributor": null
+    },
+    {
+      "id": "images_milestone_and_sprint_backlog_sprint_2_milestone",
+      "label": "Sprint 2 Milestone (Due June 21, 2026, 11 open issues, 0% complete)",
+      "file_type": "concept",
+      "source_file": "reports/week3/images/Milestone_and_Sprint_Backlog.png",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "images_milestone_and_sprint_backlog_sprint_backlog",
+      "label": "Sprint Backlog (Scrum artifact tracked via GitHub Milestones)",
+      "file_type": "concept",
+      "source_file": "reports/week3/images/Milestone_and_Sprint_Backlog.png",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "images_milestone_and_sprint_backlog_pbi_001_nl_query_input",
+      "label": "PBI-001: NL query input field in UI (#23)",
+      "file_type": "concept",
+      "source_file": "reports/week3/images/Milestone_and_Sprint_Backlog.png",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "images_milestone_and_sprint_backlog_pbi_002_backend_llm_endpoint",
+      "label": "PBI-002: Backend endpoint for prompt processing & LLM integration (#24)",
+      "file_type": "concept",
+      "source_file": "reports/week3/images/Milestone_and_Sprint_Backlog.png",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "images_milestone_and_sprint_backlog_pbi_003_sidebar_db_dropdown",
+      "label": "PBI-003: Sidebar database selection dropdown (#25)",
+      "file_type": "concept",
+      "source_file": "reports/week3/images/Milestone_and_Sprint_Backlog.png",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "images_milestone_and_sprint_backlog_pbi_004_excel_export",
+      "label": "PBI-004: Excel export service with auto-formatting (#26)",
+      "file_type": "concept",
+      "source_file": "reports/week3/images/Milestone_and_Sprint_Backlog.png",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "images_milestone_and_sprint_backlog_pbi_005_result_preview_table",
+      "label": "PBI-005: Frontend result preview table (#27)",
+      "file_type": "concept",
+      "source_file": "reports/week3/images/Milestone_and_Sprint_Backlog.png",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "images_milestone_and_sprint_backlog_pbi_006_clarification_logic",
+      "label": "PBI-006: Clarification logic in LLM prompt & Backend handler (#28)",
+      "file_type": "concept",
+      "source_file": "reports/week3/images/Milestone_and_Sprint_Backlog.png",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "images_milestone_and_sprint_backlog_pbi_007_clarification_chat_ui",
+      "label": "PBI-007: UI support for clarification turns (chat bubbles) (#29)",
+      "file_type": "concept",
+      "source_file": "reports/week3/images/Milestone_and_Sprint_Backlog.png",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "images_milestone_and_sprint_backlog_pbi_008_postgres_connection",
+      "label": "PBI-008: Persistent database connection management (PostgreSQL) (#30)",
+      "file_type": "concept",
+      "source_file": "reports/week3/images/Milestone_and_Sprint_Backlog.png",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "images_milestone_and_sprint_backlog_pbi_010_sql_preview",
+      "label": "PBI-010: Collapsible SQL preview component in UI (#32)",
+      "file_type": "concept",
+      "source_file": "reports/week3/images/Milestone_and_Sprint_Backlog.png",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "images_milestone_and_sprint_backlog_pbi_011_jwt_authentication",
+      "label": "PBI-011: Replace mock Auth with real JWT/DB authentication (#33)",
+      "file_type": "concept",
+      "source_file": "reports/week3/images/Milestone_and_Sprint_Backlog.png",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "images_milestone_and_sprint_backlog_pbi_015_error_boundaries",
+      "label": "PBI-015: Frontend Error boundaries & user-friendly error messages (#36)",
+      "file_type": "concept",
+      "source_file": "reports/week3/images/Milestone_and_Sprint_Backlog.png",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "images_milestone_and_sprint_backlog_nl_to_sql_pipeline",
+      "label": "Natural Language to SQL Query Pipeline",
+      "file_type": "concept",
+      "source_file": "reports/week3/images/Milestone_and_Sprint_Backlog.png",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    }
+  ],
+  "edges": [
+    {
+      "source": "images_milestone_and_sprint_backlog",
+      "target": "images_milestone_and_sprint_backlog_sprint_2_milestone",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "reports/week3/images/Milestone_and_Sprint_Backlog.png",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "images_milestone_and_sprint_backlog",
+      "target": "images_milestone_and_sprint_backlog_sprint_backlog",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.95,
+      "source_file": "reports/week3/images/Milestone_and_Sprint_Backlog.png",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "images_milestone_and_sprint_backlog_sprint_2_milestone",
+      "target": "images_milestone_and_sprint_backlog_pbi_001_nl_query_input",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "reports/week3/images/Milestone_and_Sprint_Backlog.png",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "images_milestone_and_sprint_backlog_sprint_2_milestone",
+      "target": "images_milestone_and_sprint_backlog_pbi_002_backend_llm_endpoint",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "reports/week3/images/Milestone_and_Sprint_Backlog.png",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "images_milestone_and_sprint_backlog_sprint_2_milestone",
+      "target": "images_milestone_and_sprint_backlog_pbi_003_sidebar_db_dropdown",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "reports/week3/images/Milestone_and_Sprint_Backlog.png",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "images_milestone_and_sprint_backlog_sprint_2_milestone",
+      "target": "images_milestone_and_sprint_backlog_pbi_004_excel_export",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "reports/week3/images/Milestone_and_Sprint_Backlog.png",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "images_milestone_and_sprint_backlog_sprint_2_milestone",
+      "target": "images_milestone_and_sprint_backlog_pbi_005_result_preview_table",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "reports/week3/images/Milestone_and_Sprint_Backlog.png",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "images_milestone_and_sprint_backlog_sprint_2_milestone",
+      "target": "images_milestone_and_sprint_backlog_pbi_006_clarification_logic",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "reports/week3/images/Milestone_and_Sprint_Backlog.png",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "images_milestone_and_sprint_backlog_sprint_2_milestone",
+      "target": "images_milestone_and_sprint_backlog_pbi_007_clarification_chat_ui",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "reports/week3/images/Milestone_and_Sprint_Backlog.png",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "images_milestone_and_sprint_backlog_sprint_2_milestone",
+      "target": "images_milestone_and_sprint_backlog_pbi_008_postgres_connection",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "reports/week3/images/Milestone_and_Sprint_Backlog.png",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "images_milestone_and_sprint_backlog_sprint_2_milestone",
+      "target": "images_milestone_and_sprint_backlog_pbi_010_sql_preview",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "reports/week3/images/Milestone_and_Sprint_Backlog.png",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "images_milestone_and_sprint_backlog_sprint_2_milestone",
+      "target": "images_milestone_and_sprint_backlog_pbi_011_jwt_authentication",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "reports/week3/images/Milestone_and_Sprint_Backlog.png",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "images_milestone_and_sprint_backlog_sprint_2_milestone",
+      "target": "images_milestone_and_sprint_backlog_pbi_015_error_boundaries",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "reports/week3/images/Milestone_and_Sprint_Backlog.png",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "images_milestone_and_sprint_backlog_pbi_001_nl_query_input",
+      "target": "images_milestone_and_sprint_backlog_pbi_002_backend_llm_endpoint",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "reports/week3/images/Milestone_and_Sprint_Backlog.png",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "images_milestone_and_sprint_backlog_pbi_006_clarification_logic",
+      "target": "images_milestone_and_sprint_backlog_pbi_007_clarification_chat_ui",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.95,
+      "source_file": "reports/week3/images/Milestone_and_Sprint_Backlog.png",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "images_milestone_and_sprint_backlog_pbi_003_sidebar_db_dropdown",
+      "target": "images_milestone_and_sprint_backlog_pbi_008_postgres_connection",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "reports/week3/images/Milestone_and_Sprint_Backlog.png",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "images_milestone_and_sprint_backlog_pbi_004_excel_export",
+      "target": "images_milestone_and_sprint_backlog_pbi_005_result_preview_table",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.75,
+      "source_file": "reports/week3/images/Milestone_and_Sprint_Backlog.png",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "images_milestone_and_sprint_backlog_pbi_002_backend_llm_endpoint",
+      "target": "images_milestone_and_sprint_backlog_pbi_010_sql_preview",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.75,
+      "source_file": "reports/week3/images/Milestone_and_Sprint_Backlog.png",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "images_milestone_and_sprint_backlog_nl_to_sql_pipeline",
+      "target": "images_milestone_and_sprint_backlog_pbi_001_nl_query_input",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "reports/week3/images/Milestone_and_Sprint_Backlog.png",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "images_milestone_and_sprint_backlog_nl_to_sql_pipeline",
+      "target": "images_milestone_and_sprint_backlog_pbi_002_backend_llm_endpoint",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "reports/week3/images/Milestone_and_Sprint_Backlog.png",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "images_milestone_and_sprint_backlog_nl_to_sql_pipeline",
+      "target": "images_milestone_and_sprint_backlog_pbi_010_sql_preview",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "reports/week3/images/Milestone_and_Sprint_Backlog.png",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "images_milestone_and_sprint_backlog_nl_to_sql_pipeline",
+      "target": "images_milestone_and_sprint_backlog_pbi_006_clarification_logic",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.75,
+      "source_file": "reports/week3/images/Milestone_and_Sprint_Backlog.png",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "images_milestone_and_sprint_backlog",
+      "target": "images_milestone_and_sprint_backlog_nl_to_sql_pipeline",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "reports/week3/images/Milestone_and_Sprint_Backlog.png",
+      "source_location": null,
+      "weight": 1.0
+    }
+  ],
+  "hyperedges": [],
+  "input_tokens": 0,
+  "output_tokens": 0
+}
