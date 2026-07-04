@@ -134,17 +134,17 @@ class ChatController:
             return "unknown"
         return orchestrator.state.value
 
-    async def process_prompt(self, chat_id: UUID, prompt: str, catalog_ids: List[str] = None) -> Dict[str, Any]:
+    async def process_prompt(self, chat_id: UUID, prompt: str, catalog_ids: List[str] = None, language: str = "ru") -> Dict[str, Any]:
         orchestrator = await self.get_orchestrator(chat_id, catalog_ids)
 
-        result = await orchestrator.execute_user_query(prompt)
+        result = await orchestrator.execute_user_query(prompt, language=language)
         active_catalogs = await self.catalog_service.get_active_catalogs()
         return self._format_response(chat_id, orchestrator, result, active_catalogs)
 
-    async def process_clarification(self, chat_id: UUID, clarification: str) -> Dict[str, Any]:
+    async def process_clarification(self, chat_id: UUID, clarification: str, language: str = "ru") -> Dict[str, Any]:
         orchestrator = await self.get_orchestrator(chat_id)
 
-        result = await orchestrator.handle_clarification(clarification)
+        result = await orchestrator.handle_clarification(clarification, language=language)
         active_catalogs = await self.catalog_service.get_active_catalogs()
         return self._format_response(chat_id, orchestrator, result, active_catalogs)
 

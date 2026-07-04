@@ -7,7 +7,7 @@ from typing import List, Dict, Any
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.dependencies.auth import get_current_user
+from src.dependencies.auth import get_current_user, require_active_user
 from src.database.session import get_db
 from src.database.models.chat import Chat as ChatModel
 from src.database.models.user import User
@@ -35,7 +35,7 @@ def get_chat_controller(
 @router.post("", status_code=status.HTTP_201_CREATED)
 async def create_chat(
     request: ChatCreateRequest, 
-    user: User = Depends(get_current_user),
+    user: User = Depends(require_active_user),
     db: AsyncSession = Depends(get_db),
 ):
     """Create a new chat session for the current user."""
@@ -126,6 +126,20 @@ async def chat_websocket(
         await websocket.close(code=1008, reason="Chat not found")
         return
 
+    from src.repositories.user_repo import UserRepository
+    user_repo = UserRepository(db)
+    user_obj = await user_repo.get_user_by_id(user_id)
+
+    # Blocked users have read-only access: refuse the (mutating) prompt channel.
+    if user_obj and getattr(user_obj, "is_blocked", False):
+        try:
+            await websocket.send_json({"type": "error", "message": "ACCOUNT_BLOCKED"})
+        finally:
+            await websocket.close(code=1008, reason="Account blocked")
+        return
+
+    user_language = user_obj.profile.language if user_obj and user_obj.profile else "ru"
+
     controller = ChatController(catalog_service, db)
 
     try:
@@ -142,6 +156,10 @@ async def chat_websocket(
             
             user_blocks = [{"type": "text", "text": prompt}]
             await ChatRepository.add_message(db, chat_id, "user", user_blocks)
+
+            # Check message count to determine titling logic
+            messages = await ChatRepository.get_messages(db, chat_id)
+            user_msg_count = sum(1 for m in messages if m.role == "user")
 
             orch = await controller.get_orchestrator(chat_id, catalog_ids)
             
@@ -167,12 +185,45 @@ async def chat_websocket(
                     
             orch.on_transition = send_status
             
-            response = await controller.process_prompt(chat_id, prompt, catalog_ids)
+            response = await controller.process_prompt(chat_id, prompt, catalog_ids, language=user_language)
             
             assistant_blocks = _response_to_blocks(response)
             export_url = response.get("export_url")
             total_tokens = response.get("result", {}).get("_usage", {}).get("total_tokens")
             await ChatRepository.add_message(db, chat_id, "assistant", assistant_blocks, export_url, total_tokens)
+            
+            # --- START TITLE LOGIC ---
+            if chat.title == "New Chat" and user_msg_count == 1:
+                new_title = prompt[:30] + "..." if len(prompt) > 30 else prompt
+                await ChatRepository.update_chat_title(db, chat_id, new_title)
+                response["chat_title"] = new_title
+
+            if user_msg_count == 2:
+                try:
+                    history = []
+                    for msg in messages:
+                        text = ""
+                        for block in msg.blocks:
+                            if block.get("type") == "text":
+                                text += block.get("text", "")
+                        if text:
+                            history.append({"role": msg.role, "content": text})
+                    
+                    if response.get("message"):
+                        history.append({"role": "assistant", "content": response["message"]})
+                    elif response.get("question"):
+                        history.append({"role": "assistant", "content": response["question"]})
+                    
+                    import asyncio
+                    title_res = await asyncio.to_thread(orch.llm_service.generate_chat_title, history)
+                    if "title" in title_res:
+                        new_ai_title = title_res["title"][:100]
+                        await ChatRepository.update_chat_title(db, chat_id, new_ai_title)
+                        response["chat_title"] = new_ai_title
+                except Exception as e:
+                    import logging
+                    logging.getLogger(__name__).warning(f"Failed to generate AI title: {e}")
+            # --- END TITLE LOGIC ---
             
             from fastapi.encoders import jsonable_encoder
             await websocket.send_json({
@@ -213,7 +264,7 @@ async def submit_prompt(
     chat_id: UUID, 
     request: PromptRequest, 
     controller: ChatController = Depends(get_chat_controller),
-    user: User = Depends(get_current_user),
+    user: User = Depends(require_active_user),
     db: AsyncSession = Depends(get_db),
 ):
     # Verify ownership
@@ -239,7 +290,8 @@ async def submit_prompt(
         await ChatRepository.update_chat_title(db, chat_id, new_title)
     
     try:
-        response = await controller.process_prompt(chat_id, request.prompt, request.catalog_ids or None)
+        user_language = user.profile.language if user and user.profile else "ru"
+        response = await controller.process_prompt(chat_id, request.prompt, request.catalog_ids or None, language=user_language)
         
         # Save assistant response as message
         assistant_blocks = _response_to_blocks(response)
@@ -289,7 +341,7 @@ async def submit_clarification(
     chat_id: UUID, 
     answer: ClarificationAnswer, 
     controller: ChatController = Depends(get_chat_controller),
-    user: User = Depends(get_current_user),
+    user: User = Depends(require_active_user),
     db: AsyncSession = Depends(get_db),
 ):
     # Verify ownership
@@ -303,7 +355,8 @@ async def submit_clarification(
         raise HTTPException(status_code=400, detail="Clarification text is required")
 
     try:
-        response = await controller.process_clarification(chat_id, clarification_text)
+        user_language = user.profile.language if user and user.profile else "ru"
+        response = await controller.process_clarification(chat_id, clarification_text, language=user_language)
         
         # Save assistant response
         assistant_blocks = _response_to_blocks(response)
@@ -351,7 +404,7 @@ async def export_chat_to_excel(
 async def update_chat(
     chat_id: UUID,
     request: ChatUpdateRequest,
-    user: User = Depends(get_current_user),
+    user: User = Depends(require_active_user),
     db: AsyncSession = Depends(get_db),
 ):
     """Update chat title."""
@@ -366,7 +419,7 @@ async def update_chat(
 @router.delete("/{chat_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_chat(
     chat_id: UUID, 
-    user: User = Depends(get_current_user),
+    user: User = Depends(require_active_user),
     db: AsyncSession = Depends(get_db),
 ):
     chat = await ChatRepository.get_chat_by_id_and_user(db, chat_id, user.id)
@@ -392,7 +445,7 @@ def _response_to_blocks(response: dict) -> list:
         if "explanation" in r and r["explanation"]:
             blocks.append({"type": "text", "text": r["explanation"]})
         
-        if r.get("data") and r.get("headers"):
+        if "data" in r and "headers" in r:
             blocks.append({
                 "type": "table",
                 "headers": r["headers"],
@@ -401,7 +454,7 @@ def _response_to_blocks(response: dict) -> list:
                 "totalRows": r.get("total_rows"),
                 "explanation": r.get("explanation"),
             })
-        if not r.get("explanation") and not r.get("data"):
+        if not r.get("explanation") and "data" not in r:
             blocks.append({"type": "text", "text": "Request completed successfully."})
     elif r.get("status") == "error":
         blocks.append({

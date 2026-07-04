@@ -11,7 +11,7 @@ export interface AuthContextType {
   register: (data: RegisterData) => Promise<void>;
   logout: () => void;
   refreshUser: () => Promise<void>;
-  updateProfile: (data: { first_name?: string; last_name?: string; avatar_url?: string }) => Promise<void>;
+  updateProfile: (data: { first_name?: string; last_name?: string; avatar_url?: string; language?: string }) => Promise<void>;
 }
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -50,7 +50,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const login = async (credentials: LoginCredentials) => {
     try {
       await api.post<{ user: User }>('/auth/login', credentials);
-      await refreshUser();
+      try {
+        const userData = await api.get<User>('/users/me');
+        setUser(userData);
+      } catch (err) {
+        throw new Error('Успешный вход, но не удалось получить данные пользователя. Проверьте настройки cookies.');
+      }
     } catch (error: any) {
       throw error;
     }
@@ -64,7 +69,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
-  const updateProfile = async (data: { first_name?: string; last_name?: string; avatar_url?: string }) => {
+  const updateProfile = async (data: { first_name?: string; last_name?: string; avatar_url?: string; language?: string }) => {
     try {
       const updatedUser = await api.patch<User>('/users/me', data);
       setUser(updatedUser);

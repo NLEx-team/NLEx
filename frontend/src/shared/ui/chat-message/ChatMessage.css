@@ -1,6 +1,8 @@
 .chat-message {
   display: flex;
   width: 100%;
+  /* Each message slides up + fades in as it mounts. */
+  animation: fade-in-up var(--motion-base) var(--ease-out) both;
 }
 
 .chat-message--user {

@@ -1,4 +1,4 @@
-export type DatabaseType = 'postgresql' | 'sqlite' | 'mysql' | 'clickhouse' | 'oracle';
+export type DatabaseType = 'postgresql' | 'sqlite' | 'mysql' | 'clickhouse' | 'oracle' | 'mongodb' | 'minio';
 export type CatalogStatus = 'active' | 'inactive' | 'error';
 
 export interface CatalogCreate {

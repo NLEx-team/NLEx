@@ -39,15 +39,15 @@ class UserService:
                 raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Email already exists")
         
         # 2. Extract and Update Profile fields
-        profile_fields = {"first_name", "last_name", "avatar_url"}
+        profile_fields = {"first_name", "last_name", "avatar_url", "language"}
         update_dict = user_update.model_dump(exclude_unset=True)
         
         profile_update_data = {k: v for k, v in update_dict.items() if k in profile_fields}
         if profile_update_data:
             await self.repository.update_user_profile(user_id, UserProfileBase(**profile_update_data))
             
-        # 3. Update User fields (email, role if admin update)
-        user_fields = {"email", "role"}
+        # 3. Update User fields (email, role, is_blocked if admin update)
+        user_fields = {"email", "role", "is_blocked"}
         user_update_data = {k: v for k, v in update_dict.items() if k in user_fields}
         
         return await self.repository.update_user_fields(user_id, user_update_data)

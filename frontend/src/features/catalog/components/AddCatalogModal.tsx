@@ -5,6 +5,7 @@ import { Dropdown } from '../../../shared/ui/dropdown';
 import { Button } from '../../../shared/ui/button';
 import { useAuth } from '../../auth/hooks/useAuth';
 import { catalogApi } from '../api';
+import { useTranslation } from 'react-i18next';
 import type { DatabaseType, CatalogCreate, CatalogRead } from '../types';
 import './AddCatalogModal.css';
 
@@ -18,22 +19,19 @@ interface AddCatalogModalProps {
 
 const DB_OPTIONS = [
   { label: 'PostgreSQL', value: 'postgresql' },
-  { label: 'SQLite', value: 'sqlite' },
   { label: 'MySQL', value: 'mysql' },
   { label: 'ClickHouse', value: 'clickhouse' },
   { label: 'Oracle', value: 'oracle' },
+  { label: 'MongoDB', value: 'mongodb' },
+  { label: 'MinIO (S3)', value: 'minio' },
+  { label: 'SQLite', value: 'sqlite' },
 ];
-
-const STATUS_LABELS: Record<string, string> = {
-  active: 'Connected',
-  inactive: 'Inactive',
-  error: 'Disconnected',
-};
 
 type ModalMode = 'create' | 'view' | 'edit';
 
 export function AddCatalogModal({ isOpen, onClose, onSubmit, initialData, onDelete }: AddCatalogModalProps) {
   const { user: authUser } = useAuth();
+  const { t } = useTranslation();
   const isAdmin = authUser?.role === 'admin';
   const [mode, setMode] = useState<ModalMode>('create');
   const [name, setName] = useState('');
@@ -45,7 +43,25 @@ export function AddCatalogModal({ isOpen, onClose, onSubmit, initialData, onDele
   const [error, setError] = useState<string | null>(null);
   const [testResult, setTestResult] = useState<{ success: boolean; latency_ms: number | null; error: string | null } | null>(null);
 
+  const STATUS_LABELS: Record<string, string> = {
+    active: t('catalog.connected'),
+    inactive: t('catalog.inactive'),
+    error: t('catalog.disconnected'),
+  };
+
   const isEdit = !!initialData;
+
+  // Per-type placeholders and hints so each DB kind gets sensible guidance.
+  const FIELD_HINTS: Record<string, { url: string; user: string; note?: string }> = {
+    postgresql: { url: 'jdbc:postgresql://host:5432/db', user: 'admin' },
+    mysql: { url: 'jdbc:mysql://host:3306/db', user: 'admin' },
+    clickhouse: { url: 'jdbc:clickhouse://host:8123/db', user: 'default' },
+    oracle: { url: 'jdbc:oracle:thin:@host:1521/db', user: 'system' },
+    sqlite: { url: 'jdbc:sqlite:/path/to.db', user: '' },
+    mongodb: { url: 'mongodb://host:27017/db', user: 'user (optional)', note: t('catalog.note_mongodb') },
+    minio: { url: 'http://minio:9000', user: 'Access Key', note: t('catalog.note_minio') },
+  };
+  const hint = FIELD_HINTS[type] ?? FIELD_HINTS.postgresql;
 
   const isDirty = useMemo(() => {
     if (!initialData) return true;
@@ -113,7 +129,7 @@ export function AddCatalogModal({ isOpen, onClose, onSubmit, initialData, onDele
       return;
     }
     if (!url.trim()) {
-      setError('URL is required to test connection');
+      setError(t('catalog.url_required'));
       return;
     }
     setLoading(true);
@@ -135,7 +151,7 @@ export function AddCatalogModal({ isOpen, onClose, onSubmit, initialData, onDele
     setError(null);
 
     if (!name.trim() || !url.trim()) {
-      setError('Name and URL are required');
+      setError(t('catalog.name_url_required'));
       return;
     }
 
@@ -173,31 +189,31 @@ export function AddCatalogModal({ isOpen, onClose, onSubmit, initialData, onDele
     return (
       <Modal isOpen={isOpen} onClose={handleClose} className="add-catalog-modal">
         <div className="add-catalog-modal__header">
-          <h2 className="add-catalog-modal__title">Database info</h2>
+          <h2 className="add-catalog-modal__title">{t('catalog.db_info')}</h2>
         </div>
         <div className="add-catalog-modal__form">
-          <Field mode="readonly" label="Alias" value={name} />
-          <Field mode="readonly" label="URL" value={url} />
-          <Field mode="readonly" label="Database type" value={type} />
-          <Field mode="readonly" label="Database user" value={user} />
+          <Field mode="readonly" label={t('catalog.alias')} value={name} />
+          <Field mode="readonly" label={t('catalog.url')} value={url} />
+          <Field mode="readonly" label={t('catalog.db_type')} value={type} />
+          <Field mode="readonly" label={t('catalog.db_user')} value={user} />
           {renderStatus()}
           {isAdmin && (
             <>
               {testResult && (
                 <div className={`field field--${testResult.success ? 'success' : 'error'}`} style={{ color: testResult.success ? 'var(--color-accent)' : 'var(--color-error-border)', fontSize: '13px' }}>
                   {testResult.success 
-                    ? `Connected successfully! Latency: ${testResult.latency_ms}ms`
-                    : `Connection failed: ${testResult.error}`}
+                    ? t('catalog.connected_success', { ms: testResult.latency_ms })
+                    : t('catalog.connection_failed', { error: testResult.error })}
                 </div>
               )}
               <div className="add-catalog-modal__actions">
                 <Button type="button" variant="secondary" onClick={handleCheckConnection} disabled={loading}>
-                  {loading ? 'Checking...' : 'Check connection'}
+                  {loading ? t('catalog.checking') : t('catalog.check_connection')}
                 </Button>
                 <div className="add-catalog-modal__actions-right">
                   {onDelete && (
                     <Button type="button" onClick={() => { onDelete(); handleClose(); }} disabled={loading} style={{ background: '#2B6A4C', color: 'white' }}>
-                      Delete
+                      {t('common.delete')}
                     </Button>
                   )}
                 </div>
@@ -212,43 +228,44 @@ export function AddCatalogModal({ isOpen, onClose, onSubmit, initialData, onDele
   return (
     <Modal isOpen={isOpen} onClose={handleClose} className="add-catalog-modal">
       <div className="add-catalog-modal__header">
-        <h2 className="add-catalog-modal__title">{isEdit ? 'Edit database' : 'Add database'}</h2>
+        <h2 className="add-catalog-modal__title">{isEdit ? t('catalog.edit_database') : t('catalog.add_database')}</h2>
       </div>
       <form className="add-catalog-modal__form" onSubmit={handleSubmit}>
         <Field
-          label="Alias"
+          label={t('catalog.alias')}
           placeholder="My Database"
           value={name}
           onChange={e => setName(e.target.value)}
           disabled={loading}
         />
         <Field
-          label="URL"
-          placeholder="jdbc:postgresql://localhost:5432/mydb"
+          label={t('catalog.url')}
+          placeholder={hint.url}
           value={url}
           onChange={e => setUrl(e.target.value)}
           disabled={loading}
         />
         <div className="add-catalog-modal__field">
-          <label className="add-catalog-modal__label">Database type</label>
+          <label className="add-catalog-modal__label">{t('catalog.db_type')}</label>
           <Dropdown
             options={DB_OPTIONS}
             value={type}
             onChange={v => setType(v as DatabaseType)}
             disabled={loading}
           />
+          {hint.note && <div className="add-catalog-modal__hint">{hint.note}</div>}
         </div>
         <Field
-          label="Database user"
-          placeholder="admin"
+          label={t('catalog.db_user')}
+          placeholder={hint.user}
           value={user}
           onChange={e => setUser(e.target.value)}
           disabled={loading}
         />
         <Field
-          label="Database password"
+          label={t('catalog.db_password')}
           type="password"
-          placeholder="Enter password"
+          placeholder={type === 'minio' ? 'Secret Key' : t('catalog.enter_password')}
           value={password}
           onChange={e => setPassword(e.target.value)}
           disabled={loading}
@@ -261,27 +278,27 @@ export function AddCatalogModal({ isOpen, onClose, onSubmit, initialData, onDele
         {testResult && (
           <div className={`field field--${testResult.success ? 'success' : 'error'}`} style={{ color: testResult.success ? 'var(--color-accent)' : 'var(--color-error-border)', fontSize: '13px' }}>
             {testResult.success 
-              ? `Connected successfully! Latency: ${testResult.latency_ms}ms`
-              : `Connection failed: ${testResult.error}`}
+              ? t('catalog.connected_success', { ms: testResult.latency_ms })
+              : t('catalog.connection_failed', { error: testResult.error })}
           </div>
         )}
         <div className="add-catalog-modal__actions">
           <Button type="button" variant="secondary" onClick={handleCheckConnection} disabled={loading}>
-            Check connection
+            {t('catalog.check_connection')}
           </Button>
           <div className="add-catalog-modal__actions-right">
             {isEdit ? (
               <>
                 <Button type="button" variant="secondary" onClick={handleCancelEdit} disabled={loading}>
-                  Cancel
+                  {t('common.cancel')}
                 </Button>
                 <Button type="submit" disabled={loading || !isDirty}>
-                  Save
+                  {t('common.save')}
                 </Button>
               </>
             ) : (
               <Button type="submit" disabled={loading}>
-                Add
+                {t('common.add')}
               </Button>
             )}
           </div>

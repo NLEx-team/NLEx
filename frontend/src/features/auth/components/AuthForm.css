@@ -9,6 +9,7 @@
   margin: 0 auto;
   padding: 0;
   box-sizing: border-box;
+  animation: fade-in-up var(--motion-slow) var(--ease-out) both;
 }
 
 .auth-header {

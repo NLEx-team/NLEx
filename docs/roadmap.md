@@ -1,23 +1,23 @@
 # NLEx Product Roadmap
 
-## Current Product Direction
-NLEx aims to bridge the gap between business analysts and data by providing a seamless, chat-based Natural Language to SQL interface capable of interacting with distributed enterprise databases.
+## MVP v1 (Sprint 1 - Current)
+**Goal:** Functional end-to-end NL2SQL flow on a single database.
+- **Natural Language Query:** Single input field for business questions.
+- **LLM Orchestration:** SQL generation with context-aware clarification turns.
+- **Browser Preview:** Interactive table showing initial result sets.
+- **Excel Export:** Downloadable `.xlsx` files with professional auto-formatting.
+- **Security:** Secure JWT-based authentication and user management.
 
-## Current Sprint (Sprint 2 / Assignment 4)
-**Focus**: Quality, stability, bug fixes, and responding to MVP v1.0 feedback.
-* Fix critical UI bugs (input blocking, options override).
-* Expand CI testing and code coverage.
-* Introduce quality requirements and automated QRTs.
-* Deliver Oracle connector for real-world customer usage.
+## MVP v2 (Sprint 2 - Planned)
+**Goal:** Cross-database querying and enhanced usability.
+- **Trino Integration:** Support for distributed queries across multiple catalogs/schemas.
+- **Connection Management:** UI-based configuration for adding and testing data sources.
+- **Chat History:** Persistent history to revisit and re-run past queries.
+- **Enhanced Accuracy:** Advanced prompt tuning for complex joins and aggregations.
 
-## Expected Next Sprint (MVP v2)
-**Focus**: Advanced context management and complex query handling.
-* Implement chat history sidebar and persistent conversations (PBI-013).
-* Introduce full Trino-SQL Generation Pipeline Integration (PBI-012).
-* Allow multiple database connections via configuration (PBI-016).
-* Bilingual (RU/EN) prompt tuning (PBI-014).
-
-## Ongoing Quality and Automation Work
-* **Continuous Integration**: The Lychee link checker, `pytest` suite, and linting rules will remain strictly enforced on the `main` and `develop` branches.
-* **Quality Gates**: The 30% critical module line coverage minimum and passing QRTs will continue to block any PR that lowers product stability.
-* **Security Scans**: Dependency auditing will continue to run to prevent CVEs.
+## MVP v3 (Future Vision)
+**Goal:** Collaboration and Enterprise features.
+- **Query Templates:** Save validated queries as reusable templates with parameters.
+- **Template Sharing:** Collaborative features for sharing insights across the team.
+- **Admin Dashboard:** Usage statistics, monitoring, and audit logs for system administrators.
+- **Advanced Security:** Role-Based Access Control (RBAC) for database connections.

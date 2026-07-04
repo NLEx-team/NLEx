@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { Field, Button, Avatar } from '../../../shared/ui';
 import { Icon } from "@iconify/react";
+import { useTranslation } from 'react-i18next';
 import './ProfileForm.css';
 
 interface ProfileData {
@@ -16,6 +17,7 @@ interface ProfileFormProps {
 
 export const ProfileForm: React.FC<ProfileFormProps> = ({ onSuccess }) => {
   const { user } = useAuth();
+  const { t } = useTranslation();
   const [firstName, setFirstName] = useState(user?.profile?.first_name || '');
   const [lastName, setLastName] = useState(user?.profile?.last_name || '');
   const [avatarUrl, setAvatarUrl] = useState(user?.profile?.avatar_url || '');
@@ -56,7 +58,7 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({ onSuccess }) => {
   return (
     <div className="profile-form-container">
       <header className="profile-header">
-        <h2>Complete Your Profile</h2>
+        <h2>{t('auth.complete_profile')}</h2>
       </header>
 
       <form onSubmit={handleSubmit} className="profile-form">
@@ -72,14 +74,14 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({ onSuccess }) => {
 
         <div className="fields-group">
           <Field
-            label="First Name"
-            placeholder="Enter your first name"
+            label={t('auth.first_name')}
+            placeholder={t('auth.enter_first_name')}
             value={firstName}
             onChange={(e) => setFirstName(e.target.value)}
           />
           <Field
-            label="Last Name"
-            placeholder="Enter your last name"
+            label={t('auth.last_name')}
+            placeholder={t('auth.enter_last_name')}
             value={lastName}
             onChange={(e) => setLastName(e.target.value)}
           />
@@ -92,13 +94,13 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({ onSuccess }) => {
             onClick={handleSkip}
             disabled={loading}
           >
-            Skip for now
+            {t('auth.skip_for_now')}
           </Button>
           <Button 
             type="submit" 
             disabled={loading}
           >
-            Save Profile
+            {t('auth.save_profile')}
           </Button>
         </div>
       </form>

@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../hooks/useAuth';
 import { Field, PasswordField, Button } from '../../../shared/ui';
 import { isValidEmail } from '../../../utils/validation';
 
 export const LoginForm: React.FC = () => {
+  const { t } = useTranslation();
   const { login } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -20,15 +22,15 @@ export const LoginForm: React.FC = () => {
     setGeneralError(null);
 
     if (!email) {
-      setEmailError('Email is required');
+      setEmailError(t('auth.email_required'));
       hasError = true;
     } else if (!isValidEmail(email)) {
-      setEmailError('Invalid email format');
+      setEmailError(t('auth.invalid_email'));
       hasError = true;
     }
 
     if (!password) {
-      setPasswordError('Password is required');
+      setPasswordError(t('auth.password_required'));
       hasError = true;
     }
 
@@ -38,7 +40,7 @@ export const LoginForm: React.FC = () => {
     try {
       await login({ email, password });
     } catch (err: any) {
-      setGeneralError(err.message || 'Failed to login. Please check your credentials.');
+      setGeneralError(err.message || t('auth.failed_login'));
     } finally {
       setLoading(false);
     }
@@ -55,9 +57,9 @@ export const LoginForm: React.FC = () => {
     <div onKeyDown={handleKeyDown} className="auth-form">
       {generalError && <div style={{ color: 'var(--color-error)', marginBottom: '10px' }}>{generalError}</div>}
       <Field
-        label="Email"
+        label={t('auth.email')}
         type="email"
-        placeholder="Email"
+        placeholder={t('auth.email')}
         value={email}
         onChange={(e) => {
           setEmail(e.target.value);
@@ -68,8 +70,8 @@ export const LoginForm: React.FC = () => {
         disabled={loading}
       />
       <PasswordField
-        label="Password"
-        placeholder="Password"
+        label={t('auth.password')}
+        placeholder={t('auth.password')}
         value={password}
         onChange={(e) => {
           setPassword(e.target.value);
@@ -80,8 +82,9 @@ export const LoginForm: React.FC = () => {
         disabled={loading}
       />
       <Button type="button" onClick={submitLogic} disabled={loading}>
-        {loading ? 'Wait...' : 'Continue'}
+        {loading ? t('auth.wait') : t('auth.continue')}
       </Button>
     </div>
   );
 };
+

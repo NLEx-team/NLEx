@@ -11,12 +11,24 @@
   --color-error: #991b1b;
   --color-error-border: #dc2626;
   --color-on-accent: #ffffff;
+  --nlex-success: #10b981;
+
+  /* Aliases for legacy names used across feature styles.
+     Defined via var() so they resolve correctly in BOTH light and dark themes. */
+  --color-primary: var(--color-accent);
+  --color-primary-dark: var(--color-accent-dark);
+  --color-surface-hover: var(--color-back-active);
+  --color-back-accent: var(--color-back-components);
+  --color-back-base: var(--color-back-main);
+  --color-back-primary: var(--color-back-main);
+  --color-text-main: var(--color-text-primary);
 
   /* spacing */
   --spacing-xs: 2px;
   --spacing-sm: 10px;
   --spacing-md: 16px;
   --spacing-lg: 25px;
+  --spacing-xl: 40px;
 
   /* radius */
   --radius: 6px;
@@ -69,10 +81,15 @@
   --color-back-main: #202124;
   --color-back-components: #2d2e30;
   --color-back-active: #3c4043;
-  --color-text-primary: #9ca2ad;
+  /* Primary text must be clearly brighter than secondary so heading/body
+     hierarchy is preserved in dark mode (was #9ca2ad, ~identical to secondary). */
+  --color-text-primary: #e8eaed;
   --color-text-secondary: #9aa0a6;
   --color-border: #5f6368;
   --color-error: #d97b72;
   --color-error-border: #a54a44;
   --color-on-accent: #c7d5bd;
+  /* Lighter green than the light-theme dark-green so accented labels stay
+     legible on the dark background (accent-dark on dark is ~2:1 contrast). */
+  --color-primary-dark: #7fb99a;
 }

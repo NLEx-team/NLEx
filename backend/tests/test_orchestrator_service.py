@@ -5,8 +5,8 @@ from src.services.orchestrator_service import OrchestratorService, OrchestratorS
 @pytest.fixture
 def mock_db_service():
     service = MagicMock()
-    service.execute_query_async = AsyncMock(return_value=[[1]])
-    service.execute_query_async_preview = AsyncMock(return_value=[[1]])
+    service.execute_query_async = AsyncMock()
+    service.execute_query_async_preview = AsyncMock()
     return service
 
 @pytest.fixture
@@ -52,6 +52,7 @@ async def test_orchestrator_success_path(orchestrator, mock_sql_service, mock_db
         "explanation": "test"
     }
     mock_db_service.execute_query_async.return_value = [[1]]
+    mock_db_service.execute_query_async_preview.return_value = [[1]]
     
     # Infer
     await orchestrator.initialize_session({"test_cat": "test"})
@@ -72,12 +73,15 @@ async def test_orchestrator_retry_path(orchestrator, mock_sql_service, mock_db_s
     # First SQL call returns a bad query
     # Second SQL call returns a fixed query
     mock_sql_service.generate_sql.side_effect = [
-        {"status": "success", "sql": "BAD SQL", "headers": ["h"], "explanation": "e"},
-        {"status": "success", "sql": "GOOD SQL", "headers": ["h"], "explanation": "e"}
+        {"status": "success", "sql": "SELECT bad", "headers": ["h"], "explanation": "e"},
+        {"status": "success", "sql": "SELECT good", "headers": ["h"], "explanation": "e"}
     ]
 
     mock_db_service.execute_query_async.side_effect = [
         Exception("Syntax error"),
+        [[1]]
+    ]
+    mock_db_service.execute_query_async_preview.side_effect = [
         [[1]]
     ]
     
@@ -86,7 +90,7 @@ async def test_orchestrator_retry_path(orchestrator, mock_sql_service, mock_db_s
     result = await orchestrator.execute_user_query("query")
 
     assert result["status"] == "success"
-    assert result["sql"] == "GOOD SQL"
+    assert result["sql"] == "SELECT good"
     assert result["attempts"] == 2
     assert orchestrator.state == OrchestratorState.COMPLETED
 

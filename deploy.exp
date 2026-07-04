@@ -1,8 +1,22 @@
 #!/usr/bin/expect -f
 
 set timeout -1
-set ip "194.226.97.77"
-set password "XorWxnZ2tNJEA8lS"
+
+# Server IP: override with DEPLOY_SSH_IP if needed.
+if {[info exists env(DEPLOY_SSH_IP)]} {
+    set ip $env(DEPLOY_SSH_IP)
+} else {
+    set ip "194.226.97.77"
+}
+
+# SSH password MUST be supplied via the DEPLOY_SSH_PASSWORD environment variable.
+# Never hardcode credentials in a file tracked by git.
+if {![info exists env(DEPLOY_SSH_PASSWORD)]} {
+    puts stderr "ERROR: DEPLOY_SSH_PASSWORD environment variable is not set."
+    puts stderr "Usage: DEPLOY_SSH_PASSWORD=... expect deploy.exp"
+    exit 1
+}
+set password $env(DEPLOY_SSH_PASSWORD)
 
 spawn ssh -o StrictHostKeyChecking=no root@$ip
 

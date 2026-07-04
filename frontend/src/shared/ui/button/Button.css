@@ -7,7 +7,10 @@
   padding: 0 var(--spacing-sm);
   border: var(--border-width) solid var(--color-accent-dark);
   cursor: pointer;
-  transition: 0.2s;
+  transition: transform var(--motion-fast) var(--ease-out),
+              opacity var(--motion-fast) var(--ease-out),
+              box-shadow var(--motion-fast) var(--ease-out),
+              border-color var(--motion-fast) var(--ease-out);
   width: 120px;
 }
 
@@ -27,6 +30,20 @@
 
 .button:active {
   transform: scale(0.98);
+}
+
+/* Lift solid buttons slightly on hover, press in on click. Scoped to
+   primary/secondary so the field-style button keeps its flat behavior. */
+.button--primary:hover:not(:disabled),
+.button--secondary:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(33, 115, 70, 0.22);
+}
+
+.button--primary:active:not(:disabled),
+.button--secondary:active:not(:disabled) {
+  transform: translateY(1px) scale(0.98);
+  box-shadow: none;
 }
 
 .button:disabled {

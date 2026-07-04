@@ -37,8 +37,17 @@ async function request<T>(endpoint: string, options: RequestInit & { timeout?: n
     const data = await response.json().catch(() => null);
 
     if (!response.ok) {
+      let errorMessage = response.statusText || 'Request failed';
+      if (data?.detail) {
+        if (Array.isArray(data.detail) && data.detail.length > 0) {
+          errorMessage = data.detail[0].msg || 'Validation Error';
+        } else if (typeof data.detail === 'string') {
+          errorMessage = data.detail;
+        }
+      }
+      
       throw new ApiError(
-        data?.detail || response.statusText || 'Request failed',
+        errorMessage,
         response.status,
         data
       );

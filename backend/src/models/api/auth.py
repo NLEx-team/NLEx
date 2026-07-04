@@ -19,7 +19,7 @@ class RegisterRequest(BaseModel):
         min_length=2,
         max_length=128,
     )
-    avatar: HttpUrl = Field(
+    avatar: Optional[HttpUrl] = Field(
         default=None
     )
 
