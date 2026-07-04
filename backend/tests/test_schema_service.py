@@ -38,6 +38,11 @@ async def test_get_full_schema(schema_service, mock_db):
             return [
                 ["sales", "orders", "customer_id", "sales", "customers", "id"]
             ]
+        if "information_schema.columns" in query:
+            return [
+                ["sales", "orders", "order_id", "bigint", "NO", 1],
+                ["sales", "orders", "customer_id", "integer", "YES", 2]
+            ]
         return []
 
     mock_db.execute_query_async.side_effect = execute_query_side_effect
