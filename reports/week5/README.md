@@ -54,7 +54,7 @@ The architecture relies on Trino for distributed querying, FastAPI for backend r
 - **SemVer Release**: [v2.0.0 Release]
 - **Changelog**: [CHANGELOG.md](../../CHANGELOG.md)
 - **Public Demo Video**: [Link to Demo Video]
-- **Hosted Documentation Site**: [Link to Docs Site]
+- **Hosted Documentation Site**: [https://NLEx-team.github.io/NLEx/](https://NLEx-team.github.io/NLEx/)
 
 ## Sprint Review & Next Steps
 - **UAT Results**: New UAT scenarios passed successfully.
@@ -82,4 +82,4 @@ The architecture relies on Trino for distributed querying, FastAPI for backend r
 - **Latest default-branch CI run**: ![Latest CI Run](images/Latest_CI_run.png)
 - **SemVer release**: ![SemVer Release](images/SemVer_release.png)
 - **Reviewed PR/MR**: ![PR 1](images/PR_example(1).png) <br> ![PR 2](images/PR_example(2).png) <br> ![PR 3](images/PR_example(3).png)
-- **Hosted docs site**: ![Docs Site](images/docs_site.png)
+- **Hosted docs site**: [https://NLEx-team.github.io/NLEx/](https://NLEx-team.github.io/NLEx/)
