@@ -53,7 +53,7 @@ The architecture relies on Trino for distributed querying, FastAPI for backend r
 ## Releases & Demo
 - **SemVer Release**: [v2.0.0 Release]
 - **Changelog**: [CHANGELOG.md](../../CHANGELOG.md)
-- **Public Demo Video**: [Link to Demo Video]
+- **Public Demo Video**: [Link to Demo Video](https://drive.google.com/file/d/1OhPgRyL55rrzAQEoNaR3oM4X-36sin54/view?usp=sharing)
 - **Hosted Documentation Site**: [https://NLEx-team.github.io/NLEx/](https://NLEx-team.github.io/NLEx/)
 
 ## Sprint Review & Next Steps
@@ -69,7 +69,7 @@ The architecture relies on Trino for distributed querying, FastAPI for backend r
 ## Contribution Traceability
 | Team Member | Role | Responsibilities |
 |---|---|---|
-| Maksim Merkushev | Product Owner | Backlog refinement, customer communication, reviewed 2 PRs. |
+| Maksim Merkushev | Product Owner | Backlog refinement, accelereation of the LLM workflow, cross-db optimization via RAG |
 | Serafim Soldatov | Scrum Master | Sprint management, reporting, CI/CD, updated process docs. |
 | Maksim Maltsev | Developer | Feature implementation (cross-db UI), opened PR #40. |
 | Polina Systerova | Developer | Feature implementation (admin panel UI), testing. |
