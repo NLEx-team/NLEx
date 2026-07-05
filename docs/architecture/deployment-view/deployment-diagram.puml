@@ -1,0 +1,38 @@
+@startuml
+node "Docker Host (Production Server)" {
+  
+  node "Frontend Container" {
+    artifact "React App"
+    component "Nginx" as Nginx
+  }
+
+  node "Backend Container" {
+    component "Uvicorn (FastAPI)" as Uvicorn
+  }
+
+  node "Trino Container" {
+    component "Trino Engine" as TrinoEngine
+  }
+
+  node "PostgreSQL Container" {
+    database "Internal State & Auth DB" as DB
+  }
+  
+  network "Docker App Network (app-net)" as AppNet
+}
+
+actor "User" as User
+cloud "External LLM Service" as LLM
+
+User --> Nginx : HTTP :80
+Nginx --> Uvicorn : Proxy /api/
+Uvicorn --> TrinoEngine : JDBC/HTTP :8080
+Uvicorn --> DB : TCP :5432
+Uvicorn --> LLM : HTTPS
+
+Nginx -down- AppNet
+Uvicorn -down- AppNet
+TrinoEngine -down- AppNet
+DB -down- AppNet
+
+@enduml

@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v2.0.0] - 2026-07-05
+### Added
+- Cross-database request capabilities (query multiple database targets).
+- Admin Panel for administrative controls and environment configuration.
+- Persistent history of past requests in the chat interface.
+
+### Deprecated
+- All saved templates and template-sharing functionality have been deprecated and removed from the roadmap based on changing product vision.
+
 ## [v1.2.0] - 2026-06-28
 ### Added
 - Oracle DBMS connector for Trino (PBI-032).
