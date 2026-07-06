@@ -136,6 +136,10 @@ async def get_user_analytics(
             bucket["tokens"] += m.total_tokens
 
     # --- History list: user -> assistant pairs, then optional text search ---
+    # When a query triggers clarification, the flow is:
+    #   user(original) -> assistant(clarification) -> user(answer) -> assistant(result)
+    # We skip intermediate clarification messages and pair the original query
+    # with the final assistant response that contains the actual SQL result.
     chats_msgs: Dict[str, List[ChatMessage]] = {}
     for m in messages:
         chats_msgs.setdefault(str(m.chat_id), []).append(m)
@@ -144,11 +148,25 @@ async def get_user_analytics(
     history_list = []
     for chat_id, msgs in chats_msgs.items():
         msgs.sort(key=lambda x: x.created_at)
-        for i in range(len(msgs) - 1):
-            if msgs[i].role != "user" or msgs[i + 1].role != "assistant":
+
+        # Identify clarification-flow messages to skip:
+        # assistant "options" blocks and the user answers that follow them.
+        skip_indices = set()
+        for i in range(len(msgs)):
+            if msgs[i].role == "assistant":
+                is_clarification = any(
+                    b.get("type") == "options" for b in msgs[i].blocks
+                )
+                if is_clarification:
+                    skip_indices.add(i)
+                    if i + 1 < len(msgs) and msgs[i + 1].role == "user":
+                        skip_indices.add(i + 1)
+
+        for i in range(len(msgs)):
+            if i in skip_indices or msgs[i].role != "user":
                 continue
+
             user_msg = msgs[i]
-            asst_msg = msgs[i + 1]
 
             query = ""
             for b in user_msg.blocks:
@@ -157,6 +175,19 @@ async def get_user_analytics(
             if not query:
                 continue
             if search_lower and search_lower not in query.lower():
+                continue
+
+            # Find the next non-skipped assistant response.
+            asst_msg = None
+            for j in range(i + 1, len(msgs)):
+                if j in skip_indices:
+                    continue
+                if msgs[j].role == "assistant":
+                    asst_msg = msgs[j]
+                    break
+                if msgs[j].role == "user":
+                    break
+            if not asst_msg:
                 continue
 
             sql = None
