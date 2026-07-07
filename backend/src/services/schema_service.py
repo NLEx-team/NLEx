@@ -16,6 +16,14 @@ IGNORED_SCHEMAS = {
     "xs$null", "ops$oracle"
 }
 
+# Prefixes of system views/tables that typically require elevated privileges.
+# Filtering by prefix covers ALL Oracle/Postgres system objects instead of
+# trying to enumerate them one by one.
+_IGNORED_TABLE_PREFIXES = (
+    "dba_", "v$", "gv$", "all_", "user$",
+    "pg_stat_", "pg_statio_",
+)
+
 class SchemaService:
     def __init__(self, db: DistributedDatabaseService):
         self.db = db
@@ -42,7 +50,14 @@ class SchemaService:
         schemas = []
         all_relationships = []
         for namespace in namespaces:
-            tables = await self.db.get_tables(catalog, namespace)
+            raw_tables = await self.db.get_tables(catalog, namespace)
+            
+            # Filter out system views/tables BEFORE any queries to avoid
+            # permission denied errors on read-only database users.
+            tables = [
+                t for t in raw_tables
+                if not t.lower().startswith(_IGNORED_TABLE_PREFIXES)
+            ]
             
             # Fetch relationships for all tables (these are lightweight metadata queries)
             rel_tasks = [
@@ -60,6 +75,7 @@ class SchemaService:
             
             tables_data = []
             for table, rels, sample_rows in zip(tables, rel_results, sample_results):
+                    
                 # Handle relationship exceptions gracefully
                 if isinstance(rels, Exception):
                     rels = []
