@@ -63,12 +63,13 @@ class ChatRepository:
         await db.commit()
 
     @staticmethod
-    async def add_message(db: AsyncSession, chat_id: UUID, role: str, blocks: list, export_url: Optional[str] = None, total_tokens: Optional[int] = None) -> ChatMessage:
+    async def add_message(db: AsyncSession, chat_id: UUID, role: str, blocks: list, export_url: Optional[str] = None, export_filename: Optional[str] = None, total_tokens: Optional[int] = None) -> ChatMessage:
         message = ChatMessage(
             chat_id=chat_id,
             role=role,
             blocks=blocks,
             export_url=export_url,
+            export_filename=export_filename,
             total_tokens=total_tokens,
         )
         db.add(message)

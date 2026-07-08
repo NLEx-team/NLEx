@@ -20,6 +20,7 @@ interface PromptResponse {
   next_steps: string[];
   result: PromptResponseResult;
   export_url?: string;
+  export_filename?: string;
   chat_title?: string;
 }
 
@@ -35,6 +36,7 @@ interface ChatMessageResponse {
   role: 'user' | 'assistant';
   blocks: any[];
   export_url?: string;
+  export_filename?: string;
   created_at: string;
 }
 
@@ -121,7 +123,7 @@ export const chatApi = {
   getStatus: (chatId: string) =>
     api.get<{status: string}>(`/chats/${chatId}/status`),
 
-  downloadExport: async (exportUrl: string) => {
+  downloadExport: async (exportUrl: string, filename?: string) => {
     const response = await fetch(`${config.apiUrl}${exportUrl}`, {
       credentials: 'include',
     });
@@ -130,9 +132,8 @@ export const chatApi = {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    const disposition = response.headers.get('Content-Disposition');
-    const match = disposition?.match(/filename="?([^";\n]+)"?/);
-    a.download = match?.[1] || 'export.xlsx';
+    // Use provided filename, or try to get from Content-Disposition header
+    a.download = filename || (response.headers.get('Content-Disposition')?.match(/filename="?([^";\n]+)"?/)?.[1] || 'export.xlsx');
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);

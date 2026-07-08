@@ -45,6 +45,7 @@ class ChatMessage(Base):
     role = Column(String, nullable=False)  # 'user' or 'assistant'
     blocks = Column(JSON, nullable=False, default=list)  # Array of content blocks
     export_url = Column(String, nullable=True)
+    export_filename = Column(String, nullable=True)
     total_tokens = Column(Integer, nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 

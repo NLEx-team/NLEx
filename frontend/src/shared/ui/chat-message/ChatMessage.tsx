@@ -77,7 +77,7 @@ function OptionsBlockView({ block, onClarify, isLastMessage }: { block: OptionsB
   );
 }
 
-function TableBlockView({ block, exportUrl, onExport }: { block: TableBlock; exportUrl?: string; onExport?: (exportUrl: string) => void }) {
+function TableBlockView({ block, exportUrl, exportFilename, onExport }: { block: TableBlock; exportUrl?: string; exportFilename?: string; onExport?: (exportUrl: string, filename?: string) => void }) {
   const { t } = useTranslation();
   return (
     <>
@@ -95,7 +95,9 @@ function TableBlockView({ block, exportUrl, onExport }: { block: TableBlock; exp
               {block.rows.slice(0, 5).map((row, ri) => (
                 <tr key={ri}>
                   {row.map((cell: any, ci: number) => (
-                    <td key={ci}>{cell == null ? 'NULL' : String(cell)}</td>
+                    <td key={ci} data-type={typeof cell === 'number' ? 'number' : 'text'}>
+                      {cell == null ? 'NULL' : String(cell)}
+                    </td>
                   ))}
                 </tr>
               ))}
@@ -130,7 +132,7 @@ function TableBlockView({ block, exportUrl, onExport }: { block: TableBlock; exp
       {exportUrl && (
         <button
           className="chat-message__export-btn"
-          onClick={() => onExport?.(exportUrl)}
+          onClick={() => onExport?.(exportUrl, exportFilename)}
           type="button"
         >
           <Icon icon="mdi:file-download-outline" />
@@ -160,7 +162,7 @@ function ErrorBlockView({ block }: { block: ErrorBlock }) {
   );
 }
 
-export function ChatMessage({ role, blocks, exportUrl, onClarify, onExport, isLastMessage }: ChatMessageProps) {
+export function ChatMessage({ role, blocks, exportUrl, exportFilename, onClarify, onExport, isLastMessage }: ChatMessageProps) {
   return (
     <div className={`chat-message chat-message--${role}`}>
       <div className="chat-message__bubble">
@@ -171,7 +173,7 @@ export function ChatMessage({ role, blocks, exportUrl, onClarify, onExport, isLa
             case 'options':
               return <OptionsBlockView key={idx} block={block} onClarify={onClarify} isLastMessage={isLastMessage} />;
             case 'table':
-              return <TableBlockView key={idx} block={block} exportUrl={exportUrl} onExport={onExport} />;
+              return <TableBlockView key={idx} block={block} exportUrl={exportUrl} exportFilename={exportFilename} onExport={onExport} />;
             case 'error':
               return <ErrorBlockView key={idx} block={block} />;
           }

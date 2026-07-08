@@ -193,7 +193,7 @@ export function AddCatalogModal({ isOpen, onClose, onSubmit, initialData, onDele
         </div>
         <div className="add-catalog-modal__form">
           <Field mode="readonly" label={t('catalog.alias')} value={name} />
-          <Field mode="readonly" label={t('catalog.url')} value={url} />
+          <Field mode="readonly" label={t('catalog.url')} value={url} multiline />
           <Field mode="readonly" label={t('catalog.db_type')} value={type} />
           <Field mode="readonly" label={t('catalog.db_user')} value={user} />
           {renderStatus()}
@@ -244,6 +244,7 @@ export function AddCatalogModal({ isOpen, onClose, onSubmit, initialData, onDele
           value={url}
           onChange={e => setUrl(e.target.value)}
           disabled={loading}
+          multiline
         />
         <div className="add-catalog-modal__field">
           <label className="add-catalog-modal__label">{t('catalog.db_type')}</label>

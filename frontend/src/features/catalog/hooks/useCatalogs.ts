@@ -1,12 +1,13 @@
 import { useState, useEffect, useCallback } from 'react';
 import { catalogApi } from '../api';
-import type { CatalogRead, CatalogCreate, CatalogTestResult } from '../types';
+import type { CatalogRead, CatalogCreate, CatalogTestResult, CatalogSyncStatus } from '../types';
 
 export function useCatalogs() {
   const [catalogs, setCatalogs] = useState<CatalogRead[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [pingResults, setPingResults] = useState<Record<string, CatalogTestResult>>({});
+  const [syncStatuses, setSyncStatuses] = useState<Record<string, CatalogSyncStatus>>({});
 
   const fetchCatalogs = useCallback(async () => {
     setLoading(true);
@@ -14,6 +15,17 @@ export function useCatalogs() {
     try {
       const data = await catalogApi.list();
       setCatalogs(data);
+      
+      // Initialize sync statuses for all catalogs
+      const statuses: Record<string, CatalogSyncStatus> = {};
+      await Promise.all(data.map(async (c) => {
+        try {
+          statuses[c.id] = await catalogApi.syncStatus(c.id);
+        } catch {
+          // ignore
+        }
+      }));
+      setSyncStatuses(statuses);
     } catch (err: any) {
       setError(err.message || 'Failed to load catalogs');
     } finally {
@@ -25,9 +37,37 @@ export function useCatalogs() {
     fetchCatalogs();
   }, [fetchCatalogs]);
 
+  // Polling for syncing catalogs
+  useEffect(() => {
+    const syncingIds = catalogs
+      .filter(c => syncStatuses[c.id] && !syncStatuses[c.id].is_cached && syncStatuses[c.id].is_syncing)
+      .map(c => c.id);
+
+    if (syncingIds.length === 0) return;
+
+    const interval = setInterval(async () => {
+      for (const id of syncingIds) {
+        try {
+          const status = await catalogApi.syncStatus(id);
+          setSyncStatuses(prev => ({ ...prev, [id]: status }));
+        } catch {
+          // ignore
+        }
+      }
+    }, 2000);
+
+    return () => clearInterval(interval);
+  }, [catalogs, syncStatuses]);
+
   const createCatalog = async (data: CatalogCreate) => {
-    await catalogApi.create(data);
-    await fetchCatalogs();
+    const newCatalog = await catalogApi.create(data);
+    setCatalogs(prev => [...prev, newCatalog]);
+    try {
+      const status = await catalogApi.syncStatus(newCatalog.id);
+      setSyncStatuses(prev => ({ ...prev, [newCatalog.id]: status }));
+    } catch {
+      // ignore
+    }
   };
 
   const deleteCatalog = async (id: string) => {
@@ -38,6 +78,12 @@ export function useCatalogs() {
   const testCatalog = async (id: string) => {
     const updated = await catalogApi.test(id);
     setCatalogs(prev => prev.map(c => c.id === id ? updated : c));
+    try {
+      const status = await catalogApi.syncStatus(id);
+      setSyncStatuses(prev => ({ ...prev, [id]: status }));
+    } catch {
+      // ignore
+    }
   };
 
   const pingCatalog = async (id: string): Promise<CatalogTestResult> => {
@@ -74,5 +120,5 @@ export function useCatalogs() {
     }));
   };
 
-  return { catalogs, loading, error, pingResults, fetchCatalogs, createCatalog, deleteCatalog, testCatalog, pingCatalog, pingAllCatalogs };
+  return { catalogs, loading, error, pingResults, syncStatuses, fetchCatalogs, createCatalog, deleteCatalog, testCatalog, pingCatalog, pingAllCatalogs };
 }

@@ -25,3 +25,8 @@ export interface CatalogTestResult {
   latency_ms: number | null;
   error: string | null;
 }
+
+export interface CatalogSyncStatus {
+  is_syncing: boolean;
+  is_cached: boolean;
+}
