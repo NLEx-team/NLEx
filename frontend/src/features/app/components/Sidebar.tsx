@@ -40,7 +40,7 @@ export function Sidebar({ isOpen, onClose, children }: SidebarProps) {
     >
       <div className="sidebar__header">
         <div className="sidebar__logo-container">
-          <Logo variant="full" />
+          <Logo variant="compact" />
         </div>
         <button
           type="button"
@@ -48,7 +48,7 @@ export function Sidebar({ isOpen, onClose, children }: SidebarProps) {
           onClick={onClose}
           aria-label="Close sidebar"
         >
-          <Icon icon="mdi:format-list-bulleted" width="28" height="28" color="#8A92A6" />
+          <Icon icon="lucide:sidebar-close" width="28" height="28" color="#8A92A6" />
         </button>
       </div>
 

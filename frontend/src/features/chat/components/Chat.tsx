@@ -69,7 +69,6 @@ export function Chat({
             {messages.length === 0 && (
               <div className="chat__welcome">
                 <Logo variant="full" />
-                <p className="chat__welcome-text">{t('chat.welcome')}</p>
               </div>
             )}
             {messages.map((msg, index) => (

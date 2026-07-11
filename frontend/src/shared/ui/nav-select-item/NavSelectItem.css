@@ -2,14 +2,9 @@
   display: flex;
   align-items: center;
   width: 100%;
-  border-bottom: 1px solid var(--color-border);
   background: var(--color-back-main);
   transition: background-color 0.2s ease;
   position: relative;
-}
-
-.nav-select-item-container:last-child {
-  border-bottom: none;
 }
 
 .nav-select-item-container--active {
