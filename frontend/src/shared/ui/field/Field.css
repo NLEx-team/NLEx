@@ -6,6 +6,8 @@
 }
 
 .field__label {
+  padding-right: 2px;
+  display: inline-block !important;
   font: inherit;
   color: var(--color-text-primary);
 }

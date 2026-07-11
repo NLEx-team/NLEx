@@ -63,7 +63,6 @@
   align-items: center;
   gap: var(--spacing-sm);
   padding: var(--spacing-md);
-  border-top: var(--border-width) solid var(--color-back-active);
   flex-shrink: 0;
 }
 
