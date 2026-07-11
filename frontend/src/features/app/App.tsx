@@ -6,7 +6,7 @@ import { UserProfilePage } from '../auth/components/UserProfilePage';
 import { AnalyticsPage } from '../analytics/components/AnalyticsPage';
 import { AdminPage } from '../admin/components/AdminPage';
 import { Chat, ChatHistory, useChat } from '../chat';
-import { CatalogManager } from '../catalog';
+
 import { AppHeader } from './components/AppHeader';
 import { Sidebar } from './components/Sidebar';
 import { ThemeToggle } from './components/ThemeToggle';
@@ -59,20 +59,23 @@ function AppLayout() {
           onDeleteChat={chat.removeSession}
           blocked={blocked}
         />
-        <CatalogManager 
-          selectedIds={selectedCatalogIds}
-          onSelectionChange={(ids) => {
-            setSelectedCatalogIds(ids);
-            if (chat.activeSessionId) {
-              chat.updateSessionCatalogs(chat.activeSessionId, ids);
-            }
-          }}
-          disabled={chat.messages.length > 0 || blocked}
-        />
       </Sidebar>
       <div className="app-page">
          {blocked && <BlockedBanner />}
-         <Outlet context={{ chat, isSidebarOpen, setIsSidebarOpen, blocked }} />
+         <Outlet context={{
+            chat,
+            isSidebarOpen,
+            setIsSidebarOpen,
+            blocked,
+            selectedCatalogIds,
+            onCatalogSelectionChange: (ids: string[]) => {
+              setSelectedCatalogIds(ids);
+              if (chat.activeSessionId) {
+                chat.updateSessionCatalogs(chat.activeSessionId, ids);
+              }
+            },
+            catalogDisabled: chat.messages.length > 0 || blocked,
+          }} />
       </div>
     </>
   );
@@ -80,7 +83,7 @@ function AppLayout() {
 
 function ChatPage() {
   const { t } = useTranslation();
-  const { chat, isSidebarOpen, setIsSidebarOpen, blocked } = useOutletContext<any>();
+  const { chat, isSidebarOpen, setIsSidebarOpen, blocked, selectedCatalogIds, onCatalogSelectionChange, catalogDisabled } = useOutletContext<any>();
 
   return (
     <>
@@ -100,6 +103,9 @@ function ChatPage() {
           pending={chat.pending}
           pendingStatus={chat.pendingStatus}
           blocked={blocked}
+          selectedCatalogIds={selectedCatalogIds}
+          onCatalogSelectionChange={onCatalogSelectionChange}
+          catalogDisabled={catalogDisabled}
         />
       </div>
     </>

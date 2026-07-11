@@ -142,19 +142,6 @@ export function ChatHistory({
 
   return (
     <>
-      <div className="sidebar__actions">
-        <button className="sidebar__action-btn" onClick={onNewChat} type="button" disabled={blocked}>
-          <Icon icon="jam:write" width="20" height="20" />
-          <span>{t('sidebar.new_chat')}</span>
-        </button>
-        {user?.role === 'admin' && (
-          <button className="sidebar__action-btn" onClick={() => navigate('/admin/databases')} type="button">
-            <Icon icon="tabler:database-edit" width="20" height="20" />
-            <span>{t('sidebar.manage_databases')}</span>
-          </button>
-        )}
-      </div>
-
       <SidebarSection title={t('sidebar.chats', { defaultValue: 'History' })} className="chat-history">
         <nav className="chat-history__sessions">
           {sessions.map(session => (
