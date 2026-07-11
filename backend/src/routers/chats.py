@@ -94,6 +94,7 @@ async def get_chat_messages(
             role=m.role,
             blocks=m.blocks,
             export_url=m.export_url,
+            export_filename=m.export_filename,
             created_at=m.created_at,
         )
         for m in messages
@@ -189,8 +190,9 @@ async def chat_websocket(
             
             assistant_blocks = _response_to_blocks(response)
             export_url = response.get("export_url")
+            export_filename = response.get("export_filename")
             total_tokens = response.get("result", {}).get("_usage", {}).get("total_tokens")
-            await ChatRepository.add_message(db, chat_id, "assistant", assistant_blocks, export_url, total_tokens)
+            await ChatRepository.add_message(db, chat_id, "assistant", assistant_blocks, export_url, export_filename, total_tokens)
             
             # --- START TITLE LOGIC ---
             if chat.title == "New Chat" and user_msg_count == 1:
@@ -296,8 +298,9 @@ async def submit_prompt(
         # Save assistant response as message
         assistant_blocks = _response_to_blocks(response)
         export_url = response.get("export_url")
+        export_filename = response.get("export_filename")
         total_tokens = response.get("result", {}).get("_usage", {}).get("total_tokens")
-        await ChatRepository.add_message(db, chat_id, "assistant", assistant_blocks, export_url, total_tokens)
+        await ChatRepository.add_message(db, chat_id, "assistant", assistant_blocks, export_url, export_filename, total_tokens)
         
         # For the second user message, we generate a smart title using AI
         if user_msg_count == 2:
@@ -361,8 +364,9 @@ async def submit_clarification(
         # Save assistant response
         assistant_blocks = _response_to_blocks(response)
         export_url = response.get("export_url")
+        export_filename = response.get("export_filename")
         total_tokens = response.get("result", {}).get("_usage", {}).get("total_tokens")
-        await ChatRepository.add_message(db, chat_id, "assistant", assistant_blocks, export_url, total_tokens)
+        await ChatRepository.add_message(db, chat_id, "assistant", assistant_blocks, export_url, export_filename, total_tokens)
         
         return response
     except Exception as e:
@@ -388,10 +392,24 @@ async def export_chat_to_excel(
         file_path = controller.excel_service.generate_and_get_excel(export_id, orch.db_service)
         if not file_path:
             raise ValueError("Export file could not be generated.")
+        
+        # Read filename from metadata
+        filename = f"export_{export_id[:8]}.xlsx"
+        import json
+        import os
+        meta_path = os.path.join(os.environ.get("EXPORTS_DIR", "/app/exports"), f"{export_id}.meta.json")
+        if os.path.exists(meta_path):
+            try:
+                with open(meta_path, "r", encoding="utf-8") as f:
+                    meta = json.load(f)
+                    filename = f"{meta.get('filename', f'export_{export_id[:8]}')}.xlsx"
+            except Exception:
+                pass
+        
         return FileResponse(
             path=file_path,
             media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-            filename=f"export_{export_id[:8]}.xlsx",
+            filename=filename,
             headers={
                 "Access-Control-Expose-Headers": "Content-Disposition",
             },

@@ -1,4 +1,5 @@
 import logging
+import re
 from typing import Dict, List, Optional, Any
 from uuid import UUID, uuid4
 from datetime import datetime
@@ -30,6 +31,37 @@ class ChatController:
         self.catalog_service = catalog_service
         self.db = db
         self.excel_service = _excel_service
+
+    @staticmethod
+    def _generate_export_filename(sql: str, catalog_mapping: dict = None) -> str:
+        """Generate a meaningful filename for the export based on SQL query.
+        
+        Replaces internal Trino catalog identifiers (cat_<hex>) with their
+        human-readable display names so the downloaded file is recognisable.
+        """
+        cleaned_sql = sql
+        if catalog_mapping:
+            for trino_name, display_name in catalog_mapping.items():
+                cleaned_sql = cleaned_sql.replace(trino_name, display_name)
+
+        # Try to extract the table reference from the FROM clause.
+        # Handles: FROM table, FROM schema.table, FROM catalog.schema.table
+        match = re.search(
+            r'FROM\s+["\']?([\w.]+)["\']?',
+            cleaned_sql,
+            re.IGNORECASE,
+        )
+        if match:
+            full_ref = match.group(1)  # e.g. "MyDB.public.orders"
+            parts = full_ref.split(".")
+            table_name = parts[-1]  # always take the last segment (table)
+            # Clean up
+            table_name = re.sub(r'[^\w]', '_', table_name)
+        else:
+            table_name = 'query'
+
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        return f"{table_name}_{timestamp}"
 
     async def get_orchestrator(self, chat_id: UUID, catalog_ids: List[str] = None) -> OrchestratorService:
         """
@@ -238,12 +270,16 @@ class ChatController:
                 text_display_name = cat.name
                 catalog_mapping[trino_name] = text_display_name
 
+            export_filename = self._generate_export_filename(original_sql, catalog_mapping)
+
             self.excel_service.save_export_metadata(
                 export_id, 
                 original_sql, 
                 result.get("headers", []),
-                catalog_mapping
+                catalog_mapping,
+                export_filename
             )
             response["export_url"] = f"/chats/{chat_id}/export/{export_id}"
+            response["export_filename"] = export_filename
 
         return response

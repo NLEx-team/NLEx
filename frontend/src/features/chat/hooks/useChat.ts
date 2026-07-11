@@ -116,13 +116,14 @@ export function useChat(_userId: string, selectedCatalogIds: string[], blocked: 
 
     chatApi.getMessages(activeSessionId)
       .then(serverMessages => {
-        const mapped: ChatMessage[] = serverMessages.map(m => ({
-          id: m.id,
-          role: m.role as 'user' | 'assistant',
-          blocks: m.blocks,
-          timestamp: m.created_at,
-          exportUrl: m.export_url || undefined,
-        }));
+            const mapped: ChatMessage[] = serverMessages.map(m => ({
+              id: m.id,
+              role: m.role as 'user' | 'assistant',
+              blocks: m.blocks,
+              timestamp: m.created_at,
+              exportUrl: m.export_url || undefined,
+              exportFilename: m.export_filename || undefined,
+            }));
         setMessagesBySession(prev => ({
           ...prev,
           [activeSessionId]: mapped,
@@ -214,6 +215,7 @@ export function useChat(_userId: string, selectedCatalogIds: string[], blocked: 
         blocks,
         timestamp: new Date().toISOString(),
         exportUrl: response.export_url,
+        exportFilename: response.export_filename,
       };
       
       if (response.chat_title) {
@@ -255,6 +257,7 @@ export function useChat(_userId: string, selectedCatalogIds: string[], blocked: 
         blocks,
         timestamp: new Date().toISOString(),
         exportUrl: response.export_url,
+        exportFilename: response.export_filename,
       };
       
       setMessagesBySession(prev => ({

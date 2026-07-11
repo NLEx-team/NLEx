@@ -68,10 +68,16 @@ class CatalogService:
         for attempt in range(3):
             try:
                 # 1. Drop if exists (idempotent), 2. connect, 3. verify.
-                await self.db_service.disconnect_catalog(trino_name)
-                await self.db_service.connect_catalog(trino_name, conn)
-                await self.db_service.get_namespaces(trino_name)
+                async def _sync():
+                    await self.db_service.disconnect_catalog(trino_name)
+                    await self.db_service.connect_catalog(trino_name, conn)
+                    await self.db_service.get_namespaces(trino_name)
+                
+                await asyncio.wait_for(_sync(), timeout=15.0)
                 return await self.repository.update_status(catalog_id, CatalogStatus.ACTIVE)
+            except asyncio.TimeoutError as e:
+                last_error = Exception("Connection timed out")
+                break
             except Exception as e:
                 last_error = e
                 transient = any(m in str(e).lower() for m in _TRANSIENT_MARKERS)
@@ -121,11 +127,19 @@ class CatalogService:
         try:
             # Drop if exists just in case
             await self.db_service.execute_query_async(f"DROP CATALOG IF EXISTS {temp_name}")
-            await self.db_service.connect_catalog(temp_name, conn)
-            # test query
-            await self.db_service.get_namespaces(temp_name)
+            
+            async def _test():
+                await self.db_service.connect_catalog(temp_name, conn)
+                # test query
+                await self.db_service.get_namespaces(temp_name)
+                
+            await asyncio.wait_for(_test(), timeout=15.0)
+            
             latency = int((time.time() - start_time) * 1000)
             return {"success": True, "latency_ms": latency}
+        except asyncio.TimeoutError:
+            logger.error(f"Test connection timed out for {temp_name}")
+            return {"success": False, "error": "Connection timed out", "latency_ms": None}
         except Exception as e:
             logger.error(f"Test connection failed: {e}")
             return {"success": False, "error": str(e), "latency_ms": None}
@@ -150,12 +164,17 @@ class CatalogService:
 
         start_time = time.time()
         try:
-            await self.db_service.get_namespaces(trino_name)
+            await asyncio.wait_for(self.db_service.get_namespaces(trino_name), timeout=10.0)
             latency = int((time.time() - start_time) * 1000)
             # Update status to active if it was error
             if catalog.status != CatalogStatus.ACTIVE:
                 await self.repository.update_status(catalog_id, CatalogStatus.ACTIVE)
             return {"success": True, "latency_ms": latency, "error": None}
+        except asyncio.TimeoutError:
+            latency = int((time.time() - start_time) * 1000)
+            logger.error(f"Ping catalog {catalog.name} timed out")
+            await self.repository.update_status(catalog_id, CatalogStatus.ERROR)
+            return {"success": False, "latency_ms": latency, "error": "Connection timed out"}
         except Exception as e:
             latency = int((time.time() - start_time) * 1000)
             logger.error(f"Ping catalog {catalog.name} failed: {e}")

@@ -4,12 +4,18 @@ from io import BytesIO
 from typing import Any, Dict, List, Optional
 from uuid import UUID
 
-from openpyxl import Workbook
+from openpyxl import Workbook, load_workbook
 from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
+from openpyxl.utils import get_column_letter
 
 logger = logging.getLogger(__name__)
 
 EXPORTS_DIR = os.environ.get("EXPORTS_DIR", "/app/exports")
+
+# How many data rows to sample for auto-width calculation (keeps it fast).
+_WIDTH_SAMPLE_ROWS = 200
+_MAX_COL_WIDTH = 60
+_MIN_COL_WIDTH = 10
 
 
 class ExcelExportService:
@@ -44,7 +50,8 @@ class ExcelExportService:
         export_id: str,
         sql: str,
         headers: List[str],
-        catalog_mapping: Dict[str, str] = None
+        catalog_mapping: Dict[str, str] = None,
+        filename: str = None
     ) -> None:
         import json
         meta_path = self._get_metadata_path(export_id)
@@ -52,7 +59,8 @@ class ExcelExportService:
             json.dump({
                 "sql": sql, 
                 "headers": headers,
-                "catalog_mapping": catalog_mapping or {}
+                "catalog_mapping": catalog_mapping or {},
+                "filename": filename or f"export_{export_id}"
             }, f)
 
     def generate_and_get_excel(self, export_id: str, db_service) -> str:
@@ -77,7 +85,6 @@ class ExcelExportService:
         ws = wb.create_sheet("Query Results")
 
         # --- Header styling ---
-        # Note: In write-only mode, we write Cell objects to apply styles
         from openpyxl.cell import WriteOnlyCell
         
         header_font = Font(name="Calibri", bold=True, color="FFFFFF", size=11)
@@ -89,10 +96,8 @@ class ExcelExportService:
         )
         data_alignment = Alignment(vertical="center")
 
-        # Apply default column widths (can't auto-fit easily in write_only mode)
-        for col_idx, column_name in enumerate(headers, start=1):
-            from openpyxl.utils import get_column_letter
-            ws.column_dimensions[get_column_letter(col_idx)].width = max(len(str(column_name)) + 4, 15)
+        # Track max width per column (seeded with header lengths)
+        col_widths = [min(len(str(h)) + 4, _MAX_COL_WIDTH) for h in headers]
 
         # Write header row
         header_cells = []
@@ -110,7 +115,7 @@ class ExcelExportService:
         row_count = 0
         for row_data in db_service.execute_readonly_sync_stream(sql, chunk_size=2000):
             data_cells = []
-            for val in row_data:
+            for ci, val in enumerate(row_data):
                 # Openpyxl doesn't support UUIDs, Decimals, dicts natively
                 if val is not None and not isinstance(val, (int, float, str, bool)):
                     val = str(val)
@@ -120,6 +125,12 @@ class ExcelExportService:
                         if t_name in val:
                             val = val.replace(t_name, d_name)
 
+                # Sample first N rows for auto-width
+                if row_count < _WIDTH_SAMPLE_ROWS and ci < len(col_widths):
+                    cell_len = len(str(val)) + 2 if val is not None else 0
+                    if cell_len > col_widths[ci]:
+                        col_widths[ci] = min(cell_len, _MAX_COL_WIDTH)
+
                 cell = WriteOnlyCell(ws, value=val)
                 cell.border = thin_border
                 cell.alignment = data_alignment
@@ -127,7 +138,18 @@ class ExcelExportService:
             ws.append(data_cells)
             row_count += 1
             
-        # Freeze panes is not supported in write_only mode
         wb.save(file_path)
+
+        # --- Post-process: apply auto-fitted widths + freeze header row ---
+        try:
+            wb2 = load_workbook(file_path)
+            ws2 = wb2.active
+            for ci, width in enumerate(col_widths):
+                ws2.column_dimensions[get_column_letter(ci + 1)].width = max(width, _MIN_COL_WIDTH)
+            ws2.freeze_panes = "A2"
+            wb2.save(file_path)
+        except Exception as e:
+            logger.warning(f"Post-processing column widths failed (file is still valid): {e}")
+
         logger.info(f"Excel file streamed and saved: {file_path} ({row_count} rows)")
         return file_path

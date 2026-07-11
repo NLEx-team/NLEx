@@ -45,8 +45,8 @@ export function Chat({
     FAILED: { text: t('chat.status_failed') },
   };
 
-  const handleExport = useCallback((exportUrl: string) => {
-    chatApi.downloadExport(exportUrl).catch((err) => {
+  const handleExport = useCallback((exportUrl: string, filename?: string) => {
+    chatApi.downloadExport(exportUrl, filename).catch((err) => {
       console.error('Export download failed:', err);
       alert(t('common.failed_download'));
     });
@@ -78,6 +78,7 @@ export function Chat({
                 role={msg.role}
                 blocks={msg.blocks}
                 exportUrl={msg.exportUrl}
+                exportFilename={msg.exportFilename}
                 onClarify={handleClarification}
                 onExport={handleExport}
                 isLastMessage={index === messages.length - 1}

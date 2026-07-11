@@ -28,6 +28,8 @@ async def get_catalog_service(db = Depends(get_db)) -> CatalogService:
     )
     return CatalogService(repo, db_service)
 
+_SYNCING_CATALOGS = set()
+
 async def background_cache_schema(catalog_id: str):
     """
     Pre-warms the schema cache for a catalog: fetches schema, infers relationships,
@@ -38,6 +40,7 @@ async def background_cache_schema(catalog_id: str):
     from src.services.relationship_inference_service import RelationshipInferenceService
     from src.services.llm_service import LLMService
     
+    _SYNCING_CATALOGS.add(catalog_id)
     try:
         async with AsyncSessionLocal() as db:
             repo = CatalogRepository(db)
@@ -93,6 +96,8 @@ async def background_cache_schema(catalog_id: str):
             logger.info(f"Pre-warm: successfully cached schema for catalog '{catalog.name}' ({trino_name})")
     except Exception as e:
         logger.error(f"Pre-warm failed for catalog {catalog_id}: {e}", exc_info=True)
+    finally:
+        _SYNCING_CATALOGS.discard(catalog_id)
 
 @router.post("", response_model=CatalogRead, status_code=status.HTTP_201_CREATED)
 async def create_catalog(
@@ -156,4 +161,26 @@ async def test_new_connection(
 ):
     result = await service.test_raw_connection(catalog_in)
     return CatalogTestResult(**result)
+
+@router.get("/{catalog_id}/sync-status")
+async def get_sync_status(
+    catalog_id: UUID,
+    service: CatalogService = Depends(get_catalog_service),
+    _ = Depends(get_current_user)
+):
+    catalog = await service.repository.get_by_id(catalog_id)
+    if not catalog:
+        raise HTTPException(status_code=404, detail="Catalog not found")
+        
+    trino_name = f"cat_{catalog.id.hex}"
+    
+    from src.services.relationship_inference_service import _GLOBAL_SCHEMA_CACHE
+    
+    is_cached = trino_name in _GLOBAL_SCHEMA_CACHE
+    is_syncing = str(catalog_id) in _SYNCING_CATALOGS
+    
+    return {
+        "is_syncing": is_syncing,
+        "is_cached": is_cached
+    }
 

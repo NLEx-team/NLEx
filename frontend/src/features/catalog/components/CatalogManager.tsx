@@ -19,7 +19,7 @@ interface CatalogManagerProps {
 export function CatalogManager({ selectedIds, onSelectionChange, disabled }: CatalogManagerProps) {
   const { user } = useAuth();
   const { t } = useTranslation();
-  const { catalogs, loading, pingResults, createCatalog, deleteCatalog, pingCatalog } = useCatalogs();
+  const { catalogs, loading, pingResults, syncStatuses, createCatalog, deleteCatalog, pingCatalog } = useCatalogs();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedCatalog, setSelectedCatalog] = useState<CatalogRead | null>(null);
   const { confirm, isOpen: isConfirmOpen, onConfirm, onCancel } = useConfirm();
@@ -75,6 +75,7 @@ export function CatalogManager({ selectedIds, onSelectionChange, disabled }: Cat
           catalogs={catalogs}
           loading={loading}
           pingResults={pingResults}
+          syncStatuses={syncStatuses}
           selectedIds={selectedIdsSet}
           onToggleSelect={handleToggleSelect}
           onPing={pingCatalog}
