@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '../../../shared/ui/button';
 import { NavSelectItem } from '../../../shared/ui/nav-select-item';
 import { SidebarSection } from '../../app/components/SidebarSection';
@@ -7,6 +8,7 @@ import { Icon } from '@iconify/react';
 import { Confirm } from '../../../shared/ui/confirm';
 import { Modal } from '../../../shared/ui/modal';
 import { Field } from '../../../shared/ui/field';
+import { useAuth } from '../../auth/hooks/useAuth';
 import { useTranslation } from 'react-i18next';
 import type { ChatSession } from '../types';
 import './ChatHistory.css';
@@ -113,6 +115,8 @@ export function ChatHistory({
   blocked = false
 }: ChatHistoryProps) {
   const { t } = useTranslation();
+  const { user } = useAuth();
+  const navigate = useNavigate();
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [renamingSession, setRenamingSession] = useState<{id: string, title: string} | null>(null);
   const [renameInputValue, setRenameInputValue] = useState('');
@@ -143,10 +147,12 @@ export function ChatHistory({
           <Icon icon="jam:write" width="20" height="20" />
           <span>{t('sidebar.new_chat')}</span>
         </button>
-        <button className="sidebar__action-btn" onClick={onNewChat} type="button" disabled={blocked}>
-          <Icon icon="tabler:database-edit" width="20" height="20" />
-          <span>{t('sidebar.manage_databases')}</span>
-        </button>
+        {user?.role === 'admin' && (
+          <button className="sidebar__action-btn" onClick={() => navigate('/admin/databases')} type="button">
+            <Icon icon="tabler:database-edit" width="20" height="20" />
+            <span>{t('sidebar.manage_databases')}</span>
+          </button>
+        )}
       </div>
 
       <SidebarSection title={t('sidebar.chats', { defaultValue: 'History' })} className="chat-history">

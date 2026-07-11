@@ -168,14 +168,16 @@ export function CatalogList({ catalogs, loading, pingResults, syncStatuses, sele
                   >
                     <Icon icon="mdi:refresh" />
                   </button>
-                  <button
-                    type="button"
-                    className="catalog-item__action-btn"
-                    onClick={(e) => handleInfo(e, catalog)}
-                    title={t('catalog.db_info')}
-                  >
-                    <Icon icon="mdi:information-outline" />
-                  </button>
+                  {onInfo && (
+                    <button
+                      type="button"
+                      className="catalog-item__action-btn"
+                      onClick={(e) => handleInfo(e, catalog)}
+                      title={t('catalog.db_info')}
+                    >
+                      <Icon icon="mdi:information-outline" />
+                    </button>
+                  )}
                 </div>
               )}
             </div>

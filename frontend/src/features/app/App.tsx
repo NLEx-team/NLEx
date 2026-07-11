@@ -186,7 +186,10 @@ export default function App() {
           <Route path="/chat" element={<ChatPage />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/analytics" element={<AnalyticsPageWrapper />} />
-          <Route path="/admin" element={<AdminPageWrapper />} />
+          <Route path="/admin" element={<Navigate to="/admin/llm" replace />} />
+          <Route path="/admin/llm" element={<AdminPageWrapper />} />
+          <Route path="/admin/users" element={<AdminPageWrapper />} />
+          <Route path="/admin/databases" element={<AdminPageWrapper />} />
         </Route>
 
         <Route
