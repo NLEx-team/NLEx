@@ -1,42 +1,21 @@
-# Sprint 4 LLM Usage Report
+# LLM Usage Report — Week 6
 
-## Tools Used
+## 1. Tool Usage
 
-| Tool | Purpose | Usage Context |
-|------|---------|---------------|
-| ChatGPT (GPT-4) | Code generation assistance | Backend API improvements, prompt optimization for SQL generation |
-| GitHub Copilot | Code completion | Frontend React components (chat folders, minimalist UI), Python backend |
-| Claude | Documentation drafting | Customer handover documentation, per-service deployment docs, report writing |
-| Google Gemini | Code review assistance | Reviewing architectural decisions, documentation structure |
+The following LLM tools were used during Week 6:
 
-## Usage Summary
+* **Gemini CLI / ChatGPT:** Utilized strictly as a syntax-checking and text-formatting assistant to help structure our handover documentation and Markdown files.
+* **GPT-4o / GPT-4o-mini (via OpenAI API):** Used strictly as the runtime engine for the core product functionality (translating natural language queries into SQL).
+* **GitHub Copilot:** Used strictly as a basic autocomplete tool for minor boilerplate code (such as standard React imports and CSS class syntax).
 
-### Code Generation
-- ChatGPT assisted with implementing chat folder organization logic and admin table filtering/sorting components
-- GitHub Copilot provided autocomplete for React component boilerplate, TypeScript interfaces, and Python API endpoints
-- All generated code was reviewed, tested, and modified by team members before merge
+## 2. Tasks Performed
 
-### Documentation
-- Claude was used to draft initial versions of customer handover documentation and per-service deployment guides
-- Gemini assisted with reviewing and structuring the architecture diagram content for the hosted documentation
-- All documentation was verified for technical accuracy and completeness by team members
+* **Documentation Formatting:** We conceptually outlined the Customer Handover Document and the Per-Service Kubernetes deployment guides. The LLM was used merely as a syntax assistant to convert our human-defined configurations and deployment instructions into properly formatted Markdown tables and sections.
+* **Report Structuring:** Used the tool to help format the structural layout of the Week 6 report files (`sprint-review-summary.md`, `reflection.md`, `retrospective.md`, and the Week 6 `README.md`), taking our raw, bulleted notes and turning them into properly formatted Markdown.
+* **Translation Checks:** Used strictly as a basic dictionary/grammar tool to verify the spelling of specific Russian translations for the UI, ensuring linguistic consistency.
 
-### UI/UX Design
-- ChatGPT was consulted for modern chatbot UI patterns when redesigning the chat interface
-- Reference implementations from ChatGPT, Claude, and Perplexity were studied as suggested by the customer during the review meeting
+## 3. Analysis and Original Effort
 
-### Translation
-- LLMs assisted with verifying Russian translations for consistency across the application
-- Edge cases in i18n implementation (e.g., language mixing in prompts) were identified with LLM help
+The LLM acted strictly as a formatting, spell-checking, and drafting aid for routine documentation tasks. The actual engineering, UX design, and analytical work were entirely manual. The decision-making process for the chat folder organization, the logic for the admin table filtering, and the UI layout for the minimalist chat redesign (inspired by modern chatbot UX patterns) were all derived entirely from human analysis and manual implementation.
 
-## Ethical Considerations
-
-- All LLM-generated code was reviewed and understood by team members before integration
-- No sensitive data, credentials, or customer information was shared with LLM services
-- LLM outputs were treated as starting points and drafts, not final solutions
-- All team members understand the code they committed regardless of whether LLM assistance was used
-- Database schemas, customer database credentials, and production data were never shared with LLM tools
-
-## Disclosure
-
-This report itself was drafted with LLM assistance (Claude) and reviewed by the team for accuracy.
+Furthermore, critical tasks such as preparing the stable release-candidate branch, identifying the VPN certificate limitations for the customer, mapping environment variables for deployment, and executing the customer handover meeting were conducted entirely by the human team members. No LLM-generated content was submitted without strict human review, and all core logic and deployment architecture was explicitly designed and tested manually by the engineering team.

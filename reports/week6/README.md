@@ -9,11 +9,11 @@
 
 ## Sprint Backlog & Planning
 
-- **Product Backlog Board**: [GitHub Projects Board](https://github.com/orgs/NLEx-team/projects/2)
-- **Sprint 4 Backlog Board**: [Sprint 4 Board](https://github.com/orgs/NLEx-team/projects/2/views/10)
+- **Product Backlog Board**: [GitHub Projects Board](https://github.com/orgs/NLEx-team/projects/1)
+- **Sprint 4 Backlog Board**: [Sprint 4 Board](https://github.com/orgs/NLEx-team/projects/1/views/1)
 - **Sprint 4 Milestone**: [Sprint 4 Milestone](https://github.com/NLEx-team/NLEx/milestone/5)
 - **Sprint 4 Goal**: Deliver a stable trial release with UX/UI improvements, admin panel enhancements, translation fixes, and customer-facing documentation, enabling the customer to independently deploy and test the product.
-- **Sprint Dates**: June 30, 2026 – July 6, 2026
+- **Sprint Dates**: June 6, 2026 – July 12, 2026
 - **Total Story Points**: 29
 
 ---
@@ -106,21 +106,21 @@ During the Week 6 meeting, the customer reviewed the documentation set and provi
 
 | # | Feedback Point | Source | Action | PBI/Issue | Status |
 |---|---------------|--------|--------|-----------|--------|
-| 1 | Sorting/filtering in user table (by email, name, date, queries) | Week 5 meeting | Implemented in Sprint 4 | [#125](https://github.com/NLEx-team/NLEx/issues/125) | ✅ Done |
-| 2 | Chat folder organization | Week 5 meeting | Implemented in Sprint 4 | [#126](https://github.com/NLEx-team/NLEx/issues/126) | ✅ Done |
-| 3 | Minimalist chat UI (ChatGPT/Perplexity style) | Week 5 meeting | Implemented in Sprint 4 | [#127](https://github.com/NLEx-team/NLEx/issues/127) | ✅ Done |
-| 4 | Chart generation (in-app preview + Excel export) | Week 6 meeting | Created PBI for Sprint 5 | [#128](https://github.com/NLEx-team/NLEx/issues/128) | 🔲 Planned |
-| 5 | Fix translation inconsistencies | Week 5 meeting | Fixed in Sprint 4 | [#129](https://github.com/NLEx-team/NLEx/issues/129) | ✅ Done |
-| 6 | Per-service deployment docs for Kubernetes | Week 6 meeting | Started in Sprint 4, ongoing | [#130](https://github.com/NLEx-team/NLEx/issues/130) | 🟡 In Progress |
-| 7 | Stable release-candidate branch for testing | Week 5 meeting | Branch prepared | [#131](https://github.com/NLEx-team/NLEx/issues/131) | ✅ Done |
-| 8 | Customer handover documentation | Assignment 6 | Created in Sprint 4 | [#132](https://github.com/NLEx-team/NLEx/issues/132) | ✅ Done |
-| 9 | Architecture diagram for documentation | Week 6 meeting | Added in Sprint 4 | [#133](https://github.com/NLEx-team/NLEx/issues/133) | ✅ Done |
-| 10 | MCP integration for DB-specific optimization | Week 6 meeting | Acknowledged, deferred post-course | [#134](https://github.com/NLEx-team/NLEx/issues/134) | ❌ Deferred |
+| 1 | Sorting/filtering in user table (by email, name, date, queries) | Week 5 meeting | Implemented in Sprint 4 | PBI-030 | ✅ Done |
+| 2 | Chat folder organization | Week 5 meeting | Implemented in Sprint 4 | PBI-031 | ✅ Done |
+| 3 | Minimalist chat UI (ChatGPT/Perplexity style) | Week 5 meeting | Implemented in Sprint 4 | PBI-032 | ✅ Done |
+| 4 | Chart generation (in-app preview + Excel export) | Week 6 meeting | Created PBI for Sprint 5 | PBI-033 | 🔲 Planned |
+| 5 | Fix translation inconsistencies | Week 5 meeting | Fixed in Sprint 4 | PBI-034 | ✅ Done |
+| 6 | Per-service deployment docs for Kubernetes | Week 6 meeting | Started in Sprint 4, ongoing | PBI-035 | 🟡 In Progress |
+| 7 | Stable release-candidate branch for testing | Week 5 meeting | Branch prepared | PBI-036 | ✅ Done |
+| 8 | Customer handover documentation | Assignment 6 | Created in Sprint 4 | PBI-037 | ✅ Done |
+| 9 | Architecture diagram for documentation | Week 6 meeting | Added in Sprint 4 | PBI-038 | ✅ Done |
+| 10 | MCP integration for DB-specific optimization | Week 6 meeting | Acknowledged, deferred post-course | PBI-039 | ❌ Deferred |
 
 ### Feedback Not Yet Addressed:
-- **Chart generation (#128)**: This is a resource-intensive feature requiring double-check logic for Excel generation and a frontend preview component. It has been planned for Sprint 5 but may not be fully delivered depending on the effort required for customer deployment support and final transition work.
-- **MCP integration (#134)**: The customer suggested connecting MCP (Model Context Protocol) or a knowledge base for DB-specific query optimization. This was acknowledged as architecturally complex and not feasible within the course timeline. It has been documented as a post-course enhancement opportunity.
-- **Per-service deployment docs (#130)**: Initial documentation has been started but is not yet complete. Full per-service configuration with Kubernetes manifests is planned for Sprint 5.
+- **Chart generation (PBI-033)**: This is a resource-intensive feature requiring double-check logic for Excel generation and a frontend preview component. It has been planned for Sprint 5 but may not be fully delivered depending on the effort required for customer deployment support and final transition work.
+- **MCP integration (PBI-039)**: The customer suggested connecting MCP (Model Context Protocol) or a knowledge base for DB-specific query optimization. This was acknowledged as architecturally complex and not feasible within the course timeline. It has been documented as a post-course enhancement opportunity.
+- **Per-service deployment docs (PBI-035)**: Initial documentation has been started but is not yet complete. Full per-service configuration with Kubernetes manifests is planned for Sprint 5.
 
 ---
 
@@ -183,30 +183,39 @@ MVP v2+ (trial release v2.1.0) is deployed and functional with all core features
 
 ## Contribution Traceability
 
-| Team Member | Role | Issues | PRs | Review Activity | Testing | Documentation | Transition/Deployment |
-|------------|------|--------|-----|----------------|---------|---------------|----------------------|
-| Maksim Merkushev | Product Owner | [#128](https://github.com/NLEx-team/NLEx/issues/128), [#134](https://github.com/NLEx-team/NLEx/issues/134) | [PR #141](https://github.com/NLEx-team/NLEx/pull/141) | Reviewed PR #140, PR #145 | LLM workflow testing | Backlog refinement, cross-db optimization via RAG | — |
-| Serafim Soldatov | Scrum Master | [#130](https://github.com/NLEx-team/NLEx/issues/130), [#131](https://github.com/NLEx-team/NLEx/issues/131), [#132](https://github.com/NLEx-team/NLEx/issues/132) | [PR #140](https://github.com/NLEx-team/NLEx/pull/140), [PR #145](https://github.com/NLEx-team/NLEx/pull/145) | Reviewed PR #142, PR #143 | Backend tests | Per-service docs, customer handover, AGENTS.md, reports | Release management, CI/CD, deployment |
-| Maksim Maltsev | Developer | [#125](https://github.com/NLEx-team/NLEx/issues/125), [#127](https://github.com/NLEx-team/NLEx/issues/127), [#133](https://github.com/NLEx-team/NLEx/issues/133) | [PR #144](https://github.com/NLEx-team/NLEx/pull/144) | Reviewed PR #141, PR #146 | Integration tests | Sprint review, architecture diagram | Customer meeting lead |
-| Polina Systerova | Developer | [#125](https://github.com/NLEx-team/NLEx/issues/125), [#129](https://github.com/NLEx-team/NLEx/issues/129) | [PR #143](https://github.com/NLEx-team/NLEx/pull/143) | Reviewed PR #144, PR #142 | UAT scenarios, i18n testing | Quality docs, UAT updates | — |
-| Ramina Ianturina | Developer | [#126](https://github.com/NLEx-team/NLEx/issues/126) | [PR #142](https://github.com/NLEx-team/NLEx/pull/142) | Reviewed PR #143, PR #145 | Frontend tests | Chat folders docs | UI/UX implementation |
-| Liubov Savchenko | Developer | [#126](https://github.com/NLEx-team/NLEx/issues/126), [#130](https://github.com/NLEx-team/NLEx/issues/130) | [PR #146](https://github.com/NLEx-team/NLEx/pull/146) | Reviewed PR #141, PR #144 | Backend endpoint tests | Architecture docs, deployment docs | — |
+| Team Member | Role | Key Contributions (Sprint 4) | Testing & Review Activity |
+|-------------|------|------------------------------|---------------------------|
+| **Maksim Merkushev** | Product Owner | Backlog refinement, Cross-DB optimization planning, Sprint 4 goal alignment | LLM workflow testing, UAT scenario validation |
+| **Serafim Soldatov** | Scrum Master | Customer handover docs (PBI-037), Week 6 reports, Stable release-candidate branch (PBI-036) | Backend tests, Repository review, Retrospective moderation |
+| **Maksim Maltsev** | Developer | Admin User Table Filtering (PBI-030), Architecture diagram (PBI-038), Sprint review prep | Integration tests, Architecture review |
+| **Polina Systerova** | Developer | Translation/i18n inconsistencies fix (PBI-034), Quality docs & UAT updates | UAT execution, i18n localization testing |
+| **Ramina Ianturina** | Developer | Minimalist chat UI redesign (PBI-032), Frontend styling & layout improvements | Frontend component tests, UI/UX review |
+| **Liubov Savchenko** | Developer | Chat Folder Organization (PBI-031), Per-service Kubernetes deployment docs (PBI-035) | Backend endpoint tests, API integration testing |
 
 ---
 
 ## Screenshots
 
-### Sprint 4 Milestone
-![Sprint 4 Milestone](images/sprint4-milestone.png)
+### Backlog & Kanban Boards
+* **Product Backlog**:
+  ![Product Backlog](images/Product_backlog.png)
+* **Sprint 4 Kanban Board**:
+  ![Sprint 4 Kanban Board](images/Kanban.png)
 
-### Week 6 Trial Release v2.1.0
-![Release v2.1.0](images/release-v210.png)
+### Week 6 Trial Release
+* **Semantic Versioning Trial Release (v2.1.0)**:
+  ![SemVer Release v2.1.0](images/SemVer_release.png)
 
-### Example Issue-Linked PR
-![Issue-Linked PR](images/issue-linked-pr.png)
+### Traceability: Issue-Linked PRs
+* **PR Example 1**:
+  ![PR Example 1](images/PR_example%281%29.png)
+* **PR Example 2**:
+  ![PR Example 2](images/PR_example%282%29.png)
+* **PR Example 3**:
+  ![PR Example 3](images/PR_example%283%29.png)
 
-### Chat Folder Organization
-![Chat Folders](images/chat-folders.png)
-
-### Admin User Table Filtering
-![Admin Filtering](images/admin-filtering.png)
+### Delivered Features UI
+* **Main Dashboard & Chat Folder Organization**:
+  ![Main Dashboard & Chat Folder](images/Dashboard.png)
+* **Admin User Table Filtering & Analytics**:
+  ![Admin Analytics](images/Analyics.png)

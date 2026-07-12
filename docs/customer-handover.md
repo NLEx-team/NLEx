@@ -35,7 +35,6 @@ The product is feature-complete for core use cases and has been demonstrated to 
 - **Repository README**: Setup, configuration, and quick-start instructions
 - **Architecture documentation**: System overview, component descriptions, and Architecture Decision Records (ADRs)
 - **Contributing guidelines**: `CONTRIBUTING.md` with development workflow, code style, and PR process
-- **Agent guidance**: `AGENTS.md` with AI/LLM contributor constraints
 
 ### Deployed Instance
 - A team-managed deployment is accessible at: [https://nlex.tech](https://nlex.tech)
@@ -52,13 +51,15 @@ The application is configured via environment variables defined in a `.env` file
 | Variable | Purpose | Notes |
 |----------|---------|-------|
 | `DATABASE_URL` | PostgreSQL connection for application data | Customer must provide their own PostgreSQL instance |
-| `LLM_API_KEY` | API key for the LLM provider | Customer uses their own model and key |
-| `LLM_API_URL` | LLM service endpoint | Supports OpenAI-compatible APIs and local models |
-| `LLM_MODEL` | Model identifier | e.g., `gpt-4`, or a local model name |
+| `OPENAI_API_KEY` | API key for the LLM provider | Customer uses their own model and key |
+| `OPENAI_BASE_URL` | LLM service endpoint | Supports OpenAI-compatible APIs and local models |
+| `LLM_MODEL_FAST` / `LLM_MODEL_THINKING` | Model identifier | e.g., `gpt-4o-mini` / `gpt-4o`, or local model names |
 | `TRINO_HOST` / `TRINO_PORT` | Trino query engine connection | Included in Docker Compose setup |
-| `SECRET_KEY` | Application secret for session management | Customer must generate their own |
+| `JWT_SECRET_KEY` | Application secret for session management | Customer must generate their own |
 | `FRONTEND_PORT` | Frontend service port | Default: `5173` |
 | `BACKEND_PORT` | Backend service port | Default: `8000` |
+| `ADMIN_EMAIL` | Admin account email | Required to log in to the admin dashboard |
+| `ADMIN_PASSWORD` | Admin account password | Required to log in to the admin dashboard |
 
 See `.env.example` in the repository root for the complete list with default values. **No secrets are stored in the repository.**
 
@@ -75,7 +76,8 @@ cd NLEx
 
 # 2. Copy and configure environment
 cp .env.example .env.secret
-# Edit .env.secret with your LLM API key, database credentials, and secret key
+# Edit .env.secret with your LLM keys, database credentials, JWT secret, and admin credentials.
+# IMPORTANT: For local deployment, ensure VITE_API_URL is set to http://localhost:8000 (defaults to https://api.nlex.tech in .env.example)
 
 # 3. Start all services (development mode)
 docker compose --env-file .env.secret --profile dev up --build
@@ -89,7 +91,7 @@ docker compose --env-file .env.secret --profile dev up --build
 
 ```bash
 docker compose --env-file .env.secret --profile prod up --build
-# Frontend: http://localhost:80
+# Frontend: http://localhost:5173 (or as configured in FRONTEND_PORT)
 # Backend API: http://localhost:8000
 ```
 
@@ -123,8 +125,8 @@ For production Kubernetes deployment, each service requires its own configuratio
 
 | Service | Technology | Default Port | Key Configuration |
 |---------|-----------|-------------|-------------------|
-| **Frontend** | React/TypeScript/Vite | 5173 (dev) / 80 (prod) | `VITE_API_URL` (backend endpoint) |
-| **Backend** | Python/FastAPI | 8000 | `DATABASE_URL`, `LLM_API_KEY`, `LLM_API_URL`, `TRINO_HOST`, `SECRET_KEY` |
+| **Frontend** | React/TypeScript/Vite | 5173 (dev) / 5173 (prod default) | `VITE_API_URL` (backend endpoint) |
+| **Backend** | Python/FastAPI | 8000 | `DATABASE_URL`, `OPENAI_API_KEY`, `OPENAI_BASE_URL`, `TRINO_HOST`, `JWT_SECRET_KEY` |
 | **PostgreSQL** | PostgreSQL 16 | 5432 | `POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_DB` |
 | **Trino** | Trino 481 | 8080 | Config properties file (`trino-config.properties`), database catalog configurations |
 
@@ -138,13 +140,11 @@ For production Kubernetes deployment, each service requires its own configuratio
 |----------|---------|----------|
 | **README.md** | Main entry point, quick-start setup | Repository root |
 | **Hosted Docs** | Full documentation site | [nlex-team.github.io/NLEx](https://nlex-team.github.io/NLEx/) |
-| **Architecture** | System overview, static/dynamic/deployment views, ADRs | `docs/architecture/` |
 | **Quality Requirements** | Non-functional requirements (performance, security, usability) | `docs/quality-requirements.md` |
 | **Testing Strategy** | Test approach, tools, coverage, and instructions | `docs/testing.md` |
 | **User Acceptance Tests** | UAT scenarios and results | `docs/user-acceptance-tests.md` |
 | **Roadmap** | Version history and planned work | `docs/roadmap.md` |
 | **Contributing** | Development workflow and guidelines | `CONTRIBUTING.md` |
-| **Agent Guidance** | AI/LLM contributor constraints | `AGENTS.md` |
 
 ---
 
@@ -165,7 +165,7 @@ For production Kubernetes deployment, each service requires its own configuratio
 |-------|-------------|----------|
 | Services fail to start | Missing or incorrect `.env.secret` configuration | Verify `.env.secret` against `.env.example`; check Docker is running; verify port availability |
 | Database connection fails | Wrong credentials or unreachable host | Verify database credentials and network accessibility; check Trino catalog configuration |
-| LLM not responding | Invalid API key or unreachable endpoint | Verify `LLM_API_KEY` and `LLM_API_URL`; check model endpoint reachability |
+| LLM not responding | Invalid API key or unreachable endpoint | Verify `OPENAI_API_KEY` and `OPENAI_BASE_URL`; check model endpoint reachability |
 | Schema not loading for new database | Connection issue during vectorization | Delete and re-add the database connection; schema is rebuilt at initial connection |
 | Translation inconsistencies | i18n coverage gap | Switch language via UI settings and report any remaining issues via GitHub Issues |
 | Frontend shows blank page | Backend not reachable | Check `VITE_API_URL` environment variable; verify backend is running on expected port |
@@ -180,7 +180,7 @@ For production Kubernetes deployment, each service requires its own configuratio
 - Direct communication via Telegram
 
 **After the course:**
-- The product is self-contained and can be maintained using the documentation, contributing guidelines, and agent guidance provided in the repository
+- The product is self-contained and can be maintained using the documentation and contributing guidelines provided in the repository
 - No ongoing team support is guaranteed after course completion
 
 ---

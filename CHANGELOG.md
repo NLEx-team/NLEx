@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v2.1.0] - 2026-07-12
+### Added
+- Chat folder organization, allowing users to group related chats (PBI-031).
+- Admin user table filtering and sorting by email, name, registration date, and query count (PBI-030).
+- Customer handover documentation for transitioning product deployment (PBI-037).
+- Architecture diagram in the hosted documentation (PBI-038).
+- Initial per-service deployment documentation for Kubernetes (PBI-035).
+- Stable release-candidate branch for independent customer testing (PBI-036).
+
+### Changed
+- Minimalist chat UI redesign inspired by modern chatbot UX patterns (PBI-032).
+
+### Fixed
+- UI translation inconsistencies (e.g., untranslated words like "successfully" in Russian UI) (PBI-034).
+
 ## [v2.0.0] - 2026-07-05
 ### Added
 - Cross-database request capabilities (query multiple database targets).

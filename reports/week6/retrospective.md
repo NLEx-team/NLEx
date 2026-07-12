@@ -22,13 +22,13 @@
 
 ## Action Items
 
-| # | Action | Owner | Target | Status |
-|---|--------|-------|--------|--------|
-| 1 | Send stable release-candidate branch to customer via Telegram | Serafim | Start of Week 7 | 🔲 To Do |
-| 2 | Complete per-service deployment documentation for Kubernetes | Serafim | Mid Week 7 | 🔲 To Do |
-| 3 | Document VPN certificate installation for Docker images | Serafim | Mid Week 7 | 🔲 To Do |
-| 4 | Implement chart generation feature (if feasible) | Maksim, Mikhail | End of Week 7 | 🔲 To Do |
-| 5 | Update customer handover docs with final deployment details | Maksim | End of Week 7 | 🔲 To Do |
-| 6 | Support customer during local deployment and testing | All | Week 7 | 🔲 To Do |
-| 7 | Prepare for and respond to performance test feedback | All | Week 7 | 🔲 To Do |
-| 8 | Prepare Demo Day presentation and record demo video | All | End of Week 7 | 🔲 To Do |
+| # | Action | Owner | Target |
+|---|--------|-------|--------|
+| 1 | Send stable release-candidate branch to customer via Telegram | Serafim | Start of Week 7 |
+| 2 | Complete per-service deployment documentation for Kubernetes | Serafim | Mid Week 7 |
+| 3 | Document VPN certificate installation for Docker images | Serafim | Mid Week 7 |
+| 4 | Implement chart generation feature (if feasible) | Maksim, Mikhail | End of Week 7 |
+| 5 | Update customer handover docs with final deployment details | Maksim | End of Week 7 |
+| 6 | Support customer during local deployment and testing | All | Week 7 |
+| 7 | Prepare for and respond to performance test feedback | All | Week 7 |
+| 8 | Prepare Demo Day presentation and record demo video | All | End of Week 7 |
