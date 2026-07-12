@@ -6,7 +6,7 @@ import { UserProfilePage } from '../auth/components/UserProfilePage';
 import { AnalyticsPage } from '../analytics/components/AnalyticsPage';
 import { AdminPage } from '../admin/components/AdminPage';
 import { Chat, ChatHistory, useChat } from '../chat';
-import { CatalogManager } from '../catalog';
+
 import { AppHeader } from './components/AppHeader';
 import { Sidebar } from './components/Sidebar';
 import { ThemeToggle } from './components/ThemeToggle';
@@ -44,39 +44,38 @@ function AppLayout() {
   return (
     <>
       <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)}>
-        <div style={{ display: 'flex', flexDirection: 'column', flex: 1, overflowY: 'auto', minHeight: 0, gap: '16px' }}>
-          <ChatHistory
-            sessions={chat.sessions}
-            activeSessionId={chat.activeSessionId}
-            onSelectSession={(id) => {
-               chat.setActiveSessionId(id);
-               navigate('/chat');
-            }}
-            onNewChat={() => {
-               chat.startNewChat();
-               navigate('/chat');
-            }}
-            onRenameChat={chat.renameSession}
-            onDeleteChat={chat.removeSession}
-            blocked={blocked}
-          />
-        </div>
-        <div style={{ flexShrink: 0, marginTop: '8px' }}>
-          <CatalogManager 
-            selectedIds={selectedCatalogIds}
-            onSelectionChange={(ids) => {
+        <ChatHistory
+          sessions={chat.sessions}
+          activeSessionId={chat.activeSessionId}
+          onSelectSession={(id) => {
+              chat.setActiveSessionId(id);
+              navigate('/chat');
+          }}
+          onNewChat={() => {
+              chat.startNewChat();
+              navigate('/chat');
+          }}
+          onRenameChat={chat.renameSession}
+          onDeleteChat={chat.removeSession}
+          blocked={blocked}
+        />
+      </Sidebar>
+      <div className="app-page">
+         {blocked && <BlockedBanner />}
+         <Outlet context={{
+            chat,
+            isSidebarOpen,
+            setIsSidebarOpen,
+            blocked,
+            selectedCatalogIds,
+            onCatalogSelectionChange: (ids: string[]) => {
               setSelectedCatalogIds(ids);
               if (chat.activeSessionId) {
                 chat.updateSessionCatalogs(chat.activeSessionId, ids);
               }
-            }}
-            disabled={chat.messages.length > 0 || blocked}
-          />
-        </div>
-      </Sidebar>
-      <div className="app-page">
-         {blocked && <BlockedBanner />}
-         <Outlet context={{ chat, isSidebarOpen, setIsSidebarOpen, blocked }} />
+            },
+            catalogDisabled: chat.messages.length > 0 || blocked,
+          }} />
       </div>
     </>
   );
@@ -84,7 +83,7 @@ function AppLayout() {
 
 function ChatPage() {
   const { t } = useTranslation();
-  const { chat, isSidebarOpen, setIsSidebarOpen, blocked } = useOutletContext<any>();
+  const { chat, isSidebarOpen, setIsSidebarOpen, blocked, selectedCatalogIds, onCatalogSelectionChange, catalogDisabled } = useOutletContext<any>();
 
   return (
     <>
@@ -104,6 +103,9 @@ function ChatPage() {
           pending={chat.pending}
           pendingStatus={chat.pendingStatus}
           blocked={blocked}
+          selectedCatalogIds={selectedCatalogIds}
+          onCatalogSelectionChange={onCatalogSelectionChange}
+          catalogDisabled={catalogDisabled}
         />
       </div>
     </>
@@ -190,7 +192,10 @@ export default function App() {
           <Route path="/chat" element={<ChatPage />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/analytics" element={<AnalyticsPageWrapper />} />
-          <Route path="/admin" element={<AdminPageWrapper />} />
+          <Route path="/admin" element={<Navigate to="/admin/llm" replace />} />
+          <Route path="/admin/llm" element={<AdminPageWrapper />} />
+          <Route path="/admin/users" element={<AdminPageWrapper />} />
+          <Route path="/admin/databases" element={<AdminPageWrapper />} />
         </Route>
 
         <Route

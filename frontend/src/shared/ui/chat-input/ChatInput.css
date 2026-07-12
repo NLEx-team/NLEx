@@ -2,7 +2,7 @@
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
-  padding: 0 var(--spacing-sm) 0 var(--spacing-md);
+  padding: 0 var(--spacing-xs) 0 var(--spacing-md);
   border: var(--border-width) solid var(--color-back-active);
   border-radius: var(--chat-input-radius);
   background: var(--color-back-main);
@@ -20,6 +20,7 @@
   max-height: var(--chat-input-max-height);
   padding: var(--spacing-sm) 0;
   border: none;
+  margin-bottom: -2px;
   background: transparent;
   color: var(--color-text-primary);
   font: inherit;

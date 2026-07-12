@@ -31,7 +31,7 @@ export function AppHeader({
             onClick={onOpenSidebar}
             aria-label="Open sidebar"
           >
-            <Icon icon="mdi:menu" />
+            <Icon icon="lucide:sidebar-open" />
           </button>
         )}
         {showBackButton && (

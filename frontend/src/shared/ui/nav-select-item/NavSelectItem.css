@@ -2,22 +2,14 @@
   display: flex;
   align-items: center;
   width: 100%;
-  border-bottom: 1px solid var(--color-border);
-  background: var(--color-back-main);
+  background: var(--color-back-accent);
   transition: background-color 0.2s ease;
   position: relative;
-}
-
-.nav-select-item-container:last-child {
-  border-bottom: none;
+  border-radius: var(--radius);
 }
 
 .nav-select-item-container--active {
   background: var(--color-back-active);
-}
-
-.nav-select-item-container:hover {
-  background: var(--color-back-components);
 }
 
 .nav-select-item__button {
@@ -25,7 +17,7 @@
   padding: 12px 16px;
   border: none;
   background: transparent;
-  color: var(--color-text-primary);
+  color: var(--color-text-accent);
   font-family: inherit;
   font-size: 14px;
   text-align: left;

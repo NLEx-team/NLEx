@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { ChatInput } from '../../../shared/ui/chat-input';
 import { ChatMessage } from '../../../shared/ui/chat-message';
 import { Logo } from '../../../shared/ui/logo';
+import { DatabaseSelector } from '../../catalog/components/DatabaseSelector';
 import { chatApi } from '../api';
 import type { ChatMessage as ChatMessageType } from '../types';
 import './Chat.css';
@@ -17,6 +18,9 @@ interface ChatProps {
   pending: boolean;
   pendingStatus?: string;
   blocked?: boolean;
+  selectedCatalogIds?: string[];
+  onCatalogSelectionChange?: (ids: string[]) => void;
+  catalogDisabled?: boolean;
 }
 
 
@@ -30,6 +34,9 @@ export function Chat({
   pending,
   pendingStatus,
   blocked = false,
+  selectedCatalogIds,
+  onCatalogSelectionChange,
+  catalogDisabled,
 }: ChatProps) {
   const { t } = useTranslation();
 
@@ -69,7 +76,15 @@ export function Chat({
             {messages.length === 0 && (
               <div className="chat__welcome">
                 <Logo variant="full" />
-                <p className="chat__welcome-text">{t('chat.welcome')}</p>
+                <br />
+                <br />
+                {selectedCatalogIds !== undefined && onCatalogSelectionChange !== undefined && (
+                  <DatabaseSelector
+                    selectedIds={selectedCatalogIds}
+                    onSelectionChange={onCatalogSelectionChange}
+                    disabled={catalogDisabled}
+                  />
+                )}
               </div>
             )}
             {messages.map((msg, index) => (
