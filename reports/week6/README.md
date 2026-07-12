@@ -11,7 +11,7 @@
 
 - **Product Backlog Board**: [GitHub Projects Board](https://github.com/orgs/NLEx-team/projects/1)
 - **Sprint 4 Backlog Board**: [Sprint 4 Board](https://github.com/orgs/NLEx-team/projects/1/views/1)
-- **Sprint 4 Milestone**: [Sprint 4 Milestone](https://github.com/NLEx-team/NLEx/milestone/5)
+- **Sprint 4 Milestone**: [Sprint 4 Milestone](https://github.com/NLEx-team/NLEx/milestone/4)
 - **Sprint 4 Goal**: Deliver a stable trial release with UX/UI improvements, admin panel enhancements, translation fixes, and customer-facing documentation, enabling the customer to independently deploy and test the product.
 - **Sprint Dates**: June 6, 2026 – July 12, 2026
 - **Total Story Points**: 29
@@ -143,7 +143,7 @@ The customer did not independently execute the trial release during Week 6. The 
 ## Release
 
 - **Week 6 Trial Release**: [v2.1.0](https://github.com/NLEx-team/NLEx/releases/tag/v2.1.0) — Sprint 4 trial/handover-candidate release for Assignment 6
-- **Sprint 4 Milestone**: [Sprint 4](https://github.com/NLEx-team/NLEx/milestone/5)
+- **Sprint 4 Milestone**: [Sprint 4](https://github.com/NLEx-team/NLEx/milestone/4)
 
 ---
 
