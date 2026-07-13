@@ -1,11 +1,5 @@
 # Quality Requirement Tests
 
-## Table of Contents
-- [Automated Tests](#automated-tests)
-  - [QRT for QR-001 (Performance Efficiency)](#qrt-for-qr-001-performance-efficiency)
-  - [QRT for QR-002 (Security - Authenticity)](#qrt-for-qr-002-security---authenticity)
-  - [QRT for QR-003 (Usability - Error Protection)](#qrt-for-qr-003-usability---error-protection)
-
 This document describes the automated Quality Requirement Tests (QRTs) implemented to verify the quality requirements defined in `quality-requirements.md`.
 
 ## Automated Tests

@@ -1,11 +1,5 @@
 # Testing Strategy
 
-## Table of Contents
-- [Overview](#overview)
-- [Automated Checks](#automated-checks)
-- [Critical Module Coverage](#critical-module-coverage)
-- [Additional QA Checks](#additional-qa-checks)
-
 ## Overview
 Our testing strategy encompasses unit testing, integration testing, and end-to-end testing of critical product logic using Pytest on the backend and build verification on the frontend. Since our application heavily relies on LLM API calls and database connections, integration tests play a vital role.
 
