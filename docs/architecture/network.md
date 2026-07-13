@@ -35,17 +35,6 @@ graph TB
 
     TR =="JDBC"==> EXT_DB
     BE =="HTTPS"==> LLM
-
-    style app-net fill:#1a237e,color:#fff,stroke:#0d1642,stroke-width:2px
-    style shared-net fill:#4a148c,color:#fff,stroke:#2c0d52,stroke-width:2px
-    style FE fill:#1565c0,color:#fff,stroke:#0d47a1
-    style BE fill:#2e7d32,color:#fff,stroke:#1b5e20
-    style PG fill:#336791,color:#fff,stroke:#264d73
-    style TR fill:#dd00a1,color:#fff,stroke:#a8007a
-    style TR2 fill:#dd00a1,color:#fff,stroke:#a8007a
-    style TEST fill:#ff6f00,color:#fff,stroke:#e65100
-    style EXT_DB fill:#5d4037,color:#fff,stroke:#3e2723
-    style LLM fill:#00695c,color:#fff,stroke:#004d40
 ```
 
 ### Network Definitions
@@ -113,30 +102,46 @@ graph TB
 
 Cross-Origin Resource Sharing (CORS) is configured on the **Backend** service to allow the Frontend to make API requests.
 
+!!! warning "CORS origins are hardcoded in code"
+    Unlike many FastAPI apps, NLEx does **not** read allowed origins from an environment variable. The origins are a fixed list in [`backend/src/main.py`](https://github.com/NLEx-team/NLEx/blob/develop/backend/src/main.py). To add or change an origin, edit the file and rebuild the backend image — there is no runtime override.
+
 ### Configuration
 
 | Parameter            | Value                                | Description                              |
 |----------------------|--------------------------------------|------------------------------------------|
-| `allow_origins`      | Value of `CORS_ORIGINS` env var      | Allowed origin URLs                      |
+| `allow_origins`      | Hardcoded list in `main.py`           | Allowed origin URLs                      |
 | `allow_credentials`  | `true`                               | Allow cookies / auth headers             |
 | `allow_methods`      | `["*"]`                              | All HTTP methods permitted               |
 | `allow_headers`      | `["*"]`                              | All headers permitted                    |
 
-### Environment-Specific Origins
+### Allowed Origins
 
-| Environment  | `CORS_ORIGINS` Value                        |
-|-------------|----------------------------------------------|
-| Development | `["http://localhost:5173"]`                   |
-| Staging     | `["https://staging.nlex.example.com"]`        |
-| Production  | `["https://nlex.example.com"]`                |
+| Environment  | Origin                                              |
+|--------------|-----------------------------------------------------|
+| Production   | `https://nlex.tech`, `https://www.nlex.tech`        |
+| Production   | `http://nlex.tech`, `http://www.nlex.tech`           |
+| Staging      | `http://194.226.97.77`                              |
+| Development  | `http://localhost:5173`, `http://127.0.0.1:5173`    |
+| Development  | `http://localhost:5174`, `http://127.0.0.1:5174`    |
 
 ```python
-# Backend CORS middleware setup (FastAPI)
+# backend/src/main.py — CORS middleware setup (FastAPI)
 from fastapi.middleware.cors import CORSMiddleware
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.CORS_ORIGINS,
+    allow_origins=[
+        "https://nlex.tech",
+        "https://www.nlex.tech",
+        "http://nlex.tech",
+        "http://www.nlex.tech",
+        "http://194.226.97.77",
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+        "http://localhost:5174",
+        "http://127.0.0.1:5174",
+        # Add your custom domain here when deploying to a new origin
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -145,6 +150,7 @@ app.add_middleware(
 
 !!! warning "Wildcard Origins"
     Never use `allow_origins=["*"]` in production when `allow_credentials=True`. This is a security vulnerability. Always specify the exact origin(s) of your frontend deployment.
+
 
 ---
 

@@ -49,18 +49,6 @@ graph TB
     Trino -->|JDBC| CH
     Trino -->|MongoDB Connector| Mongo
     Trino -->|Hive / S3 Connector| MinIO
-
-    style FE fill:#61dafb,stroke:#333,color:#000
-    style BE fill:#009688,stroke:#333,color:#fff
-    style AppDB fill:#336791,stroke:#333,color:#fff
-    style Trino fill:#dd00a1,stroke:#333,color:#fff
-    style LLM fill:#10a37f,stroke:#333,color:#fff
-    style PG fill:#336791,stroke:#333,color:#fff
-    style MySQL fill:#4479a1,stroke:#333,color:#fff
-    style Oracle fill:#f80000,stroke:#333,color:#fff
-    style CH fill:#ffcc00,stroke:#333,color:#000
-    style Mongo fill:#47a248,stroke:#333,color:#fff
-    style MinIO fill:#c72c48,stroke:#333,color:#fff
 ```
 
 ---
@@ -291,10 +279,6 @@ graph LR
     T --> Result["Query Results"]
     Result --> E
     O --> A
-
-    style O fill:#009688,stroke:#333,color:#fff
-    style L fill:#10a37f,stroke:#333,color:#fff
-    style T fill:#dd00a1,stroke:#333,color:#fff
 ```
 
 ---

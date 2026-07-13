@@ -33,11 +33,6 @@ flowchart LR
     Trino --> CH[(ClickHouse)]
     Trino --> Mongo[(MongoDB)]
     Trino --> MinIO[(MinIO / S3)]
-
-    style Frontend fill:#61dafb,stroke:#333,color:#000
-    style Backend fill:#009688,stroke:#333,color:#fff
-    style Trino fill:#dd00a1,stroke:#333,color:#fff
-    style LLM fill:#10a37f,stroke:#333,color:#fff
 ```
 
 ---
@@ -78,9 +73,13 @@ flowchart LR
 ## Documentation
 
 - 📐 [Architecture Overview](architecture/overview.md) — system design, component diagrams, request flow
-- 🚀 Deployment Guide — Docker Compose setup, environment configuration *(coming soon)*
-- 🛠️ Development Guide — local setup, project structure, contributing *(coming soon)*
-- 📡 API Reference — REST and WebSocket endpoints *(coming soon)*
+- 🧩 [Services & Configuration](architecture/services.md) — per-service Dockerfile stages, env vars, health checks
+- 🌐 [Network & Communication](architecture/network.md) — topology, ports, CORS, auth flow
+- 🗄️ [Database Schema](architecture/database.md) — tables, relationships, migration strategy
+- 🐳 [Docker Compose Deployment](deployment/docker-compose.md) — local & production Compose setup
+- ☸️ [Per-Service (DevOps) Deployment](deployment/per-service.md) — Kubernetes manifests, scaling, shared storage
+- 🔐 [Environment Variables](deployment/environment.md) — complete env var reference
+- 🗺️ [Roadmap](roadmap.md) · 🤝 [Contributing](contributing.md) · 🧪 [Testing](testing.md)
 
 ---
 
@@ -88,15 +87,22 @@ flowchart LR
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-org/nlex.git
-cd nlex
+git clone https://github.com/NLEx-team/NLEx.git
+cd NLEx
 
-# Start all services
-docker compose up -d
+# Create your environment file and fill in secrets (ADMIN_PASSWORD, JWT_SECRET_KEY, ...)
+cp .env.example .env.secret
+
+# Start all services in dev mode (frontend + backend + PostgreSQL + Trino)
+docker compose --env-file .env.secret --profile dev up --build
 
 # Open the app
-open http://localhost:3000
+open http://localhost:5173
 ```
+
+!!! info "Docs deployment"
+    This documentation site is built with [MkDocs Material](https://squidfunk.github.io/mkdocs-material/) and published to **GitHub Pages** automatically by the `.github/workflows/docs.yml` workflow on every push to `develop`/`main` that changes `docs/**` or `mkdocs.yml`. To preview locally: `pip install mkdocs-material && mkdocs serve`.
+
 
 ---
 
