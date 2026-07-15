@@ -2,9 +2,9 @@
   display: grid;
   grid-template-columns: 1fr auto 1fr;
   align-items: center;
-  padding: 0 var(--spacing-md);
-  height: 60px;
-  border-bottom: var(--border-width) solid var(--color-back-active);
+  padding: 0 var(--spacing-sm);
+  height: var(--header-height);
+  /* border-bottom: var(--border-width) solid var(--color-back-active); */
   background: var(--color-back-main);
   flex-shrink: 0;
 }

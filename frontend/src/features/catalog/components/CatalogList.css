@@ -1,6 +1,9 @@
 .catalog-list {
   display: flex;
   flex-direction: column;
+  border-radius: var(--radius);
+  overflow: hidden;
+  flex-shrink: 0;
 }
 
 .catalog-list__empty {

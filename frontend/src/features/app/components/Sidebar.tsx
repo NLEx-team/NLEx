@@ -40,7 +40,7 @@ export function Sidebar({ isOpen, onClose, children }: SidebarProps) {
     >
       <div className="sidebar__header">
         <div className="sidebar__logo-container">
-          <Logo variant="full" />
+          <Logo variant="compact" />
         </div>
         <button
           type="button"
@@ -48,8 +48,27 @@ export function Sidebar({ isOpen, onClose, children }: SidebarProps) {
           onClick={onClose}
           aria-label="Close sidebar"
         >
-          <Icon icon="mdi:format-list-bulleted" width="28" height="28" color="#8A92A6" />
+          <Icon icon="lucide:sidebar-close" width="28" height="28" color="#8A92A6" />
         </button>
+      </div>
+
+      <div className="sidebar__actions">
+        <button className="sidebar__action-btn" onClick={() => navigate('/chat')} type="button">
+          <Icon icon="jam:write" width="20" height="20" />
+          <span>{t('sidebar.new_chat')}</span>
+        </button>
+        {user?.role === 'admin' && (
+          <button className="sidebar__action-btn" onClick={() => navigate('/admin/databases')} type="button">
+            <Icon icon="tabler:database-edit" width="20" height="20" />
+            <span>{t('sidebar.manage_databases')}</span>
+          </button>
+        )}
+        {user?.role === 'admin' && (
+          <button className="sidebar__action-btn" onClick={() => navigate('/admin')} type="button">
+            <Icon icon="mingcute:settings-6-line" width="20" height="20" />
+            <span>{t('sidebar.admin_panel')}</span>
+          </button>
+        )}
       </div>
 
       <div className="sidebar__content">

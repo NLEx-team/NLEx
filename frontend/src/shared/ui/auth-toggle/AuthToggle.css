@@ -5,7 +5,7 @@
   width: 100%;
   height: var(--components-height);
   overflow: hidden;
-  border: var(--border-width) solid var(--color-text-primary);
+  /* border: var(--border-width) solid var(--color-black-active); */
   border-radius: var(--button-radius);
   background: var(--color-back-components);
 }
@@ -51,4 +51,8 @@
 .auth-toggle__segment:focus-visible {
   outline: var(--focus-outline-width) solid var(--color-accent);
   outline-offset: calc(-1 * var(--focus-outline-offset));
+}
+
+.auth-toggle-wrapper {
+  padding: var(--spacing-xs);
 }

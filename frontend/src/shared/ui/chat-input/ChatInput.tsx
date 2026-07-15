@@ -71,7 +71,7 @@ export function ChatInput({
         aria-label="Send message"
       >
         <IconWrapper>
-          <Icon icon="mdi:send" aria-hidden="true" />
+          <Icon icon="ic:round-send" aria-hidden="true" />
         </IconWrapper>
       </button>
     </div>
