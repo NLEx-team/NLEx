@@ -153,9 +153,11 @@ function TableBlockView({ block, exportUrl, exportFilename, onExport }: { block:
           <table className="chat-message__table">
             <thead>
               <tr>
-                {block.headers.map(header => (
-                  <th key={header}>{header}</th>
-                ))}
+                {block.headers.map((header, ci) => {
+                  const firstRow = block.rows[0];
+                  const isNumber = firstRow && typeof firstRow[ci] === 'number';
+                  return <th key={header} data-type={isNumber ? 'number' : 'text'}>{header}</th>;
+                })}
               </tr>
             </thead>
             <tbody>

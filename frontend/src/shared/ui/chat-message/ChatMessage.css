@@ -121,7 +121,8 @@
   text-align: left;
 }
 
-.chat-message__table td[data-type="number"] {
+.chat-message__table td[data-type="number"],
+.chat-message__table th[data-type="number"] {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
