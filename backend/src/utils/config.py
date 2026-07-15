@@ -43,6 +43,10 @@ class Settings(BaseSettings):
     LLM_MODEL_INFERENCE: str = "deepseek-v4-flash"
     MAX_SQL_RETRIES: int = 3
     SYSTEM_PROXY_URL: str | None = None
+
+    # CORS — comma-separated list of allowed origins.
+    # Defaults cover local development; override in .env.secret for production.
+    CORS_ORIGINS: str = "http://localhost,http://localhost:5173,http://localhost:5174,http://127.0.0.1,http://127.0.0.1:5173,http://127.0.0.1:5174"
     
     @model_validator(mode="after")
     def _reject_insecure_secrets_in_production(self) -> "Settings":
