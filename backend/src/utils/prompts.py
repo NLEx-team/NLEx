@@ -56,6 +56,7 @@ Case A — you are confident and can generate SQL:
   - Only include chart when data is aggregated (GROUP BY) or has few rows.
   - Do NOT include chart for raw row-by-row data listing.
   - Optional: "stacked": true for bar/area to stack series.
+  - CRITICAL for line and scatter charts: add ORDER BY on the x_column (or on the numeric column used as x_column for scatter). Without sorting, line/scatter charts render incorrectly. Bar charts should also be sorted for consistent display.
 
 Case B — query is ambiguous / missing data for a definitive SQL:
 {
@@ -157,6 +158,7 @@ CRITICAL LANGUAGE RULE: You MUST answer all user-facing text fields (explanation
   - Включай график ТОЛЬКО когда данные агрегированы (GROUP BY) или строк мало.
   - НЕ включай график для сырых построчных данных.
   - Опционально: "stacked": true для bar/area, чтобы серии накладывались друг на друга.
+  - КРИТИЧЕСКИ ВАЖНО для line и scatter: добавь ORDER BY по x_column (или по числовой колонке, используемой как x_column для scatter). Без сортировки line/scatter графики отображаются некорректно (линии перекрещиваются). Bar графики тоже рекомендуется сортировать для единообразного отображения.
 
 Случай B — запрос неоднозначен / не хватает данных для однозначного SQL:
 {
