@@ -1,6 +1,10 @@
 # Per-Service Deployment Guide
 
-This guide explains how to deploy each NLEx service independently — for Kubernetes, bare-metal, or any orchestration platform. It is the **primary reference for DevOps teams and customers** performing production deployments.
+> [!WARNING]
+> **Kubernetes Deployment Support is Deprecated**
+> Production Kubernetes deployment manifests are officially deprecated and are no longer actively supported under our current product roadmap. The manifests provided below are for historical reference only. DevOps teams are advised to configure generic container orchestrators or bare-metal deployments using the environment variable guides below.
+
+This guide explains how to deploy each NLEx service independently for bare-metal, general container orchestration, or other platforms. It is the **primary reference for DevOps teams and customers** performing production deployments.
 
 ---
 

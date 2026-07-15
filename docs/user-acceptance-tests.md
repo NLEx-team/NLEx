@@ -53,7 +53,7 @@ User Acceptance Testing ensures the system meets the core requirements from the 
 
 ### UAT-05: Admin Panel Access & Configuration
 * **Status**: Passed
-* **Related PBI**: PBI-025, PBI-030 (Admin Dashboard)
+* **Related PBI**: PBI-025 (Admin Dashboard)
 * **Pre-conditions**: User is logged in with Admin privileges.
 * **Steps**:
   1. Navigate to the Admin Panel.

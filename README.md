@@ -2,16 +2,20 @@
 
 **NLEx — Natural Language to SQL.** A service that translates natural language requests into SQL queries, enabling business analysts to interact with databases without writing code.
 
-## Documentation
+## Documentation & Reports
 
 - **License:** [MIT](LICENSE)
+- **Deployed Product:** [https://nlex.tech/](https://nlex.tech/)
+- **Docs site (GitHub Pages):** [https://NLEx-team.github.io/NLEx/](https://NLEx-team.github.io/NLEx/)
+- **Customer Handover:** [docs/customer-handover.md](docs/customer-handover.md)
+- **Contributing guide:** [CONTRIBUTING.md](CONTRIBUTING.md)
+- **Agent guidance:** [AGENTS.md](AGENTS.md)
+- **Week 7 report (index):** [reports/week7/README.md](reports/week7/README.md)
+- **Week 6 report (index):** [reports/week6/README.md](reports/week6/README.md)
+- **Week 5 report (index):** [reports/week5/README.md](reports/week5/README.md)
 - **Week 4 report (index):** [reports/week4/README.md](reports/week4/README.md)
 - **Week 3 report (index):** [reports/week3/README.md](reports/week3/README.md)
 - **Week 2 report (index):** [reports/week2/README.md](reports/week2/README.md)
-- **MVP v0 report:** [reports/week2/mvp-v0-report.md](reports/week2/mvp-v0-report.md)
-- **User stories:** [reports/week2/user-stories.md](reports/week2/user-stories.md)
-- **Contributing guide:** [CONTRIBUTING.md](CONTRIBUTING.md)
-- **Docs site (GitHub Pages):** [https://NLEx-team.github.io/NLEx/](https://NLEx-team.github.io/NLEx/)
 
 ## How to Run with Docker
 

@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v3.0.0] - 2026-07-15
+### Added
+- Excel export performance improvements replacing openpyxl with xlsxwriter (PBI-033).
+- Rich download animation for Excel export.
+- Per-service configuration documentation.
+
+### Deprecated
+- Per-service deployment documentation for Kubernetes (PBI-035) is officially deprecated.
+- MCP integration for database-specific query optimization (PBI-039) is officially deprecated.
+- Chat folder organization (PBI-031) is officially deprecated and removed.
+
+### Fixed
+- Deployment blockers for customer setup (nginx SPA routing, environment variables, backend health checks, CORS) (PBI-119).
+- UI bugs and LLM configuration cleanup.
+- Excel exported data cells formatting.
+
 ## [v2.1.0] - 2026-07-12
 ### Added
 - Chat folder organization, allowing users to group related chats (PBI-031).
