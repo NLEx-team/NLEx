@@ -1,7 +1,17 @@
-from typing import Optional, List, Dict, Any
+from typing import Optional, List, Dict, Any, Literal
 from pydantic import BaseModel
 from uuid import UUID
 from ..schemas.chat import ChatRead, DatabaseConnectionRead, DraftRead, SchemaSnapshot, ClarificationQuestion
+
+
+class ChartSpec(BaseModel):
+    type: Literal["bar", "line", "pie", "area", "scatter"]
+    title: Optional[str] = None
+    x_column: Optional[str] = None
+    y_columns: Optional[List[str]] = None
+    category_column: Optional[str] = None
+    value_column: Optional[str] = None
+    stacked: Optional[bool] = None
 
 class ChatCreateRequest(BaseModel):
     name: Optional[str] = None

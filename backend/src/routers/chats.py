@@ -472,6 +472,21 @@ def _response_to_blocks(response: dict) -> list:
                 "totalRows": r.get("total_rows"),
                 "explanation": r.get("explanation"),
             })
+            # Add chart block if chart spec is provided
+            chart = r.get("chart")
+            if chart and isinstance(chart, dict):
+                blocks.append({
+                    "type": "chart",
+                    "chartType": chart.get("type", "bar"),
+                    "title": chart.get("title"),
+                    "xColumn": chart.get("x_column"),
+                    "yColumns": chart.get("y_columns"),
+                    "categoryColumn": chart.get("category_column"),
+                    "valueColumn": chart.get("value_column"),
+                    "stacked": chart.get("stacked"),
+                    "data": r["data"],
+                    "headers": r["headers"],
+                })
         if not r.get("explanation") and "data" not in r:
             blocks.append({"type": "text", "text": "Request completed successfully."})
     elif r.get("status") == "error":

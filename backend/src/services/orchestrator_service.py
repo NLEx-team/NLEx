@@ -298,6 +298,8 @@ class OrchestratorService:
                 }
                 if "_usage" in result:
                     success_result["_usage"] = result["_usage"]
+                if "chart" in result:
+                    success_result["chart"] = result["chart"]
                 self.last_result = success_result
                 return success_result
             except Exception as e:
