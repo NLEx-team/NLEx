@@ -33,6 +33,6 @@ asyncpg==0.29.0
 aiosqlite==0.20.0
 trino==0.337.0
 openai==2.41.1
-openpyxl==3.1.5
+XlsxWriter==3.2.2
 numpy==1.26.4
 tiktoken==0.7.0
