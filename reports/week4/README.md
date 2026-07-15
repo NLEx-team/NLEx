@@ -290,7 +290,7 @@ MVP v1.2.0 is delivered, deployed, and customer-tested. The product successfully
 
 | Team Member | GitHub Username | Sprint 1 PBIs | Week 4 Activities |
 |---|---|---|---|
-| Merkushev Maksim | MaksimMerkushev | PBI-006 | Backend services, orchestrator, customer demo |
+| Merkushev Maksim | MaksimMerkushev | PBI-006, PBI-002, PBI-005, PBI-008 | Backend services, orchestrator, customer demo |
 | Maltsev Maksim | Maksim-1307 | PBI-001, PBI-002, PBI-005, PBI-008, PBI-010 | Frontend implementation, result table, SQL preview |
 | Systerova Polina | plnsstrv | PBI-003 | Sidebar components, database selector UI |
 | Ianturina Ramina | RaminaYanturina | PBI-007 | Chat UI, clarification bubbles |
