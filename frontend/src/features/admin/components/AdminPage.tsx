@@ -1,10 +1,17 @@
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect, useCallback } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../auth/hooks/useAuth';
 import { Field, Button } from '../../../shared/ui';
 import { Icon } from '@iconify/react';
 import { api } from '../../../utils/api';
 import { useTranslation } from 'react-i18next';
+import { useCatalogs } from '../../catalog/hooks/useCatalogs';
+import { CatalogList } from '../../catalog/components/CatalogList';
+import { AddCatalogModal } from '../../catalog/components/AddCatalogModal';
+import { catalogApi } from '../../catalog/api';
+import { useConfirm } from '../../../shared/ui/confirm';
+import { Confirm } from '../../../shared/ui/confirm';
+import type { CatalogRead, CatalogCreate } from '../../catalog/types';
 import './AdminPage.css';
 
 interface LlmConfig {
@@ -34,8 +41,9 @@ interface UserStats {
 export function AdminPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const { t, i18n } = useTranslation();
-  const [activeTab, setActiveTab] = useState<'llm' | 'users'>('llm');
+  const activeTab = (location.pathname.split('/').pop() || 'llm') as 'llm' | 'users' | 'databases';
   
   // LLM State
   const [llmConfig, setLlmConfig] = useState<LlmConfig>({ base_url: '', api_key: '', model_name: '', is_shared: false, is_active: true, proxy_mode: 'system', proxy_url: '', is_proxy_shared: false });
@@ -56,6 +64,34 @@ export function AdminPage() {
   const [userActionId, setUserActionId] = useState<string | null>(null);
   const [userRoleFilter, setUserRoleFilter] = useState<'all' | 'admin' | 'visitor'>('all');
   const [userStatusFilter, setUserStatusFilter] = useState<'all' | 'active' | 'blocked'>('all');
+
+  // Catalogs state
+  const { catalogs, loading, pingResults, syncStatuses, createCatalog, deleteCatalog, pingCatalog } = useCatalogs();
+  const [isCatalogModalOpen, setIsCatalogModalOpen] = useState(false);
+  const [selectedCatalog, setSelectedCatalog] = useState<CatalogRead | null>(null);
+  const { confirm: confirmDelete, isOpen: isConfirmOpen, onConfirm, onCancel } = useConfirm();
+
+  const handleCatalogSubmit = async (data: CatalogCreate) => {
+    await createCatalog(data);
+  };
+
+  const handleCatalogDelete = useCallback(async (id: string) => {
+    const ok = await confirmDelete();
+    if (ok) {
+      await deleteCatalog(id);
+    }
+  }, [confirmDelete, deleteCatalog]);
+
+  const handleCatalogInfo = useCallback(async (cat: CatalogRead) => {
+    try {
+      const freshList = await catalogApi.list();
+      const fresh = freshList.find(c => c.id === cat.id) || cat;
+      setSelectedCatalog(fresh);
+    } catch {
+      setSelectedCatalog(cat);
+    }
+    setIsCatalogModalOpen(true);
+  }, []);
 
   useEffect(() => {
     if (user?.role !== 'admin') {
@@ -234,17 +270,23 @@ export function AdminPage() {
     <div className="admin-page">
       <div className="admin-page__header">
         <div className="admin-page__tabs">
-          <button 
+          <button
             className={`admin-tab ${activeTab === 'llm' ? 'admin-tab--active' : ''}`}
-            onClick={() => setActiveTab('llm')}
+            onClick={() => navigate('/admin/llm')}
           >
             <Icon icon="mdi:robot-outline" /> {t('admin.llm_config')}
           </button>
-          <button 
+          <button
             className={`admin-tab ${activeTab === 'users' ? 'admin-tab--active' : ''}`}
-            onClick={() => setActiveTab('users')}
+            onClick={() => navigate('/admin/users')}
           >
             <Icon icon="mdi:account-group-outline" /> {t('admin.user_management')}
+          </button>
+          <button
+            className={`admin-tab ${activeTab === 'databases' ? 'admin-tab--active' : ''}`}
+            onClick={() => navigate('/admin/databases')}
+          >
+            <Icon icon="tabler:database-edit" /> {t('catalog.manage_databases')}
           </button>
         </div>
       </div>
@@ -442,6 +484,40 @@ export function AdminPage() {
                 </div>
               </div>
             </div>
+          </div>
+        )}
+
+        {activeTab === 'databases' && (
+          <div className="admin-panel">
+            <CatalogList
+              catalogs={catalogs}
+              loading={loading}
+              pingResults={pingResults}
+              syncStatuses={syncStatuses}
+              selectedIds={new Set()}
+              onToggleSelect={() => {}}
+              onPing={pingCatalog}
+              onAdd={() => { setSelectedCatalog(null); setIsCatalogModalOpen(true); }}
+              onInfo={handleCatalogInfo}
+            />
+
+            <Confirm
+              isOpen={isConfirmOpen}
+              onConfirm={onConfirm}
+              onCancel={onCancel}
+              title={t('catalog.delete_catalog')}
+              confirmText={t('common.delete')}
+            >
+              {t('catalog.delete_confirm_generic')}
+            </Confirm>
+
+            <AddCatalogModal
+              isOpen={isCatalogModalOpen}
+              onClose={() => setIsCatalogModalOpen(false)}
+              onSubmit={handleCatalogSubmit}
+              initialData={selectedCatalog || undefined}
+              onDelete={selectedCatalog ? () => handleCatalogDelete(selectedCatalog.id) : undefined}
+            />
           </div>
         )}
 

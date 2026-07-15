@@ -1,13 +1,14 @@
 .auth-container {
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: stretch;
   width: 100%;
   max-width: 360px;
   min-height: 100vh;
   margin: 0 auto;
   padding: 0;
+  padding-top: 120px;
   box-sizing: border-box;
   animation: fade-in-up var(--motion-slow) var(--ease-out) both;
 }

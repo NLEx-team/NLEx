@@ -239,3 +239,4 @@ backend/venv311/
 
 # Lychee link-checker cache (CI caches this via actions/cache)
 .lycheecache
+graphify-out/

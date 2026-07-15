@@ -118,6 +118,13 @@
   padding: var(--spacing-sm);
   border-top: var(--border-width) solid var(--color-back-active);
   white-space: nowrap;
+  text-align: left;
+}
+
+.chat-message__table td[data-type="number"],
+.chat-message__table th[data-type="number"] {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
 }
 
 .chat-message__table-actions {
@@ -132,7 +139,8 @@
   align-self: flex-start;
   align-items: center;
   gap: 7px;
-  padding: var(--spacing-sm);
+  padding: var(--spacing-sm) 12px;
+  min-height: 36px;
   border: var(--border-width) solid var(--color-accent);
   border-radius: var(--radius);
   background: transparent;
@@ -142,15 +150,152 @@
   font-size: 13px;
   font-weight: 700;
   white-space: nowrap;
-  transition: background 0.15s;
+  transition: background 0.3s, border-color 0.3s, color 0.3s, opacity 0.3s, transform 0.3s;
 }
 
 .chat-message__export-btn > span {
   color: var(--color-text-primary);
 }
 
-.chat-message__export-btn:hover {
+.chat-message__export-btn:hover:not(:disabled) {
   background: var(--color-back-active);
+}
+
+.chat-message__export-btn:disabled {
+  cursor: not-allowed;
+  opacity: 1;
+}
+
+/* --- Export row layout --- */
+.chat-message__export-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* --- Loading state --- */
+.chat-message__export-btn--loading {
+  border-color: var(--color-text-secondary);
+  color: var(--color-text-secondary);
+}
+
+.chat-message__export-btn--loading > span:first-child {
+  color: var(--color-text-secondary);
+}
+
+/* --- Done state --- */
+.chat-message__export-btn--done {
+  border-color: #34a853;
+  color: #34a853;
+  animation: export-done-pop 0.35s var(--ease-out);
+}
+
+.chat-message__export-btn--done > span {
+  color: #34a853 !important;
+}
+
+@keyframes export-done-pop {
+  0%   { transform: scale(0.92); }
+  50%  { transform: scale(1.06); }
+  100% { transform: scale(1); }
+}
+
+/* --- Fading state (done → idle transition) --- */
+.chat-message__export-btn--fading {
+  animation: export-fade-back 0.5s ease both;
+}
+
+@keyframes export-fade-back {
+  0%   { opacity: 0.4; transform: scale(0.96); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+/* --- Spinner --- */
+.chat-message__export-spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--color-text-secondary);
+  border-top-color: var(--color-accent);
+  border-radius: 50%;
+  animation: export-spin 0.7s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes export-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* --- Download info pill --- */
+.chat-message__download-info {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  padding: 8px 14px;
+  background: var(--color-back-active);
+  border-radius: var(--radius);
+  border: var(--border-width) solid transparent;
+  animation: download-info-in 0.3s var(--ease-out) both;
+  min-width: 160px;
+}
+
+.chat-message__download-info--done {
+  background: rgba(52, 168, 83, 0.08);
+  border-color: rgba(52, 168, 83, 0.2);
+}
+
+@keyframes download-info-in {
+  from { opacity: 0; transform: translateX(-8px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+/* --- Indeterminate progress bar --- */
+.chat-message__download-progress-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: var(--color-back-components, #e0e0e0);
+}
+
+.chat-message__download-progress-fill {
+  width: 40%;
+  height: 100%;
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--color-accent), #66bb6a, var(--color-accent));
+  background-size: 200% 100%;
+  animation: progress-shimmer 1.5s ease-in-out infinite;
+}
+
+@keyframes progress-shimmer {
+  0%   { transform: translateX(-100%); background-position: 0% 0%; }
+  50%  { background-position: 100% 0%; }
+  100% { transform: translateX(250%); background-position: 0% 0%; }
+}
+
+/* --- Download details --- */
+.chat-message__download-details {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.chat-message__download-detail {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+}
+
+.chat-message__download-info--done .chat-message__download-detail {
+  color: #34a853;
+  font-weight: 500;
 }
 
 .chat-message__sql-details {

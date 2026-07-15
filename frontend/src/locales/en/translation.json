@@ -22,7 +22,9 @@
     "chats": "Chats",
     "settings": "Settings",
     "admin": "Admin Panel",
-    "new_chat": "New chat"
+    "new_chat": "New chat",
+    "manage_databases": "Manage databases",
+    "admin_panel": "Admin Panel"
   },
   "chat": {
     "rename": "Rename",
@@ -229,6 +231,8 @@
     "no_catalogs": "No catalogs connected",
     "loading": "Loading catalogs...",
     "pinging": "Pinging...",
-    "ping_connection": "Ping connection"
+    "ping_connection": "Ping connection",
+    "manage_databases": "Manage Databases",
+    "choose_database": "Choose Database"
   }
 }

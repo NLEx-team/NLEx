@@ -6,6 +6,8 @@
 }
 
 .field__label {
+  padding-right: 2px;
+  display: inline-block !important;
   font: inherit;
   color: var(--color-text-primary);
 }
@@ -46,6 +48,13 @@
   color: var(--color-text-primary);
   font: inherit;
   outline: none;
+}
+
+.field__input--multiline {
+  height: auto;
+  min-height: var(--components-height);
+  padding: 10px var(--spacing-sm);
+  line-height: 1.4;
 }
 
 .field__input[type="password"]::-webkit-credentials-auto-fill-button,
@@ -167,8 +176,8 @@
   display: flex;
   align-items: center;
   width: 100%;
-  height: var(--components-height);
-  padding: 0 var(--spacing-sm);
+  min-height: var(--components-height);
+  padding: 8px var(--spacing-sm);
   border: var(--border-width) solid var(--color-back-active);
   border-radius: var(--input-radius);
   background: var(--color-back-components);

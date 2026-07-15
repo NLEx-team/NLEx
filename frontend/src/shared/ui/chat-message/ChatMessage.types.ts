@@ -33,7 +33,8 @@ export interface ChatMessageProps {
   role: ChatMessageRole;
   blocks: ContentBlock[];
   exportUrl?: string;
+  exportFilename?: string;
   onClarify?: (questionId: string, selectedOptions: string[]) => void;
-  onExport?: (exportUrl: string) => void;
+  onExport?: (exportUrl: string, filename?: string) => void;
   isLastMessage?: boolean;
 }

@@ -53,7 +53,7 @@ The application is configured via environment variables defined in a `.env` file
 | `DATABASE_URL` | PostgreSQL connection for application data | Customer must provide their own PostgreSQL instance |
 | `OPENAI_API_KEY` | API key for the LLM provider | Customer uses their own model and key |
 | `OPENAI_BASE_URL` | LLM service endpoint | Supports OpenAI-compatible APIs and local models |
-| `LLM_MODEL_FAST` / `LLM_MODEL_THINKING` | Model identifier | e.g., `gpt-4o-mini` / `gpt-4o`, or local model names |
+| `LLM_MODEL_SQL` / `LLM_MODEL_INFERENCE` | Model identifiers | SQL generation model and relationship inference model (default: `gpt-5.4-mini` for both) |
 | `TRINO_HOST` / `TRINO_PORT` | Trino query engine connection | Included in Docker Compose setup |
 | `JWT_SECRET_KEY` | Application secret for session management | Customer must generate their own |
 | `FRONTEND_PORT` | Frontend service port | Default: `5173` |

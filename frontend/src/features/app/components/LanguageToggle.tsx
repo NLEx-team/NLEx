@@ -17,7 +17,9 @@ export function LanguageToggle({ className = '' }: LanguageToggleProps) {
   const currentLang = (user?.profile?.language || i18n.language || 'ru').toLowerCase().substring(0, 2);
   const flagIcon = currentLang === 'ru' ? 'circle-flags:ru' : 'circle-flags:us';
 
-  const toggleLanguage = async () => {
+  const toggleLanguage = async (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent event bubbling
+    
     const newLang = currentLang === 'ru' ? 'en' : 'ru';
 
     // Trigger the switch animation (reset on animationend).
@@ -43,6 +45,7 @@ export function LanguageToggle({ className = '' }: LanguageToggleProps) {
       aria-label="Toggle language"
       type="button"
       title={`Switch to ${currentLang === 'ru' ? 'English' : 'Russian'}`}
+      style={{ pointerEvents: 'auto' }}
     >
       <span className={`language-toggle__icon ${switching ? 'language-toggle__icon--switching' : ''}`}>
         <Icon icon={flagIcon} />

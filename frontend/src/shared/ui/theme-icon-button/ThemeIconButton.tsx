@@ -4,8 +4,8 @@ import type { ThemeIconButtonProps } from "./ThemeIconButton.types";
 import "./ThemeIconButton.css";
 
 const THEME_ICONS = {
-  light: "mdi:weather-sunny",
-  dark: "mdi:moon-waning-crescent",
+  light: "lucide:sun",
+  dark: "tabler:moon",
 } as const;
 
 const THEME_LABELS = {

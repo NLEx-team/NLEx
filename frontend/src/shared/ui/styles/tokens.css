@@ -43,6 +43,7 @@
   --overlay-backdrop: rgba(0, 0, 0, 0.4);
 
   /* sizing */
+  --header-height: 64px;
   --button-max-width: 120px;
   --components-height: 44px;
   --border-width: 1px;
@@ -88,7 +89,7 @@
   --color-border: #5f6368;
   --color-error: #d97b72;
   --color-error-border: #a54a44;
-  --color-on-accent: #c7d5bd;
+  --color-on-accent: #ffffff;
   /* Lighter green than the light-theme dark-green so accented labels stay
      legible on the dark background (accent-dark on dark is ~2:1 contrast). */
   --color-primary-dark: #7fb99a;

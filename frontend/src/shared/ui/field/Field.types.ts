@@ -1,9 +1,10 @@
-import type { InputHTMLAttributes, ReactNode } from "react";
+import type { InputHTMLAttributes, ReactNode, TextareaHTMLAttributes } from "react";
 
 export type FieldMode = "default" | "error" | "readonly";
 
-export interface FieldProps
-  extends Omit<InputHTMLAttributes<HTMLInputElement>, "size"> {
+type BaseProps = Omit<InputHTMLAttributes<HTMLInputElement>, "size"> & Omit<TextareaHTMLAttributes<HTMLTextAreaElement>, "size">;
+
+export interface FieldProps extends BaseProps {
   mode?: FieldMode;
   label?: string;
   errorText?: string;
@@ -16,4 +17,5 @@ export interface FieldProps
   /** Icon slot — pass a node already wrapped in `IconWrapper`.
    *  See leftIcon for overlay layout rules. */
   rightIcon?: ReactNode;
+  multiline?: boolean;
 }

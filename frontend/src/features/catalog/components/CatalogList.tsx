@@ -1,14 +1,15 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Icon } from '@iconify/react';
 import { useAuth } from '../../auth/hooks/useAuth';
 import { useTranslation } from 'react-i18next';
-import type { CatalogRead, CatalogTestResult } from '../types';
+import type { CatalogRead, CatalogTestResult, CatalogSyncStatus } from '../types';
 import './CatalogList.css';
 
 interface CatalogListProps {
   catalogs: CatalogRead[];
   loading: boolean;
   pingResults: Record<string, CatalogTestResult>;
+  syncStatuses: Record<string, CatalogSyncStatus>;
   selectedIds: Set<string>;
   onToggleSelect: (id: string) => void;
   onPing: (id: string) => Promise<CatalogTestResult>;
@@ -18,11 +19,40 @@ interface CatalogListProps {
   disabled?: boolean;
 }
 
-export function CatalogList({ catalogs, loading, pingResults, selectedIds, onToggleSelect, onPing, onAdd, onInfo, disabled }: CatalogListProps) {
+export function CatalogList({ catalogs, loading, pingResults, syncStatuses, selectedIds, onToggleSelect, onPing, onAdd, onInfo, disabled }: CatalogListProps) {
   const [pingingId, setPingingId] = useState<string | null>(null);
+  const [successIds, setSuccessIds] = useState<Set<string>>(new Set());
+  const prevSyncStatusesRef = useRef(syncStatuses);
+
   const { user } = useAuth();
   const { t } = useTranslation();
   const isAdmin = user?.role === 'admin';
+
+  useEffect(() => {
+    const newSuccessIds = new Set(successIds);
+    let changed = false;
+
+    Object.entries(syncStatuses).forEach(([id, status]) => {
+      const prev = prevSyncStatusesRef.current[id];
+      if (prev && prev.is_syncing && !prev.is_cached && status.is_cached && !status.is_syncing) {
+        newSuccessIds.add(id);
+        changed = true;
+        
+        setTimeout(() => {
+          setSuccessIds(curr => {
+            const next = new Set(curr);
+            next.delete(id);
+            return next;
+          });
+        }, 5000);
+      }
+    });
+
+    if (changed) {
+      setSuccessIds(newSuccessIds);
+    }
+    prevSyncStatusesRef.current = syncStatuses;
+  }, [syncStatuses, successIds]);
 
   if (loading) {
     return <div className="catalog-list__empty">{t('catalog.loading')}</div>;
@@ -45,6 +75,23 @@ export function CatalogList({ catalogs, loading, pingResults, selectedIds, onTog
 
   const getStatusText = (catalog: CatalogRead) => {
     if (pingingId === catalog.id) return t('catalog.pinging');
+    
+    const syncStatus = syncStatuses[catalog.id];
+    if (syncStatus && syncStatus.is_syncing && !syncStatus.is_cached) {
+      return (
+        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+          <Icon icon="mdi:sync" className="spin" /> Синхронизация
+        </span>
+      );
+    }
+    
+    if (successIds.has(catalog.id)) {
+      return (
+        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', color: 'var(--color-accent)' }}>
+          <Icon icon="mdi:check-circle-outline" style={{ fontSize: '1.1em' }} /> Успешно
+        </span>
+      );
+    }
     const pingResult = pingResults[catalog.id];
     if (pingResult) {
       if (pingResult.success) {
@@ -61,6 +108,10 @@ export function CatalogList({ catalogs, loading, pingResults, selectedIds, onTog
   };
 
   const getStatusClass = (catalog: CatalogRead) => {
+    const syncStatus = syncStatuses[catalog.id];
+    if (syncStatus && syncStatus.is_syncing && !syncStatus.is_cached) {
+      return 'syncing'; // We will define this class to be yellow
+    }
     const pingResult = pingResults[catalog.id];
     if (pingResult) {
       return pingResult.success ? 'active' : 'error';
@@ -117,14 +168,16 @@ export function CatalogList({ catalogs, loading, pingResults, selectedIds, onTog
                   >
                     <Icon icon="mdi:refresh" />
                   </button>
-                  <button
-                    type="button"
-                    className="catalog-item__action-btn"
-                    onClick={(e) => handleInfo(e, catalog)}
-                    title={t('catalog.db_info')}
-                  >
-                    <Icon icon="mdi:information-outline" />
-                  </button>
+                  {onInfo && (
+                    <button
+                      type="button"
+                      className="catalog-item__action-btn"
+                      onClick={(e) => handleInfo(e, catalog)}
+                      title={t('catalog.db_info')}
+                    >
+                      <Icon icon="mdi:information-outline" />
+                    </button>
+                  )}
                 </div>
               )}
             </div>

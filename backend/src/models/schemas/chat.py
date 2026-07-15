@@ -38,6 +38,7 @@ class ChatMessageRead(BaseModel):
     role: str
     blocks: List[Any]
     export_url: Optional[str] = None
+    export_filename: Optional[str] = None
     total_tokens: Optional[int] = None
     created_at: datetime
 

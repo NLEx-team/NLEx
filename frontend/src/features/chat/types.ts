@@ -35,6 +35,7 @@ export interface ChatMessage {
   blocks: ContentBlock[];
   timestamp: string;
   exportUrl?: string;
+  exportFilename?: string;
 }
 
 export interface ChatSession {

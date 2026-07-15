@@ -1,4 +1,5 @@
 import logging
+import re
 from typing import Dict, List, Optional, Any
 from uuid import UUID, uuid4
 from datetime import datetime
@@ -31,12 +32,43 @@ class ChatController:
         self.db = db
         self.excel_service = _excel_service
 
+    @staticmethod
+    def _generate_export_filename(sql: str, catalog_mapping: dict = None) -> str:
+        """Generate a meaningful filename for the export based on SQL query.
+        
+        Replaces internal Trino catalog identifiers (cat_<hex>) with their
+        human-readable display names so the downloaded file is recognisable.
+        """
+        cleaned_sql = sql
+        if catalog_mapping:
+            for trino_name, display_name in catalog_mapping.items():
+                cleaned_sql = cleaned_sql.replace(trino_name, display_name)
+
+        # Try to extract the table reference from the FROM clause.
+        # Handles: FROM table, FROM schema.table, FROM catalog.schema.table
+        match = re.search(
+            r'FROM\s+["\']?([\w.]+)["\']?',
+            cleaned_sql,
+            re.IGNORECASE,
+        )
+        if match:
+            full_ref = match.group(1)  # e.g. "MyDB.public.orders"
+            parts = full_ref.split(".")
+            table_name = parts[-1]  # always take the last segment (table)
+            # Clean up
+            table_name = re.sub(r'[^\w]', '_', table_name)
+        else:
+            table_name = 'query'
+
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        return f"{table_name}_{timestamp}"
+
     async def get_orchestrator(self, chat_id: UUID, catalog_ids: List[str] = None) -> OrchestratorService:
         """
         Retrieves or initializes an orchestrator for the given chat session.
         Uses two-tier model strategy:
-          - Inference model (deepseek-v4-flash) for relationship inference (simpler task)
-          - SQL model (gpt-5.4-mini) for SQL generation (RAG keeps context small)
+          - Inference model (LLM_MODEL_INFERENCE, default gpt-5.4-mini) for relationship inference
+          - SQL model (LLM_MODEL_SQL, default gpt-5.4-mini) for SQL generation (RAG keeps context small)
         """
         if chat_id not in _ORCHESTRATOR_SESSIONS:
             active_catalogs = await self.catalog_service.get_active_catalogs()
@@ -86,20 +118,22 @@ class ChatController:
                 elif proxy_config.proxy_mode == 'system':
                     resolved_proxy_url = settings.SYSTEM_PROXY_URL
             
-            # Two-tier model: fast model for SQL, inference model for relationships
+            # Two-tier model strategy:
+            #   - SQL model (LLM_MODEL_SQL, default gpt-5.4-mini) for SQL generation
+            #   - Inference model (LLM_MODEL_INFERENCE, default gpt-5.4-mini) for relationship inference
             base_kwargs = {
                 "api_key": llm_config.api_key if llm_config else None,
                 "base_url": llm_config.base_url if llm_config else None,
                 "proxy_url": resolved_proxy_url,
             }
             
-            # SQL generation service: always use fast model (RAG keeps context small)
+            # SQL generation service: uses admin-configured model or LLM_MODEL_SQL fallback
             sql_llm = LLMService(
                 **base_kwargs,
-                model=llm_config.model_name if llm_config else settings.LLM_MODEL_FAST,
+                model=llm_config.model_name if llm_config else settings.LLM_MODEL_SQL,
             )
             
-            # Inference service: use dedicated inference model (cheaper, good at pattern matching)
+            # Inference service: uses dedicated inference model (cheaper, good at pattern matching)
             inference_llm = LLMService(
                 **base_kwargs,
                 model=settings.LLM_MODEL_INFERENCE,
@@ -238,12 +272,16 @@ class ChatController:
                 text_display_name = cat.name
                 catalog_mapping[trino_name] = text_display_name
 
+            export_filename = self._generate_export_filename(original_sql, catalog_mapping)
+
             self.excel_service.save_export_metadata(
                 export_id, 
                 original_sql, 
                 result.get("headers", []),
-                catalog_mapping
+                catalog_mapping,
+                export_filename
             )
             response["export_url"] = f"/chats/{chat_id}/export/{export_id}"
+            response["export_filename"] = export_filename
 
         return response
