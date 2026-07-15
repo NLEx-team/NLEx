@@ -96,6 +96,7 @@ class ExcelExportService:
             "border": 1,
         })
         data_fmt = wb.add_format({
+            "align": "center",
             "valign": "vcenter",
             "border": 1,
         })
