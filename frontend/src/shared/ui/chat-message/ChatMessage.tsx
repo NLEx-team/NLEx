@@ -79,12 +79,12 @@ function OptionsBlockView({ block, onClarify, isLastMessage }: { block: OptionsB
 
 function TableBlockView({ block, exportUrl, exportFilename, onExport }: { block: TableBlock; exportUrl?: string; exportFilename?: string; onExport?: (exportUrl: string, filename?: string) => void }) {
   const { t } = useTranslation();
-  const [downloadState, setDownloadState] = useState<'idle' | 'downloading' | 'done'>('idle');
+  const [downloadState, setDownloadState] = useState<'idle' | 'downloading' | 'done' | 'fading'>('idle');
   const [elapsed, setElapsed] = useState(0);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const handleExportClick = () => {
-    if (downloadState === 'downloading' || !exportUrl) return;
+    if (downloadState === 'downloading' || downloadState === 'fading' || !exportUrl) return;
 
     setDownloadState('downloading');
     setElapsed(0);
@@ -101,7 +101,10 @@ function TableBlockView({ block, exportUrl, exportFilename, onExport }: { block:
       setElapsed(Math.floor((Date.now() - start) / 1000));
       if (success) {
         setDownloadState('done');
-        setTimeout(() => setDownloadState('idle'), 4000);
+        setTimeout(() => {
+          setDownloadState('fading');
+          setTimeout(() => setDownloadState('idle'), 500);
+        }, 3500);
       } else {
         setDownloadState('idle');
       }
@@ -196,12 +199,12 @@ function TableBlockView({ block, exportUrl, exportFilename, onExport }: { block:
       {exportUrl && (
         <div className="chat-message__export-row">
           <button
-            className={`chat-message__export-btn ${downloadState === 'downloading' ? 'chat-message__export-btn--loading' : ''} ${downloadState === 'done' ? 'chat-message__export-btn--done' : ''}`}
+            className={`chat-message__export-btn ${downloadState === 'downloading' ? 'chat-message__export-btn--loading' : ''} ${downloadState === 'done' ? 'chat-message__export-btn--done' : ''} ${downloadState === 'fading' ? 'chat-message__export-btn--fading' : ''}`}
             onClick={handleExportClick}
             type="button"
-            disabled={downloadState === 'downloading'}
+            disabled={downloadState === 'downloading' || downloadState === 'fading'}
           >
-            {downloadState === 'idle' && (
+            {(downloadState === 'idle' || downloadState === 'fading') && (
               <>
                 <Icon icon="mdi:file-download-outline" />
                 <span>{t('chat.export_excel')}</span>
