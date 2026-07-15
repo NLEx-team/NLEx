@@ -58,10 +58,7 @@ function AppLayout() {
               chat.setActiveSessionId(id);
               navigate('/chat');
           }}
-          onNewChat={() => {
-              chat.startNewChat();
-              navigate('/chat');
-          }}
+
           onRenameChat={chat.renameSession}
           onDeleteChat={chat.removeSession}
           blocked={blocked}

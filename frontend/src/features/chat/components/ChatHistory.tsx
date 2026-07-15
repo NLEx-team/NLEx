@@ -1,6 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { useNavigate } from 'react-router-dom';
 import { Button } from '../../../shared/ui/button';
 import { NavSelectItem } from '../../../shared/ui/nav-select-item';
 import { SidebarSection } from '../../app/components/SidebarSection';
@@ -8,7 +7,6 @@ import { Icon } from '@iconify/react';
 import { Confirm } from '../../../shared/ui/confirm';
 import { Modal } from '../../../shared/ui/modal';
 import { Field } from '../../../shared/ui/field';
-import { useAuth } from '../../auth/hooks/useAuth';
 import { useTranslation } from 'react-i18next';
 import type { ChatSession } from '../types';
 import './ChatHistory.css';
@@ -17,7 +15,6 @@ interface ChatHistoryProps {
   sessions: ChatSession[];
   activeSessionId: string;
   onSelectSession: (id: string) => void;
-  onNewChat?: () => void;
   onRenameChat?: (id: string, newTitle: string) => void;
   onDeleteChat?: (id: string) => void;
   blocked?: boolean;
@@ -108,15 +105,12 @@ function ChatActionMenu({
 export function ChatHistory({ 
   sessions, 
   activeSessionId, 
-  onSelectSession, 
-  onNewChat,
+  onSelectSession,
   onRenameChat,
   onDeleteChat,
   blocked = false
 }: ChatHistoryProps) {
   const { t } = useTranslation();
-  const { user } = useAuth();
-  const navigate = useNavigate();
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [renamingSession, setRenamingSession] = useState<{id: string, title: string} | null>(null);
   const [renameInputValue, setRenameInputValue] = useState('');
