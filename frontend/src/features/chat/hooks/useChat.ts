@@ -6,7 +6,7 @@ function generateId() {
   return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
 }
 
-function parseBlocks(response: { result: { status: string; question?: string; options?: string[]; data?: any[][]; headers?: string[]; explanation?: string; sql?: string; message?: string; total_rows?: number } }): ContentBlock[] {
+function parseBlocks(response: { result: { status: string; question?: string; options?: string[]; data?: any[][]; headers?: string[]; explanation?: string; sql?: string; message?: string; total_rows?: number; chart?: { type: string; title?: string; x_column?: string; y_columns?: string[]; category_column?: string; value_column?: string; stacked?: boolean } } }): ContentBlock[] {
   const r = response.result;
   const blocks: ContentBlock[] = [];
 
@@ -30,6 +30,21 @@ function parseBlocks(response: { result: { status: string; question?: string; op
         explanation: r.explanation,
         totalRows: r.total_rows,
       });
+      // Add chart block if chart spec is present
+      if (r.chart) {
+        blocks.push({
+          type: 'chart',
+          chartType: r.chart.type as 'bar' | 'line' | 'pie' | 'area' | 'scatter',
+          title: r.chart.title,
+          xColumn: r.chart.x_column,
+          yColumns: r.chart.y_columns,
+          categoryColumn: r.chart.category_column,
+          valueColumn: r.chart.value_column,
+          stacked: r.chart.stacked,
+          data: r.data,
+          headers: r.headers,
+        });
+      }
     }
     if (!r.explanation && !r.data) {
       blocks.push({ type: 'text', text: 'Request completed successfully.' });
