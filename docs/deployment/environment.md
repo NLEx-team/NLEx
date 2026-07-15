@@ -79,12 +79,12 @@ Complete reference for all NLEx environment variables. Variables are loaded from
 
 | Variable | Required | Default | Description | Security |
 |---|---|---|---|---|
-| `LLM_BASE_URL` | ❌ | — | Default LLM API endpoint (e.g., `https://api.openai.com/v1`). Can be overridden per-configuration in the UI. | None |
-| `LLM_API_KEY` | ❌ | — | Default API key for the LLM provider. | 🔐 Secret |
-| `LLM_MODEL_NAME` | ❌ | — | Default model name (e.g., `gpt-4o`, `deepseek-chat`). | None |
-| `LLM_PROXY_URL` | ❌ | — | HTTP proxy URL for LLM API requests. | None |
-| `LLM_TIMEOUT` | ❌ | `120` | Request timeout in seconds for LLM API calls. | None |
-| `LLM_MAX_TOKENS` | ❌ | `4096` | Maximum tokens per LLM response. | None |
+| `OPENAI_API_KEY` | ✅ | — | API key for the LLM provider (OpenAI or compatible). | 🔐 Secret |
+| `OPENAI_BASE_URL` | ❌ | `https://api.openai.com/v1` | LLM API endpoint. Supports any OpenAI-compatible API. | None |
+| `LLM_MODEL_SQL` | ❌ | `gpt-5.4-mini` | Model used for SQL query generation (called per user request). | None |
+| `LLM_MODEL_INFERENCE` | ❌ | `gpt-5.4-mini` | Model used for database relationship inference (called once during schema sync). | None |
+| `MAX_SQL_RETRIES` | ❌ | `3` | Number of retry attempts for failed SQL generation. | None |
+| `SYSTEM_PROXY_URL` | ❌ | — | HTTP proxy URL for LLM API requests. | None |
 
 ---
 
@@ -98,7 +98,7 @@ Complete reference for all NLEx environment variables. Variables are loaded from
 | `POSTGRES_PASSWORD` | Full database access |
 | `JWT_SECRET_KEY` | Token forgery — full impersonation |
 | `FIRST_ADMIN_PASSWORD` | Admin account takeover |
-| `LLM_API_KEY` | Unauthorized LLM usage and billing |
+| `OPENAI_API_KEY` | Unauthorized LLM usage and billing |
 
 **Best practices:**
 
@@ -172,11 +172,11 @@ LOG_LEVEL=warning
 WORKERS=4
 
 # LLM — OpenAI
-LLM_BASE_URL=https://api.openai.com/v1
-LLM_API_KEY=sk-proj-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-LLM_MODEL_NAME=gpt-4o
-LLM_TIMEOUT=120
-LLM_MAX_TOKENS=4096
+OPENAI_BASE_URL=https://api.openai.com/v1
+OPENAI_API_KEY=sk-proj-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+LLM_MODEL_SQL=gpt-5.4-mini
+LLM_MODEL_INFERENCE=gpt-5.4-mini
+MAX_SQL_RETRIES=3
 ```
 
 ---
@@ -210,11 +210,11 @@ LOG_LEVEL=warning
 WORKERS=4
 
 # LLM — DeepSeek
-LLM_BASE_URL=https://api.deepseek.com/v1
-LLM_API_KEY=sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-LLM_MODEL_NAME=deepseek-chat
-LLM_TIMEOUT=180
-LLM_MAX_TOKENS=4096
+OPENAI_BASE_URL=https://api.deepseek.com/v1
+OPENAI_API_KEY=sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+LLM_MODEL_SQL=deepseek-chat
+LLM_MODEL_INFERENCE=deepseek-chat
+MAX_SQL_RETRIES=3
 ```
 
 ---
@@ -248,15 +248,14 @@ LOG_LEVEL=info
 WORKERS=4
 
 # LLM — Self-hosted (OpenAI-compatible API)
-LLM_BASE_URL=http://llm-server.internal:8000/v1
-LLM_API_KEY=not-needed
-LLM_MODEL_NAME=meta-llama/Llama-3.1-70B-Instruct
-LLM_TIMEOUT=300
-LLM_MAX_TOKENS=8192
+OPENAI_BASE_URL=http://llm-server.internal:8000/v1
+OPENAI_API_KEY=not-needed
+LLM_MODEL_SQL=meta-llama/Llama-3.1-70B-Instruct
+LLM_MODEL_INFERENCE=meta-llama/Llama-3.1-70B-Instruct
+MAX_SQL_RETRIES=3
 ```
 
 !!!tip "Self-hosted LLM notes"
-    - Set `LLM_BASE_URL` to your vLLM / Ollama / TGI endpoint (must expose an OpenAI-compatible API).
-    - `LLM_API_KEY` can be set to any non-empty string if the server doesn't require authentication.
-    - Increase `LLM_TIMEOUT` for larger models — inference can be slow on limited hardware.
-    - `LLM_MAX_TOKENS` should match the model's context window capabilities.
+    - Set `OPENAI_BASE_URL` to your vLLM / Ollama / TGI endpoint (must expose an OpenAI-compatible API).
+    - `OPENAI_API_KEY` can be set to any non-empty string if the server doesn't require authentication.
+    - `LLM_MODEL_SQL` and `LLM_MODEL_INFERENCE` can use the same model, or different models if you want to optimize cost.
