@@ -24,7 +24,7 @@ FORBIDDEN_PATTERN = re.compile(
 READ_ONLY_PREFIX = re.compile(r"^\s*\(*\s*(SELECT|WITH)\b", re.IGNORECASE)
 
 # Maximum SQL length (guards against abnormally large queries).
-MAX_SQL_LENGTH = 10_000
+MAX_SQL_LENGTH = 250_000
 
 # Violation codes that read_only_violation() may return.
 VIOLATION_EMPTY = "empty"

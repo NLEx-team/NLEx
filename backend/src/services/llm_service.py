@@ -57,7 +57,7 @@ class LLMService:
         if not actual_api_key:
             raise ValueError("OPENAI_API_KEY is not configured")
 
-        self.model = model or settings.LLM_MODEL_FAST
+        self.model = model or settings.LLM_MODEL_SQL
 
         actual_base_url = base_url or settings.OPENAI_BASE_URL
         # Remove /chat/completions from base_url if it's there, as SDK will add it

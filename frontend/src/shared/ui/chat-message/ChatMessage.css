@@ -229,9 +229,10 @@
 
 /* --- Download info pill --- */
 .chat-message__download-info {
+  position: relative;
+  overflow: hidden;
   display: flex;
-  flex-direction: column;
-  gap: 6px;
+  align-items: center;
   padding: 8px 14px;
   background: var(--color-back-active);
   border-radius: var(--radius);
@@ -252,11 +253,12 @@
 
 /* --- Indeterminate progress bar --- */
 .chat-message__download-progress-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
   height: 3px;
-  border-radius: 2px;
   background: var(--color-back-components, #e0e0e0);
-  overflow: hidden;
 }
 
 .chat-message__download-progress-fill {

@@ -15,7 +15,6 @@ interface ChatHistoryProps {
   sessions: ChatSession[];
   activeSessionId: string;
   onSelectSession: (id: string) => void;
-  onNewChat?: () => void;
   onRenameChat?: (id: string, newTitle: string) => void;
   onDeleteChat?: (id: string) => void;
   blocked?: boolean;
@@ -106,8 +105,7 @@ function ChatActionMenu({
 export function ChatHistory({ 
   sessions, 
   activeSessionId, 
-  onSelectSession, 
-  onNewChat,
+  onSelectSession,
   onRenameChat,
   onDeleteChat,
   blocked = false
@@ -138,11 +136,6 @@ export function ChatHistory({
 
   return (
     <>
-      <button className="sidebar__new-chat-btn" onClick={onNewChat} type="button" disabled={blocked}>
-        <Icon icon="mdi:plus" width="20" height="20" />
-        <span>{t('sidebar.new_chat')}</span>
-      </button>
-
       <SidebarSection title={t('sidebar.chats', { defaultValue: 'History' })} className="chat-history">
         <nav className="chat-history__sessions">
           {sessions.map(session => (

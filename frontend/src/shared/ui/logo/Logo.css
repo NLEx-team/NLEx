@@ -1,6 +1,7 @@
 .logo {
   display: flex;
   flex-shrink: 0;
+  align-items: flex-start;
   user-select: none;
   -webkit-user-select: none;
 }
@@ -8,22 +9,18 @@
 .logo--full {
   flex-direction: column;
   align-items: center;
-  gap: 4px;
-  width: 180px;
 }
 
 .logo--compact {
   align-items: center;
   justify-content: center;
-  width: 120px;
-  height: 35px;
 }
 
 .logo__title {
   margin: 0;
   font-weight: 800;
   line-height: 1;
-  background: linear-gradient(to right, #21a366, var(--color-accent-dark));
+  background: linear-gradient(to right bottom, #41b37d, #1a452d);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -31,17 +28,17 @@
 }
 
 .logo--full .logo__title {
-  font-size: 74px;
+  font-size: 71px;
 }
 
 .logo--compact .logo__title {
-  font-size: 48px;
+  font-size: 35px;
 }
 
 .logo__subtitle {
   margin: 0;
-  font-weight: 500;
+  font-weight: 200;
   font-size: 14px;
   line-height: 1;
-  color: var(--color-accent);
+  color: var(--color-text-primary);
 }
