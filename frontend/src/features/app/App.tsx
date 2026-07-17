@@ -43,7 +43,7 @@ function AppLayout() {
 
   return (
     <>
-      <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)}>
+      <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} onNewChat={() => { chat.startNewChat(); navigate('/chat'); }}>
         <ChatHistory
           sessions={chat.sessions}
           activeSessionId={chat.activeSessionId}

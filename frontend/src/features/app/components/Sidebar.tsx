@@ -10,10 +10,11 @@ import './Sidebar.css';
 interface SidebarProps {
   isOpen: boolean;
   onClose: () => void;
+  onNewChat?: () => void;
   children: ReactNode;
 }
 
-export function Sidebar({ isOpen, onClose, children }: SidebarProps) {
+export function Sidebar({ isOpen, onClose, onNewChat, children }: SidebarProps) {
   const { user, logout } = useAuth();
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -53,7 +54,7 @@ export function Sidebar({ isOpen, onClose, children }: SidebarProps) {
       </div>
 
       <div className="sidebar__actions">
-        <button className="sidebar__action-btn" onClick={() => navigate('/chat')} type="button">
+        <button className="sidebar__action-btn" onClick={() => { onNewChat?.(); navigate('/chat'); }} type="button">
           <Icon icon="jam:write" width="20" height="20" />
           <span>{t('sidebar.new_chat')}</span>
         </button>
