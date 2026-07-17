@@ -97,3 +97,7 @@
   font-weight: 400;
   margin-right: auto;
 }
+
+.chat-history__folder-children {
+  padding-left: 12px;
+}

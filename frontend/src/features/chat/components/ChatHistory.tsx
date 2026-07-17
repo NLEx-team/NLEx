@@ -224,17 +224,13 @@ export function ChatHistory({
 
     // Build merged display list: walk sessions in order, render folder groups at first encounter
     const renderedFolders = new Set<string>();
-    const items: Array<{ type: 'folder-header'; folderId: string } | { type: 'chat'; session: ChatSession }> = [];
+    const items: Array<{ type: 'folder'; folderId: string; children: ChatSession[] } | { type: 'chat'; session: ChatSession }> = [];
 
     for (const s of sessions) {
       if (s.folderId) {
         if (!renderedFolders.has(s.folderId)) {
           renderedFolders.add(s.folderId);
-          items.push({ type: 'folder-header', folderId: s.folderId });
-          const folderSessions = folderChats.get(s.folderId) || [];
-          for (const fs of folderSessions) {
-            items.push({ type: 'chat', session: fs });
-          }
+          items.push({ type: 'folder', folderId: s.folderId, children: folderChats.get(s.folderId) || [] });
         }
       } else {
         items.push({ type: 'chat', session: s });
@@ -296,6 +292,8 @@ export function ChatHistory({
         if (folder && onMoveChatToFolder) {
           await onMoveChatToFolder(movingChatId, folder.id);
         }
+      } else if (selectedFolderId === '__none__') {
+        await onRemoveChatFromFolder?.(movingChatId);
       } else if (selectedFolderId && onMoveChatToFolder) {
         await onMoveChatToFolder(movingChatId, selectedFolderId);
       }
@@ -320,22 +318,41 @@ export function ChatHistory({
       <SidebarSection title={t('sidebar.chats', { defaultValue: 'History' })} className="chat-history">
         <nav className="chat-history__sessions">
           {groupedContent.map(item => {
-            if (item.type === 'folder-header') {
+            if (item.type === 'folder') {
               const folder = folders.find(f => f.id === item.folderId);
               if (!folder) return null;
-              const count = sessions.filter(s => s.folderId === folder.id).length;
+              const count = item.children.length;
               return (
-                <div key={`folder-${folder.id}`} className="chat-history__folder">
+                <div key={`folder-${folder.id}`}>
                   <div className="chat-history__folder-header">
                     <Icon icon="mdi:folder" width="18" height="18" />
                     <span className="chat-history__folder-name">{folder.name}</span>
-                    <span className="chat-history__folder-count">{count}</span>
                     {!blocked && (
                       <FolderActionMenu
                         onRename={() => handleFolderRenameStart(folder.id)}
                         onDelete={() => setDeletingFolderId(folder.id)}
                       />
                     )}
+                  </div>
+                  <div className="chat-history__folder-children">
+                    {item.children.map(session => (
+                      <NavSelectItem
+                        key={session.id}
+                        label={session.title}
+                        active={session.id === activeSessionId}
+                        onClick={() => onSelectSession(session.id)}
+                        actions={blocked ? undefined : (
+                          <ChatActionMenuWithMove
+                            onRename={() => handleRenameStart(session.id, session.title)}
+                            onDelete={() => setDeletingId(session.id)}
+                            onMoveToFolder={() => {
+                              setMovingChatId(session.id);
+                              setSelectedFolderId(session.folderId || null);
+                            }}
+                          />
+                        )}
+                      />
+                    ))}
                   </div>
                 </div>
               );
@@ -442,6 +459,30 @@ export function ChatHistory({
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', minWidth: '400px' }}>
           <h2 style={{ margin: 0, fontSize: '18px' }}>{t('chat.move_to_folder')}</h2>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', maxHeight: '300px', overflowY: 'auto' }}>
+            <button
+              type="button"
+              onClick={() => {
+                setSelectedFolderId('__none__');
+                setNewFolderName('');
+              }}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '8px 12px',
+                border: 'none',
+                borderRadius: '6px',
+                background: selectedFolderId === '__none__' ? 'var(--color-primary, #4A6CF7)' : 'transparent',
+                color: selectedFolderId === '__none__' ? '#fff' : 'inherit',
+                cursor: 'pointer',
+                textAlign: 'left',
+                fontSize: '14px',
+              }}
+            >
+              <Icon icon="mdi:folder-off" width="18" height="18" />
+              <span>{t('chat.no_folder')}</span>
+            </button>
+            <div style={{ height: '1px', background: 'var(--color-border, #e0e0e0)', margin: '4px 0' }} />
             {folders
               .filter(f => activeFolderIds.has(f.id))
               .map(folder => (

@@ -57,6 +57,7 @@
     "delete_folder_confirm": "Вы уверены, что хотите удалить эту папку?",
     "delete_folder_chats": "Также удалить все чаты внутри папки",
     "enter_folder_name": "Введите название папки",
+    "no_folder": "Без папки",
     "no_folders": "Папок пока нет",
     "create_new_folder_placeholder": "Или создайте новую папку...",
     "move": "Переместить"
