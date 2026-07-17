@@ -55,4 +55,11 @@ export interface ChatSession {
   id: string;
   title: string;
   catalogIds: string[];
+  folderId?: string;
+}
+
+export interface ChatFolder {
+  id: string;
+  name: string;
+  chatCount: number;
 }

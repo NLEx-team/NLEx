@@ -46,6 +46,7 @@ function AppLayout() {
       <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} onNewChat={() => { chat.startNewChat(); navigate('/chat'); }}>
         <ChatHistory
           sessions={chat.sessions}
+          folders={chat.folders}
           activeSessionId={chat.activeSessionId}
           onSelectSession={(id) => {
               chat.setActiveSessionId(id);
@@ -57,6 +58,11 @@ function AppLayout() {
           }}
           onRenameChat={chat.renameSession}
           onDeleteChat={chat.removeSession}
+          onCreateFolder={chat.createFolder}
+          onRenameFolder={chat.renameFolder}
+          onDeleteFolder={chat.deleteFolder}
+          onMoveChatToFolder={chat.moveChatToFolder}
+          onRemoveChatFromFolder={chat.removeChatFromFolder}
           blocked={blocked}
         />
       </Sidebar>

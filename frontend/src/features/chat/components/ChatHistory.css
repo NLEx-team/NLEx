@@ -67,3 +67,33 @@
   background: rgba(239, 68, 68, 0.12);
   color: #dc2626;
 }
+
+/* Folder styles */
+.chat-history__folder {
+  margin-top: 4px;
+}
+
+.chat-history__folder-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 8px;
+  border-radius: var(--radius);
+  color: var(--color-text-secondary);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.chat-history__folder-name {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chat-history__folder-count {
+  font-size: 11px;
+  opacity: 0.5;
+  font-weight: 400;
+  margin-right: auto;
+}
