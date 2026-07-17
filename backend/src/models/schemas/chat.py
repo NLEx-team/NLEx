@@ -24,10 +24,21 @@ class ChatRead(ChatBase):
     created_at: datetime
     updated_at: datetime
 
+class ChatFolderRead(BaseModel):
+    id: str
+    name: str
+    chat_count: int
+    created_at: datetime
+    updated_at: datetime
+
+    class Config:
+        from_attributes = True
+
 class ChatListItem(BaseModel):
     id: str
     title: str
     catalog_ids: List[str]
+    folder_id: Optional[str] = None
     updated_at: datetime
 
     class Config:

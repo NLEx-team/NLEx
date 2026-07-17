@@ -94,6 +94,7 @@ async def lifespan(app: FastAPI):
         from sqlalchemy import text
         await conn.execute(text("ALTER TABLE user_profiles ADD COLUMN IF NOT EXISTS language VARCHAR DEFAULT 'ru';"))
         await conn.execute(text("ALTER TABLE users ADD COLUMN IF NOT EXISTS is_blocked BOOLEAN NOT NULL DEFAULT FALSE;"))
+        await conn.execute(text("ALTER TABLE chats ADD COLUMN IF NOT EXISTS folder_id UUID REFERENCES chat_folders(id);"))
     
     # Create default admin if missing
     await create_default_admin()

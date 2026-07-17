@@ -31,3 +31,12 @@ class ClarificationAnswer(BaseModel):
 
 class ChatUpdateRequest(BaseModel):
     name: str
+
+class CreateFolderRequest(BaseModel):
+    name: str
+
+class UpdateFolderRequest(BaseModel):
+    name: str
+
+class MoveToFolderRequest(BaseModel):
+    folder_id: Optional[str] = None
