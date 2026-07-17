@@ -50,7 +50,16 @@
     "status_executing": "Executing query...",
     "status_fixing": "Fixing SQL error...",
     "status_formatting": "Formatting results...",
-    "status_failed": "Failed."
+    "status_failed": "Failed.",
+    "move_to_folder": "Move to folder",
+    "rename_folder": "Rename Folder",
+    "delete_folder": "Delete Folder",
+    "delete_folder_confirm": "Are you sure you want to delete this folder?",
+    "delete_folder_chats": "Also delete all chats in this folder",
+    "enter_folder_name": "Enter folder name",
+    "no_folders": "No folders yet",
+    "create_new_folder_placeholder": "Or create new folder...",
+    "move": "Move"
   },
   "auth": {
     "login": "Login",

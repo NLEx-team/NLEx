@@ -50,7 +50,16 @@
     "status_executing": "Выполняем запрос...",
     "status_fixing": "Исправляем ошибку SQL...",
     "status_formatting": "Форматируем результаты...",
-    "status_failed": "Ошибка."
+    "status_failed": "Ошибка.",
+    "move_to_folder": "Переместить в папку",
+    "rename_folder": "Переименовать папку",
+    "delete_folder": "Удалить папку",
+    "delete_folder_confirm": "Вы уверены, что хотите удалить эту папку?",
+    "delete_folder_chats": "Также удалить все чаты внутри папки",
+    "enter_folder_name": "Введите название папки",
+    "no_folders": "Папок пока нет",
+    "create_new_folder_placeholder": "Или создайте новую папку...",
+    "move": "Переместить"
   },
   "auth": {
     "login": "Войти",
