@@ -1,0 +1,35 @@
+@startuml
+skinparam componentStyle uml2
+
+actor "Business Analyst" as User
+
+package "NLEx System" {
+  [Frontend SPA (React/Vite)] as Frontend
+  
+  package "Backend API (FastAPI)" {
+    [Auth Router] as AuthRouter
+    [Query Router] as QueryRouter
+    [Orchestrator Service] as Orchestrator
+    [Schema Service] as SchemaService
+    [Auth Service] as AuthService
+  }
+}
+
+database "Trino (Federated Engine)" as Trino
+database "Internal DB (PostgreSQL)" as InternalDB
+cloud "LLM API (OpenAI/Gemini)" as LLM
+
+User --> Frontend : HTTP/HTTPS
+Frontend --> AuthRouter : JWT/JSON
+Frontend --> QueryRouter : NL Query/JSON
+
+AuthRouter --> AuthService : Validate/Issue
+QueryRouter --> Orchestrator : Process Query
+Orchestrator --> LLM : Generate SQL / Detect Ambiguity
+Orchestrator --> Trino : Execute SQL
+Orchestrator --> SchemaService : Get Metadata
+
+Trino --> InternalDB : Connectors
+Trino --> [External Enterprise DBs] : Connectors
+
+@enduml

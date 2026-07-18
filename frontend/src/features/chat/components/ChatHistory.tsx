@@ -18,7 +18,6 @@ interface ChatHistoryProps {
   folders: ChatFolder[];
   activeSessionId: string;
   onSelectSession: (id: string) => void;
-  onNewChat?: () => void;
   onRenameChat?: (id: string, newTitle: string) => void;
   onDeleteChat?: (id: string) => void;
   onCreateFolder?: (name: string) => Promise<ChatFolder | null>;

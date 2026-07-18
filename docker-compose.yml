@@ -100,11 +100,15 @@ services:
       target: production
     ports:
       - "${BACKEND_PORT}:8000"
+    volumes:
+      - exports_data:/app/exports
     env_file:
       - .env.secret
     depends_on:
-      - db
-      - trino
+      db:
+        condition: service_healthy
+      trino:
+        condition: service_healthy
     restart: always
     networks:
       - app-net

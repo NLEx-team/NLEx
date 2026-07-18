@@ -67,8 +67,11 @@ export function useChat(_userId: string, selectedCatalogIds: string[], blocked: 
   const [messagesBySession, setMessagesBySession] = useState<Record<string, ChatMessage[]>>({});
   const [loadedSessions, setLoadedSessions] = useState<Set<string>>(new Set());
   const [inputValue, setInputValue] = useState('');
-  const [pending, setPending] = useState(false);
-  const [pendingStatus, setPendingStatus] = useState<string>('');
+  const [pendingBySession, setPendingBySession] = useState<Record<string, boolean>>({});
+  const [pendingStatusBySession, setPendingStatusBySession] = useState<Record<string, string>>({});
+
+  const pending = pendingBySession[activeSessionId] || false;
+  const pendingStatus = pendingStatusBySession[activeSessionId] || '';
   const [initialized, setInitialized] = useState(false);
 
   // Load sessions list and folders from the server on mount
@@ -112,21 +115,21 @@ export function useChat(_userId: string, selectedCatalogIds: string[], blocked: 
 
   // Poll status when pending
   useEffect(() => {
-    if (!pending || !activeSessionId) {
-      setPendingStatus('');
-      return;
-    }
+    const pendingSessionIds = Object.keys(pendingBySession).filter(id => pendingBySession[id]);
+    if (pendingSessionIds.length === 0) return;
 
     const interval = setInterval(() => {
-      chatApi.getStatus(activeSessionId).then((res) => {
-        setPendingStatus(res.status);
-      }).catch(() => {
-        // ignore polling errors
+      pendingSessionIds.forEach(id => {
+        chatApi.getStatus(id).then((res) => {
+          setPendingStatusBySession(prev => ({ ...prev, [id]: res.status }));
+        }).catch(() => {
+          // ignore polling errors
+        });
       });
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [pending, activeSessionId]);
+  }, [pendingBySession]);
 
   // Load messages when switching to a session that hasn't been loaded yet
   useEffect(() => {
@@ -162,16 +165,16 @@ export function useChat(_userId: string, selectedCatalogIds: string[], blocked: 
 
   const initChat = useCallback(() => {
     if (blocked) return; // blocked users cannot create chats
-    // Prevent creating a new chat if the current active session is already empty
-    const currentMessages = activeSessionId ? messagesBySession[activeSessionId] : undefined;
-    const currentSession = sessions.find(s => s.id === activeSessionId);
-    
-    // If it's a newly created chat (no messages or still loading) and it's named "New Chat", prevent duplicates
-    if (
-      activeSessionId && 
-      (!currentMessages || currentMessages.length === 0) &&
-      currentSession?.title === 'New Chat'
-    ) {
+    // Check if there's already an empty "New Chat" in the sessions list
+    const existingEmptySession = sessions.find(s => {
+      const msgs = messagesBySession[s.id];
+      return (!msgs || msgs.length === 0) && (s.title === 'New Chat' || s.title === 'Новый чат');
+    });
+
+    if (existingEmptySession) {
+      // Just switch to the existing empty chat instead of creating a new one
+      setActiveSessionId(existingEmptySession.id);
+      setInputValue('');
       return;
     }
 
@@ -196,7 +199,9 @@ export function useChat(_userId: string, selectedCatalogIds: string[], blocked: 
 
   const handleSendMessage = useCallback(async () => {
     const text = inputValue.trim();
-    if (blocked || !text || pending || !activeSessionId) return;
+    const sessionId = activeSessionId;
+    const isPending = pendingBySession[sessionId];
+    if (blocked || !text || isPending || !sessionId) return;
 
     setInputValue('');
 
@@ -219,14 +224,15 @@ export function useChat(_userId: string, selectedCatalogIds: string[], blocked: 
       [activeSessionId]: [...(prev[activeSessionId] || []), userMsg]
     }));
     
-    setPending(true);
+    setPendingBySession(prev => ({ ...prev, [sessionId]: true }));
+    setPendingStatusBySession(prev => ({ ...prev, [sessionId]: '' }));
 
     try {
       const response = await chatApi.sendPromptStream(
-        activeSessionId, 
+        sessionId, 
         text, 
         selectedCatalogIds,
-        (status) => setPendingStatus(status)
+        (status) => setPendingStatusBySession(prev => ({ ...prev, [sessionId]: status }))
       );
       const blocks = parseBlocks(response);
       const assistantMsg: ChatMessage = {
@@ -258,15 +264,17 @@ export function useChat(_userId: string, selectedCatalogIds: string[], blocked: 
         [activeSessionId]: [...(prev[activeSessionId] || []), errorMsg]
       }));
     } finally {
-      setPending(false);
-      setPendingStatus('');
+      setPendingBySession(prev => ({ ...prev, [sessionId]: false }));
+      setPendingStatusBySession(prev => ({ ...prev, [sessionId]: '' }));
     }
-  }, [inputValue, pending, activeSessionId, messagesBySession, selectedCatalogIds]);
+  }, [inputValue, pendingBySession, activeSessionId, messagesBySession, selectedCatalogIds]);
 
   const handleClarification = useCallback(async (questionId: string, selectedOptions: string[]) => {
-    if (!activeSessionId || pending) return;
+    const sessionId = activeSessionId;
+    const isPending = pendingBySession[sessionId];
+    if (!sessionId || isPending) return;
 
-    setPending(true);
+    setPendingBySession(prev => ({ ...prev, [sessionId]: true }));
 
     try {
       const response = await chatApi.sendClarification(activeSessionId, questionId, selectedOptions);
@@ -296,9 +304,9 @@ export function useChat(_userId: string, selectedCatalogIds: string[], blocked: 
         [activeSessionId]: [...(prev[activeSessionId] || []), errorMsg]
       }));
     } finally {
-      setPending(false);
+      setPendingBySession(prev => ({ ...prev, [sessionId]: false }));
     }
-  }, [pending, activeSessionId]);
+  }, [pendingBySession, activeSessionId]);
 
   const activeSession = sessions.find(s => s.id === activeSessionId);
   const currentMessages = messagesBySession[activeSessionId] || [];

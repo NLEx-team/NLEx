@@ -11,6 +11,7 @@
 - **MVP v0 report:** [reports/week2/mvp-v0-report.md](reports/week2/mvp-v0-report.md)
 - **User stories:** [reports/week2/user-stories.md](reports/week2/user-stories.md)
 - **Contributing guide:** [CONTRIBUTING.md](CONTRIBUTING.md)
+- **Docs site (GitHub Pages):** [https://NLEx-team.github.io/NLEx/](https://NLEx-team.github.io/NLEx/)
 
 ## How to Run with Docker
 

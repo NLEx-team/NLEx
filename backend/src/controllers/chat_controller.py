@@ -67,8 +67,8 @@ class ChatController:
         """
         Retrieves or initializes an orchestrator for the given chat session.
         Uses two-tier model strategy:
-          - Inference model (deepseek-v4-flash) for relationship inference (simpler task)
-          - SQL model (gpt-5.4-mini) for SQL generation (RAG keeps context small)
+          - Inference model (LLM_MODEL_INFERENCE, default gpt-5.4-mini) for relationship inference
+          - SQL model (LLM_MODEL_SQL, default gpt-5.4-mini) for SQL generation (RAG keeps context small)
         """
         if chat_id not in _ORCHESTRATOR_SESSIONS:
             active_catalogs = await self.catalog_service.get_active_catalogs()
@@ -118,20 +118,22 @@ class ChatController:
                 elif proxy_config.proxy_mode == 'system':
                     resolved_proxy_url = settings.SYSTEM_PROXY_URL
             
-            # Two-tier model: fast model for SQL, inference model for relationships
+            # Two-tier model strategy:
+            #   - SQL model (LLM_MODEL_SQL, default gpt-5.4-mini) for SQL generation
+            #   - Inference model (LLM_MODEL_INFERENCE, default gpt-5.4-mini) for relationship inference
             base_kwargs = {
                 "api_key": llm_config.api_key if llm_config else None,
                 "base_url": llm_config.base_url if llm_config else None,
                 "proxy_url": resolved_proxy_url,
             }
             
-            # SQL generation service: always use fast model (RAG keeps context small)
+            # SQL generation service: uses admin-configured model or LLM_MODEL_SQL fallback
             sql_llm = LLMService(
                 **base_kwargs,
-                model=llm_config.model_name if llm_config else settings.LLM_MODEL_FAST,
+                model=llm_config.model_name if llm_config else settings.LLM_MODEL_SQL,
             )
             
-            # Inference service: use dedicated inference model (cheaper, good at pattern matching)
+            # Inference service: uses dedicated inference model (cheaper, good at pattern matching)
             inference_llm = LLMService(
                 **base_kwargs,
                 model=settings.LLM_MODEL_INFERENCE,

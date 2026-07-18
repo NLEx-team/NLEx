@@ -38,11 +38,14 @@ class Settings(BaseSettings):
     # LLM
     OPENAI_API_KEY: str | None = None
     OPENAI_BASE_URL: str = "https://api.openai.com/v1"
-    LLM_MODEL_FAST: str = "gpt-5.4-mini"
-    LLM_MODEL_THINKING: str = "gpt-5.5"
-    LLM_MODEL_INFERENCE: str = "deepseek-v4-flash"
+    LLM_MODEL_SQL: str = "gpt-5.4-mini"           # Model for SQL generation
+    LLM_MODEL_INFERENCE: str = "gpt-5.4-mini"      # Model for relationship inference
     MAX_SQL_RETRIES: int = 3
     SYSTEM_PROXY_URL: str | None = None
+
+    # CORS — comma-separated list of allowed origins.
+    # Defaults cover local development; override in .env.secret for production.
+    CORS_ORIGINS: str = "http://localhost,http://localhost:5173,http://localhost:5174,http://127.0.0.1,http://127.0.0.1:5173,http://127.0.0.1:5174"
     
     @model_validator(mode="after")
     def _reject_insecure_secrets_in_production(self) -> "Settings":

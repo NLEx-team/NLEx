@@ -1,3 +1,5 @@
+import asyncio
+
 from fastapi import APIRouter, Depends, HTTPException, status, BackgroundTasks, WebSocket, WebSocketDisconnect
 from fastapi.responses import FileResponse
 from src.services.auth import AuthService
@@ -230,6 +232,72 @@ async def chat_websocket(
                     logging.getLogger(__name__).warning(f"Failed to generate AI title: {e}")
             # --- END TITLE LOGIC ---
             
+            # --- START TITLE LOGIC ---
+            if chat.title == "New Chat" and user_msg_count == 1:
+                new_title = prompt[:30] + "..." if len(prompt) > 30 else prompt
+                await ChatRepository.update_chat_title(db, chat_id, new_title)
+                response["chat_title"] = new_title
+
+            if user_msg_count == 2:
+                try:
+                    history = []
+                    for msg in messages:
+                        text = ""
+                        for block in msg.blocks:
+                            if block.get("type") == "text":
+                                text += block.get("text", "")
+                        if text:
+                            history.append({"role": msg.role, "content": text})
+                    
+                    if response.get("message"):
+                        history.append({"role": "assistant", "content": response["message"]})
+                    elif response.get("question"):
+                        history.append({"role": "assistant", "content": response["question"]})
+                    
+                    import asyncio
+                    title_res = await asyncio.to_thread(orch.llm_service.generate_chat_title, history)
+                    if "title" in title_res:
+                        new_ai_title = title_res["title"][:100]
+                        await ChatRepository.update_chat_title(db, chat_id, new_ai_title)
+                        response["chat_title"] = new_ai_title
+                except Exception as e:
+                    import logging
+                    logging.getLogger(__name__).warning(f"Failed to generate AI title: {e}")
+            # --- END TITLE LOGIC ---
+            
+            # --- START TITLE LOGIC ---
+            if chat.title == "New Chat" and user_msg_count == 1:
+                new_title = prompt[:30] + "..." if len(prompt) > 30 else prompt
+                await ChatRepository.update_chat_title(db, chat_id, new_title)
+                response["chat_title"] = new_title
+
+            if user_msg_count == 2:
+                try:
+                    history = []
+                    for msg in messages:
+                        text = ""
+                        for block in msg.blocks:
+                            if block.get("type") == "text":
+                                text += block.get("text", "")
+                        if text:
+                            history.append({"role": msg.role, "content": text})
+                    
+                    if response.get("message"):
+                        history.append({"role": "assistant", "content": response["message"]})
+                    elif response.get("question"):
+                        history.append({"role": "assistant", "content": response["question"]})
+                    
+                    import asyncio
+                    title_res = await asyncio.to_thread(orch.llm_service.generate_chat_title, history)
+                    if "title" in title_res:
+                        new_ai_title = title_res["title"][:100]
+                        await ChatRepository.update_chat_title(db, chat_id, new_ai_title)
+                        response["chat_title"] = new_ai_title
+                except Exception as e:
+                    import logging
+                    logging.getLogger(__name__).warning(f"Failed to generate AI title: {e}")
+            # --- END TITLE LOGIC ---
+            
             from fastapi.encoders import jsonable_encoder
             await websocket.send_json({
                 "type": "result",
@@ -390,9 +458,14 @@ async def export_chat_to_excel(
     Returns the cached file matching the export_id.
     """
     try:
-        # Generate on the fly using DB streaming to avoid memory crash
+        # Generate on the fly using DB streaming to avoid memory crash.
+        # Run in a thread pool so the async event loop isn't blocked
+        # while streaming 100k+ rows from Trino into the Excel file.
         orch = await controller.get_orchestrator(chat_id)
-        file_path = controller.excel_service.generate_and_get_excel(export_id, orch.db_service)
+        loop = asyncio.get_running_loop()
+        file_path = await loop.run_in_executor(
+            None, controller.excel_service.generate_and_get_excel, export_id, orch.db_service
+        )
         if not file_path:
             raise ValueError("Export file could not be generated.")
         
