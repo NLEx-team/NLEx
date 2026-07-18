@@ -1,11 +1,13 @@
 from typing import Optional, List
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, desc
+from sqlalchemy.orm import selectinload
 from sqlalchemy.sql import func
 from uuid import UUID
 from datetime import datetime
 
 from src.database.models.chat import Chat, Draft, ChatMessage
+from src.database.models.chat_folder import ChatFolder
 
 class ChatRepository:
     @staticmethod
@@ -117,3 +119,91 @@ class ChatRepository:
         await db.commit()
         await db.refresh(draft)
         return draft
+
+    # ---- Folder methods ----
+
+    @staticmethod
+    async def create_folder(db: AsyncSession, user_id: UUID, name: str) -> ChatFolder:
+        folder = ChatFolder(user_id=user_id, name=name)
+        db.add(folder)
+        await db.commit()
+        await db.refresh(folder)
+        return folder
+
+    @staticmethod
+    async def get_user_folders(db: AsyncSession, user_id: UUID) -> List[ChatFolder]:
+        stmt = (
+            select(ChatFolder)
+            .where(ChatFolder.user_id == user_id)
+            .order_by(ChatFolder.created_at)
+        )
+        result = await db.execute(stmt)
+        return list(result.scalars().all())
+
+    @staticmethod
+    async def get_folder_by_id(db: AsyncSession, folder_id: UUID, user_id: UUID) -> Optional[ChatFolder]:
+        stmt = select(ChatFolder).where(ChatFolder.id == folder_id, ChatFolder.user_id == user_id)
+        result = await db.execute(stmt)
+        return result.scalar_one_or_none()
+
+    @staticmethod
+    async def delete_folder(db: AsyncSession, folder: ChatFolder, delete_chats: bool = False) -> None:
+        if delete_chats:
+            stmt = select(Chat).where(Chat.folder_id == folder.id, Chat.is_deleted == False)
+            result = await db.execute(stmt)
+            chats = list(result.scalars().all())
+            for chat in chats:
+                chat.is_deleted = True
+                chat.folder_id = None
+                chat.updated_at = datetime.utcnow()
+        else:
+            stmt = select(Chat).where(Chat.folder_id == folder.id)
+            result = await db.execute(stmt)
+            chats = list(result.scalars().all())
+            for chat in chats:
+                chat.folder_id = None
+
+        await db.delete(folder)
+        await db.commit()
+
+    @staticmethod
+    async def update_folder(db: AsyncSession, folder: ChatFolder, name: str) -> ChatFolder:
+        folder.name = name
+        folder.updated_at = datetime.utcnow()
+        await db.commit()
+        await db.refresh(folder)
+        return folder
+
+    @staticmethod
+    async def move_chat_to_folder(db: AsyncSession, chat: Chat, folder_id: UUID) -> Chat:
+        chat.folder_id = folder_id
+        chat.updated_at = datetime.utcnow()
+        await db.commit()
+        await db.refresh(chat)
+        return chat
+
+    @staticmethod
+    async def remove_chat_from_folder(db: AsyncSession, chat: Chat) -> Chat:
+        chat.folder_id = None
+        chat.updated_at = datetime.utcnow()
+        await db.commit()
+        await db.refresh(chat)
+        return chat
+
+    @staticmethod
+    async def get_chats_in_folder(db: AsyncSession, folder_id: UUID) -> List[Chat]:
+        stmt = (
+            select(Chat)
+            .where(Chat.folder_id == folder_id, Chat.is_deleted == False)
+            .order_by(desc(Chat.updated_at))
+        )
+        result = await db.execute(stmt)
+        return list(result.scalars().all())
+
+    @staticmethod
+    async def count_chats_in_folder(db: AsyncSession, folder_id: UUID) -> int:
+        stmt = select(func.count(Chat.id)).where(
+            Chat.folder_id == folder_id, Chat.is_deleted == False
+        )
+        result = await db.execute(stmt)
+        return result.scalar() or 0

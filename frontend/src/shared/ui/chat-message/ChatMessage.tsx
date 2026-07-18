@@ -1,7 +1,12 @@
 import { useState, useRef, useEffect } from 'react';
 import { Icon } from '@iconify/react';
-import type { ChatMessageProps, OptionsBlock, TableBlock, ErrorBlock } from './ChatMessage.types';
+import type { ChatMessageProps, OptionsBlock, TableBlock, ChartBlock, ErrorBlock } from './ChatMessage.types';
 import { useTranslation } from 'react-i18next';
+import {
+  ResponsiveContainer,
+  BarChart, Bar, LineChart, Line, PieChart, Pie, AreaChart, Area, ScatterChart, Scatter,
+  XAxis, YAxis, CartesianGrid, Tooltip, Legend, Cell,
+} from 'recharts';
 import './ChatMessage.css';
 
 function TextBlockView({ text }: { text: string }) {
@@ -264,6 +269,105 @@ function TableBlockView({ block, exportUrl, exportFilename, onExport }: { block:
   );
 }
 
+const CHART_COLORS = ['#4472C4', '#ED7D31', '#A5A5A5', '#FFC000', '#5B9BD5', '#70AD47', '#264478', '#9B57A0'];
+
+function ChartBlockView({ block }: { block: ChartBlock }) {
+  if (!block.data || !block.headers || block.data.length === 0) return null;
+
+  const chartData = block.data.map(row => {
+    const obj: Record<string, any> = {};
+    block.headers!.forEach((h, i) => {
+      const val = row[i];
+      obj[h] = typeof val === 'string' && !isNaN(Number(val)) ? Number(val) : val;
+    });
+    return obj;
+  });
+
+  const yKeys = block.yColumns ?? [];
+  const xKey = block.xColumn ?? block.headers[0];
+  const title = block.title;
+
+  const renderTitle = title
+    ? <div className="chat-message__chart-title">{title}</div>
+    : null;
+
+  if (block.chartType === 'pie') {
+    const catKey = block.categoryColumn ?? block.headers[0];
+    const valKey = block.valueColumn ?? (block.headers[1] ?? block.headers[0]);
+    return (
+      <div className="chat-message__chart-wrapper">
+        {renderTitle}
+        <ResponsiveContainer width="100%" height={300}>
+          <PieChart>
+            <Pie
+              data={chartData}
+              dataKey={valKey}
+              nameKey={catKey}
+              cx="50%"
+              cy="50%"
+              outerRadius={100}
+              label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+            >
+              {chartData.map((_, idx) => (
+                <Cell key={idx} fill={CHART_COLORS[idx % CHART_COLORS.length]} />
+              ))}
+            </Pie>
+            <Tooltip />
+          </PieChart>
+        </ResponsiveContainer>
+      </div>
+    );
+  }
+
+  if (block.chartType === 'scatter') {
+    return (
+      <div className="chat-message__chart-wrapper">
+        {renderTitle}
+        <ResponsiveContainer width="100%" height={300}>
+          <ScatterChart>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey={xKey} name={xKey} />
+            <YAxis dataKey={yKeys[0]} name={yKeys[0]} />
+            <Tooltip cursor={{ strokeDasharray: '3 3' }} />
+            <Legend />
+            <Scatter data={chartData} fill="#4472C4" />
+          </ScatterChart>
+        </ResponsiveContainer>
+      </div>
+    );
+  }
+
+  const isBar = block.chartType === 'bar';
+  const isArea = block.chartType === 'area';
+  const ChartComponent = isBar ? BarChart : isArea ? AreaChart : LineChart;
+  const DataComponent = isBar ? Bar : isArea ? Area : Line;
+
+  return (
+    <div className="chat-message__chart-wrapper">
+      {renderTitle}
+      <ResponsiveContainer width="100%" height={300}>
+        <ChartComponent data={chartData}>
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis dataKey={xKey} />
+          <YAxis />
+          <Tooltip />
+          <Legend />
+          {yKeys.map((key, idx) => (
+            <DataComponent
+              key={key}
+              type="monotone"
+              dataKey={key}
+              fill={CHART_COLORS[idx % CHART_COLORS.length]}
+              stroke={CHART_COLORS[idx % CHART_COLORS.length]}
+              fillOpacity={isArea ? 0.3 : undefined}
+            />
+          ))}
+        </ChartComponent>
+      </ResponsiveContainer>
+    </div>
+  );
+}
+
 function ErrorBlockView({ block }: { block: ErrorBlock }) {
   const { t } = useTranslation();
   return (
@@ -295,6 +399,8 @@ export function ChatMessage({ role, blocks, exportUrl, exportFilename, onClarify
               return <OptionsBlockView key={idx} block={block} onClarify={onClarify} isLastMessage={isLastMessage} />;
             case 'table':
               return <TableBlockView key={idx} block={block} exportUrl={exportUrl} exportFilename={exportFilename} onExport={onExport} />;
+            case 'chart':
+              return <ChartBlockView key={idx} block={block} />;
             case 'error':
               return <ErrorBlockView key={idx} block={block} />;
           }

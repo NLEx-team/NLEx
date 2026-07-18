@@ -12,6 +12,7 @@ class Chat(Base):
     status = Column(String, default="IDLE", nullable=False)
     user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False)
     connection_id = Column(UUID(as_uuid=True), ForeignKey("database_connections.id"), nullable=True)
+    folder_id = Column(UUID(as_uuid=True), ForeignKey("chat_folders.id", ondelete="SET NULL"), nullable=True)
     catalog_ids = Column(JSON, nullable=False, default=list)
     is_deleted = Column(Boolean, default=False, nullable=False, server_default='false')
     created_at = Column(DateTime(timezone=True), server_default=func.now())
@@ -19,6 +20,7 @@ class Chat(Base):
 
     user = relationship("User")
     connection = relationship("DatabaseConnection")
+    folder = relationship("ChatFolder", back_populates="chats")
     drafts = relationship("Draft", back_populates="chat", cascade="all, delete-orphan")
     messages = relationship("ChatMessage", back_populates="chat", cascade="all, delete-orphan", order_by="ChatMessage.created_at")
 

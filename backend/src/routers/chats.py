@@ -14,11 +14,13 @@ from src.database.session import get_db
 from src.database.models.chat import Chat as ChatModel
 from src.database.models.user import User
 from src.models.api.chats import (
-    ChatCreateRequest, PromptRequest, 
-    ClarificationAnswer, ChatUpdateRequest
+    ChatCreateRequest, PromptRequest,
+    ClarificationAnswer, ChatUpdateRequest,
+    CreateFolderRequest, UpdateFolderRequest, MoveToFolderRequest,
 )
 from src.models.schemas.chat import (
-    ChatRead, ChatStatus, ChatListItem, ChatMessageRead
+    ChatRead, ChatStatus, ChatListItem, ChatMessageRead,
+    ChatFolderRead,
 )
 from src.repositories.chat_repo import ChatRepository
 from src.routers.catalogs import get_catalog_service
@@ -71,6 +73,7 @@ async def list_chats(
             id=str(c.id),
             title=c.title,
             catalog_ids=c.catalog_ids,
+            folder_id=str(c.folder_id) if c.folder_id else None,
             updated_at=c.updated_at or c.created_at,
         )
         for c in chats
@@ -520,6 +523,106 @@ async def delete_chat(
     return None
 
 
+# ── Folder endpoints ──────────────────────────────────────────────
+
+@router.post("/folders", status_code=status.HTTP_201_CREATED)
+async def create_folder(
+    request: CreateFolderRequest,
+    user: User = Depends(require_active_user),
+    db: AsyncSession = Depends(get_db),
+):
+    folder = await ChatRepository.create_folder(db, user.id, request.name)
+    return {
+        "id": str(folder.id),
+        "name": folder.name,
+        "created_at": folder.created_at.isoformat() if folder.created_at else datetime.utcnow().isoformat(),
+        "updated_at": folder.updated_at.isoformat() if folder.updated_at else datetime.utcnow().isoformat(),
+    }
+
+
+@router.get("/folders", response_model=List[ChatFolderRead])
+async def list_folders(
+    user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """Get all folders for the current user with chat counts."""
+    folders = await ChatRepository.get_user_folders(db, user.id)
+    result = []
+    for f in folders:
+        count = await ChatRepository.count_chats_in_folder(db, f.id)
+        result.append(ChatFolderRead(
+            id=str(f.id),
+            name=f.name,
+            chat_count=count,
+            created_at=f.created_at,
+            updated_at=f.updated_at,
+        ))
+    return result
+
+
+@router.patch("/folders/{folder_id}")
+async def rename_folder(
+    folder_id: UUID,
+    request: UpdateFolderRequest,
+    user: User = Depends(require_active_user),
+    db: AsyncSession = Depends(get_db),
+):
+    folder = await ChatRepository.get_folder_by_id(db, folder_id, user.id)
+    if not folder:
+        raise HTTPException(status_code=404, detail="Folder not found")
+    folder = await ChatRepository.update_folder(db, folder, request.name)
+    return {"status": "success", "name": folder.name}
+
+
+@router.delete("/folders/{folder_id}")
+async def delete_folder(
+    folder_id: UUID,
+    delete_chats: bool = False,
+    user: User = Depends(require_active_user),
+    db: AsyncSession = Depends(get_db),
+):
+    folder = await ChatRepository.get_folder_by_id(db, folder_id, user.id)
+    if not folder:
+        raise HTTPException(status_code=404, detail="Folder not found")
+    await ChatRepository.delete_folder(db, folder, delete_chats=delete_chats)
+    return {"status": "success"}
+
+
+@router.post("/{chat_id}/folder")
+async def move_chat_to_folder(
+    chat_id: UUID,
+    request: MoveToFolderRequest,
+    user: User = Depends(require_active_user),
+    db: AsyncSession = Depends(get_db),
+):
+    chat = await ChatRepository.get_chat_by_id_and_user(db, chat_id, user.id)
+    if not chat:
+        raise HTTPException(status_code=404, detail="Chat not found")
+
+    if request.folder_id:
+        folder = await ChatRepository.get_folder_by_id(db, UUID(request.folder_id), user.id)
+        if not folder:
+            raise HTTPException(status_code=404, detail="Folder not found")
+        await ChatRepository.move_chat_to_folder(db, chat, folder.id)
+    else:
+        await ChatRepository.remove_chat_from_folder(db, chat)
+
+    return {"status": "success"}
+
+
+@router.delete("/{chat_id}/folder")
+async def remove_chat_from_folder(
+    chat_id: UUID,
+    user: User = Depends(require_active_user),
+    db: AsyncSession = Depends(get_db),
+):
+    chat = await ChatRepository.get_chat_by_id_and_user(db, chat_id, user.id)
+    if not chat:
+        raise HTTPException(status_code=404, detail="Chat not found")
+    await ChatRepository.remove_chat_from_folder(db, chat)
+    return {"status": "success"}
+
+
 def _response_to_blocks(response: dict) -> list:
     """Convert orchestrator response to storable content blocks."""
     r = response.get("result", {})
@@ -545,6 +648,21 @@ def _response_to_blocks(response: dict) -> list:
                 "totalRows": r.get("total_rows"),
                 "explanation": r.get("explanation"),
             })
+            # Add chart block if chart spec is provided
+            chart = r.get("chart")
+            if chart and isinstance(chart, dict):
+                blocks.append({
+                    "type": "chart",
+                    "chartType": chart.get("type", "bar"),
+                    "title": chart.get("title"),
+                    "xColumn": chart.get("x_column"),
+                    "yColumns": chart.get("y_columns"),
+                    "categoryColumn": chart.get("category_column"),
+                    "valueColumn": chart.get("value_column"),
+                    "stacked": chart.get("stacked"),
+                    "data": r["data"],
+                    "headers": r["headers"],
+                })
         if not r.get("explanation") and "data" not in r:
             blocks.append({"type": "text", "text": "Request completed successfully."})
     elif r.get("status") == "error":

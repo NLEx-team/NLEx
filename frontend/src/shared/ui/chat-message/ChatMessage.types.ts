@@ -21,13 +21,26 @@ export interface TableBlock {
   explanation?: string;
 }
 
+export interface ChartBlock {
+  type: 'chart';
+  chartType: 'bar' | 'line' | 'pie' | 'area' | 'scatter';
+  title?: string;
+  xColumn?: string;
+  yColumns?: string[];
+  categoryColumn?: string;
+  valueColumn?: string;
+  stacked?: boolean;
+  data?: any[][];
+  headers?: string[];
+}
+
 export interface ErrorBlock {
   type: 'error';
   message: string;
   sql?: string;
 }
 
-export type ContentBlock = TextBlock | OptionsBlock | TableBlock | ErrorBlock;
+export type ContentBlock = TextBlock | OptionsBlock | TableBlock | ChartBlock | ErrorBlock;
 
 export interface ChatMessageProps {
   role: ChatMessageRole;

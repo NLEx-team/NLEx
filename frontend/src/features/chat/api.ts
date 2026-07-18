@@ -28,6 +28,15 @@ interface ChatListResponse {
   id: string;
   title: string;
   catalog_ids: string[];
+  folder_id?: string | null;
+  updated_at: string;
+}
+
+interface FolderResponse {
+  id: string;
+  name: string;
+  chat_count: number;
+  created_at: string;
   updated_at: string;
 }
 
@@ -122,6 +131,24 @@ export const chatApi = {
 
   getStatus: (chatId: string) =>
     api.get<{status: string}>(`/chats/${chatId}/status`),
+
+  getFolders: () =>
+    api.get<FolderResponse[]>('/chats/folders'),
+
+  createFolder: (name: string) =>
+    api.post<{ id: string; name: string; created_at: string; updated_at: string }>('/chats/folders', { name }),
+
+  renameFolder: (folderId: string, name: string) =>
+    api.patch<{ status: string; name: string }>(`/chats/folders/${folderId}`, { name }),
+
+  deleteFolder: (folderId: string, deleteChats: boolean = false) =>
+    api.delete<{ status: string }>(`/chats/folders/${folderId}?delete_chats=${deleteChats}`),
+
+  moveChatToFolder: (chatId: string, folderId: string) =>
+    api.post<{ status: string }>(`/chats/${chatId}/folder`, { folder_id: folderId }),
+
+  removeChatFromFolder: (chatId: string) =>
+    api.delete<{ status: string }>(`/chats/${chatId}/folder`),
 
   downloadExport: async (exportUrl: string, filename?: string) => {
     const response = await fetch(`${config.apiUrl}${exportUrl}`, {

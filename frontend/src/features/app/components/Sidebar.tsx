@@ -54,13 +54,7 @@ export function Sidebar({ isOpen, onClose, onNewChat, children }: SidebarProps) 
       </div>
 
       <div className="sidebar__actions">
-        <button className="sidebar__action-btn" onClick={() => {
-          if (onNewChat) {
-            onNewChat();
-          } else {
-            navigate('/chat');
-          }
-        }} type="button">
+        <button className="sidebar__action-btn" onClick={() => { onNewChat?.(); navigate('/chat'); }} type="button">
           <Icon icon="jam:write" width="20" height="20" />
           <span>{t('sidebar.new_chat')}</span>
         </button>
