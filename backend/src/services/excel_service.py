@@ -58,7 +58,7 @@ class ExcelExportService:
         headers: List[str],
         catalog_mapping: Dict[str, str] = None,
         filename: str = None,
-        chart: Optional[Dict[str, Any]] = None
+        chart: Optional[Dict[str, any]] = None
     ) -> None:
         import json
         meta_path = self._get_metadata_path(export_id)
@@ -78,7 +78,7 @@ class ExcelExportService:
                 return i + 1
         return None
 
-    def _add_chart_to_workbook(self, wb: Workbook, ws: Any, chart_spec: dict, headers: List[str], row_count: int):
+    def _add_chart_to_workbook(self, wb: Workbook, ws: any, chart_spec: dict, headers: List[str], row_count: int):
         """Add a chart to the workbook based on chart spec from LLM."""
         chart_type = chart_spec.get("type", "bar")
         title = chart_spec.get("title", "")
