@@ -1,6 +1,5 @@
 import { useState, useRef, useEffect, useMemo } from 'react';
 import { createPortal } from 'react-dom';
-import { useNavigate } from 'react-router-dom';
 import { Button } from '../../../shared/ui/button';
 import { NavSelectItem } from '../../../shared/ui/nav-select-item';
 import { SidebarSection } from '../../app/components/SidebarSection';
@@ -8,7 +7,6 @@ import { Icon } from '@iconify/react';
 import { Confirm } from '../../../shared/ui/confirm';
 import { Modal } from '../../../shared/ui/modal';
 import { Field } from '../../../shared/ui/field';
-import { useAuth } from '../../auth/hooks/useAuth';
 import { useTranslation } from 'react-i18next';
 import type { ChatSession, ChatFolder } from '../types';
 import './ChatHistory.css';
@@ -174,7 +172,6 @@ export function ChatHistory({
   folders,
   activeSessionId,
   onSelectSession,
-  onNewChat,
   onRenameChat,
   onDeleteChat,
   onCreateFolder,
