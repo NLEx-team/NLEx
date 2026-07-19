@@ -18,6 +18,12 @@
 **Requirement status:** Active
 **MoSCoW priority:** Must Have
 
+**Related PBIs:**
+- [PBI-001: NL query input field in UI](https://github.com/NLEx-team/NLEx/issues/23)
+- [PBI-002: Backend endpoint for prompt processing & LLM integration](https://github.com/NLEx-team/NLEx/issues/24)
+- [PBI-032: Minimalist chat UI (ChatGPT/Perplexity style)](https://github.com/NLEx-team/NLEx/issues/106)
+- [PBI-043: UI Layout Alignment with Enterprise Design Patterns](https://github.com/NLEx-team/NLEx/issues/130)
+
 As a Business Analyst,
 I want to type an analytical question in plain natural language into a single input field,
 so that I can request data without knowing SQL or the database schema.
@@ -33,6 +39,10 @@ so that I can request data without knowing SQL or the database schema.
 
 **Requirement status:** Active
 **MoSCoW priority:** Must Have
+
+**Related PBIs:**
+- [PBI-003: Sidebar database selection dropdown](https://github.com/NLEx-team/NLEx/issues/25)
+- [PBI-019: Explicit database selector control before query submission](https://github.com/NLEx-team/NLEx/issues/82)
 
 As a Business Analyst,
 I want to select a single database to query from a dropdown of human-readable names,
@@ -51,6 +61,10 @@ so that I can target the correct data source without remembering connection stri
 **Requirement status:** Active
 **MoSCoW priority:** Must Have
 
+**Related PBIs:**
+- [PBI-004: Excel export service with auto-formatting](https://github.com/NLEx-team/NLEx/issues/26)
+- [PBI-041: Fix Production Excel Export Download Format](https://github.com/NLEx-team/NLEx/issues/128)
+
 As a Business Analyst,
 I want to receive a downloadable Excel file with my query results,
 so that I can analyze, format, and share the data using familiar tools.
@@ -66,6 +80,10 @@ so that I can analyze, format, and share the data using familiar tools.
 
 **Requirement status:** Active
 **MoSCoW priority:** Must Have
+
+**Related PBIs:**
+- [PBI-005: Frontend result preview table](https://github.com/NLEx-team/NLEx/issues/27)
+- [PBI-042: Interactive In-App Chart Generation](https://github.com/NLEx-team/NLEx/issues/129)
 
 As a Business Analyst,
 I want to see a preview of the first rows of my query result in the browser,
@@ -84,6 +102,11 @@ so that I can quickly verify the data looks correct before downloading.
 **Requirement status:** Active
 **MoSCoW priority:** Must Have
 
+**Related PBIs:**
+- [PBI-006: Clarification logic in LLM prompt & Backend handler](https://github.com/NLEx-team/NLEx/issues/28)
+- [PBI-007: UI support for clarification turns (chat bubbles)](https://github.com/NLEx-team/NLEx/issues/29)
+- [PBI-021: "Other" hint button on clarification option sets](https://github.com/NLEx-team/NLEx/issues/84)
+
 As a Business Analyst,
 I want the system to ask me clarifying questions when my request is ambiguous,
 so that I get the exact data I intended instead of a wrong result based on an incorrect assumption.
@@ -98,8 +121,12 @@ so that I get the exact data I intended instead of a wrong result based on an in
 
 ## US-06: Config-file-based single database connection
 
-**Requirement status:** Active
+**Requirement status:** Deprecated (Replaced by dynamic runtime catalogs in Admin panel)
 **MoSCoW priority:** Must Have
+
+**Related PBIs:**
+- [PBI-023: DBMS type selector in "Add Database" admin form](https://github.com/NLEx-team/NLEx/issues/86)
+- [PBI-028: LLM provider configuration via admin panel](https://github.com/NLEx-team/NLEx/issues/90)
 
 As a Data Engineer,
 I want to configure a single database connection through a configuration file or environment variables before starting the system,
@@ -118,6 +145,10 @@ so that the NLEx container connects to that database immediately upon launch wit
 **Requirement status:** Active
 **MoSCoW priority:** Must Have
 
+**Related PBIs:**
+- [PBI-009: API health check and startup connection validation](https://github.com/NLEx-team/NLEx/issues/31)
+- [PBI-026: "Check Connection" button for regular users](https://github.com/NLEx-team/NLEx/issues/92)
+
 As a Data Engineer,
 I want to see a health-check report at container startup showing whether the configured database connection succeeded or failed,
 so that I can fix a misconfigured connection before users encounter errors.
@@ -135,6 +166,9 @@ so that I can fix a misconfigured connection before users encounter errors.
 **Requirement status:** Active
 **MoSCoW priority:** Must Have
 
+**Related PBIs:**
+- [PBI-010: Collapsible SQL preview component in UI](https://github.com/NLEx-team/NLEx/issues/32)
+
 As a Data Team Analyst,
 I want to view the SQL that the system generated for a query,
 so that I can validate its correctness and build trust in the system before recommending it to business users.
@@ -151,6 +185,10 @@ so that I can validate its correctness and build trust in the system before reco
 **Requirement status:** Active
 **MoSCoW priority:** Should Have
 
+**Related PBIs:**
+- [PBI-013: Chat history sidebar and persistence](https://github.com/NLEx-team/NLEx/issues/37)
+- [PBI-022: Deferred chat title synthesis (multi-message context)](https://github.com/NLEx-team/NLEx/issues/85)
+
 As a Business Analyst,
 I want to see a history of my previous queries with their status and results,
 so that I can re-run a past query or re-download an Excel file without re-typing the request.
@@ -165,6 +203,10 @@ so that I can re-run a past query or re-download an Excel file without re-typing
 
 **Requirement status:** Active
 **MoSCoW priority:** Must Have
+
+**Related PBIs:**
+- [PBI-004: Excel export service with auto-formatting](https://github.com/NLEx-team/NLEx/issues/26)
+- [PBI-041: Fix Production Excel Export Download Format](https://github.com/NLEx-team/NLEx/issues/128)
 
 As a Business Analyst,
 I want to receive the Excel file with reasonable default formatting (number separators, date formats, auto-width columns, frozen headers),
@@ -182,6 +224,10 @@ so that the file is ready to use immediately without manual cleanup.
 **Requirement status:** Active
 **MoSCoW priority:** Should Have
 
+**Related PBIs:**
+- [PBI-014: Prompt tuning for bilingual (RU/EN) support](https://github.com/NLEx-team/NLEx/issues/35)
+- [PBI-034: Fix translation inconsistencies](https://github.com/NLEx-team/NLEx/issues/108)
+
 As a Business Analyst,
 I want to write my query in Russian or English and have the system understand both,
 so that I can use my preferred language.
@@ -198,6 +244,10 @@ so that I can use my preferred language.
 **Requirement status:** Active
 **MoSCoW priority:** Must Have
 
+**Related PBIs:**
+- [PBI-012: Full Trino-SQL Gen Pipeline Integration](https://github.com/NLEx-team/NLEx/issues/34)
+- [PBI-029: Oracle DBMS connector support](https://github.com/NLEx-team/NLEx/issues/91)
+
 As a Business Analyst,
 I want to submit a single natural language question that requires data from multiple databases simultaneously,
 so that I can get a unified answer without manually merging results from separate queries.
@@ -211,7 +261,7 @@ so that I can get a unified answer without manually merging results from separat
 
 ## US-13: Multiple database connections via config
 
-**Requirement status:** Active
+**Requirement status:** Deprecated (Replaced by dynamic runtime catalogs in Admin panel)
 **MoSCoW priority:** Must Have
 
 As a Data Engineer,
@@ -227,7 +277,7 @@ so that the system can query across all of them when a user request spans databa
 
 ## US-14: Save validated query as reusable template
 
-**Requirement status:** Active
+**Requirement status:** Deprecated (Dropped from scope)
 **MoSCoW priority:** Should Have
 
 As a Data Team Analyst,
@@ -242,7 +292,7 @@ so that business users can run it themselves without asking me every time.
 
 ## US-15: Run a saved template with parameters
 
-**Requirement status:** Active
+**Requirement status:** Deprecated (Dropped from scope)
 **MoSCoW priority:** Should Have
 
 As a Business Analyst,
@@ -257,7 +307,7 @@ so that I can get regular reports without typing the full question each time.
 
 ## US-16: Share templates with specific users
 
-**Requirement status:** Active
+**Requirement status:** Deprecated (Dropped from scope)
 **MoSCoW priority:** Could Have
 
 As a Data Team Analyst,
@@ -275,6 +325,12 @@ so that they can run validated queries without my further involvement.
 **Requirement status:** Active
 **MoSCoW priority:** Could Have
 
+**Related PBIs:**
+- [PBI-027: Admin dashboard — token usage & per-user request analytics](https://github.com/NLEx-team/NLEx/issues/89)
+- [PBI-011: Replace mock Auth with real JWT/DB authentication](https://github.com/NLEx-team/NLEx/issues/33)
+- [PBI-024: Password requirements validation & feedback on registration](https://github.com/NLEx-team/NLEx/issues/87)
+- [PBI-025: Role-based UI element visibility (hide admin-only controls)](https://github.com/NLEx-team/NLEx/issues/88)
+
 As a System Administrator,
 I want to see basic usage statistics (number of queries per day, success rate, average execution time),
 so that I can monitor system health and justify the cost of the LLM API.
@@ -287,7 +343,12 @@ so that I can monitor system health and justify the cost of the LLM API.
 
 ## Removed User Stories
 
-None at this stage. All documented stories remain active as legitimate candidate requirements.
+The following stories were deprecated during development:
+- **US-06**: Replaced by dynamic runtime catalogs managed in the Admin panel.
+- **US-13**: Replaced by dynamic runtime catalogs managed in the Admin panel.
+- **US-14**: Dropped from scope to focus on core chat and export functionality.
+- **US-15**: Dropped from scope.
+- **US-16**: Dropped from scope.
 
 ---
 
@@ -295,10 +356,10 @@ None at this stage. All documented stories remain active as legitimate candidate
 
 | Priority | Stories | Count |
 |----------|---------|-------|
-| **Must Have** | US-01, US-02, US-03, US-04, US-05, US-06, US-07, US-08, US-10, US-12, US-13 | 11 |
-| **Should Have** | US-09, US-11, US-14, US-15 | 4 |
-| **Could Have** | US-16, US-17 | 2 |
-| **Won't Have** | — | 0 |
+| **Must Have** | US-01, US-02, US-03, US-04, US-05, US-07, US-08, US-10, US-12 | 9 |
+| **Should Have** | US-09, US-11 | 2 |
+| **Could Have** | US-17 | 1 |
+| **Won't Have** | US-06, US-13, US-14, US-15, US-16 | 5 |
 
 ---
 
@@ -327,3 +388,13 @@ The following Must Have stories form the initial proposed MVP v1 scope: a minima
 - US-07
 - US-08
 - US-10
+
+## Project-Level PBIs (Chores, Docs, & Testing)
+
+The following PBIs represent technical tasks, process improvements, or documentation efforts that apply project-wide rather than to a single user story:
+
+- [PBI-036: Stable release-candidate branch for testing](https://github.com/NLEx-team/NLEx/issues/110)
+- [PBI-037: Customer handover documentation](https://github.com/NLEx-team/NLEx/issues/113)
+- [PBI-038: Architecture diagram for documentation](https://github.com/NLEx-team/NLEx/issues/111)
+- [PBI-040: Portfolio Showcase and Team Contribution Documentation](https://github.com/NLEx-team/NLEx/issues/127)
+- [PBI-044: Comprehensive Manual Testing & Production Verification](https://github.com/NLEx-team/NLEx/issues/131)

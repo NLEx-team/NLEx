@@ -2,7 +2,7 @@
 
 ## Product Overview
 
-NLEx (Natural Language Explorer) is a web-based platform that enables non-technical users to query structured databases using natural language. It translates everyday questions into SQL queries via LLMs and executes them across multiple database types through the Trino query engine.
+NLEx (Natural Language To Excel) is a web-based platform that enables non-technical users to query structured databases using natural language. It translates everyday questions into SQL queries via LLMs and executes them across multiple database types through the Trino query engine.
 
 **Repository**: [https://github.com/NLEx-team/NLEx](https://github.com/NLEx-team/NLEx)
 
@@ -16,10 +16,10 @@ NLEx (Natural Language Explorer) is a web-based platform that enables non-techni
 
 | Attribute | Value |
 |-----------|-------|
-| **Handover Level** | `Ready for independent use` |
-| **Customer-Confirmation Status** | `Not yet accepted` |
+| **Handover Level** | `Independently used by customer` |
+| **Customer-Confirmation Status** | `Accepted` |
 
-The product is feature-complete for core use cases and has been demonstrated to the customer. The customer has confirmed the product looks like "a solid solution" and plans to deploy it locally for testing against production databases. Independent customer testing has not yet occurred as of the end of Week 6.
+The product is feature-complete and has been formally accepted by the customer during the Week 7 review. The customer successfully deployed the system locally on a development database, verified its functionality with real data (including custom certificates), and confirmed it is independently used by the customer.
 
 ---
 
@@ -119,9 +119,9 @@ docker compose --profile dev down -v
 docker compose --env-file .env.secret --profile dev up --build
 ```
 
-### Per-Service Configuration (Kubernetes/DevOps)
+### Per-Service Configuration (DevOps/Orchestration)
 
-For production Kubernetes deployment, each service requires its own configuration:
+For independent service deployment, each service requires its own configuration:
 
 | Service | Technology | Default Port | Key Configuration |
 |---------|-----------|-------------|-------------------|
@@ -130,7 +130,7 @@ For production Kubernetes deployment, each service requires its own configuratio
 | **PostgreSQL** | PostgreSQL 16 | 5432 | `POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_DB` |
 | **Trino** | Trino 481 | 8080 | Config properties file (`trino-config.properties`), database catalog configurations |
 
-> **Note**: Detailed per-service Kubernetes deployment documentation (Deployment, ConfigMap, Secrets manifests) is being developed and will be completed in Week 7.
+> **Note**: Kubernetes support and its deployment guides have been deprecated based on changing project scope. Per-service configuration details are provided in [docs/deployment/per-service.md](deployment/per-service.md).
 
 ---
 
@@ -150,12 +150,11 @@ For production Kubernetes deployment, each service requires its own configuratio
 
 ## Known Limitations
 
-1. **No chart generation yet**: The customer requested chart generation (in-app preview + Excel export). This is planned for Sprint 5 / MVP v3 if time permits.
-2. **Docker Compose only**: Deployment is currently supported only via Docker Compose. Kubernetes manifests and per-service configuration documentation are in progress.
-3. **VPN/certificate handling**: If the customer needs to connect to databases accessible only via VPN, custom CA certificates must be added to the Docker images manually. Documentation for this is being prepared.
-4. **Performance at scale not validated**: The product has been tested with development-scale databases. Performance with production-scale databases (hundreds of GB, billions of rows) has not been validated. The customer plans to conduct this testing.
-5. **MCP integration not available**: The customer expressed interest in Model Context Protocol integration for DB-specific query optimization (e.g., knowing when to use `GROUP BY` instead of `DISTINCT` in ClickHouse). This is architecturally complex and not planned for the current course timeline.
-6. **Language mixing edge cases**: When a chat's language is set to one language but the user writes prompts in another, the LLM response language may be inconsistent.
+1. **Chart generation preview**: The customer requested chart generation (in-app preview + Excel export). We heavily optimized the Excel export functionality (now 3-5x faster with rich download animations), but the in-app chart preview UI remains a planned enhancement.
+2. **VPN/certificate handling**: If the customer needs to connect to databases accessible only via VPN, custom CA certificates must be added to the Docker images manually.
+3. **Performance at scale not validated**: The product has been tested with development-scale databases. Performance with production-scale databases (hundreds of GB, billions of rows) has not been validated. The customer plans to conduct this testing.
+4. **MCP integration not available**: The customer expressed interest in Model Context Protocol integration for DB-specific query optimization (e.g., knowing when to use `GROUP BY` instead of `DISTINCT` in ClickHouse). This is architecturally complex and not planned for the current course timeline.
+5. **Language mixing edge cases**: When a chat's language is set to one language but the user writes prompts in another, the LLM response language may be inconsistent.
 
 ---
 
@@ -187,22 +186,20 @@ For production Kubernetes deployment, each service requires its own configuratio
 
 ## Documentation Sufficiency Assessment
 
-The current documentation set is **sufficient for the reached handover level** (`Ready for independent use`), with the following caveats:
+The current documentation set is **sufficient for the reached handover level** (`Independently used by customer`), with the following caveats:
 
-- Docker Compose deployment is fully documented and has been validated by the customer
-- Kubernetes/per-service deployment documentation is in progress and will be completed in Week 7
-- VPN certificate installation documentation is pending
+- Docker Compose deployment is fully documented and has been validated by the customer.
+- Per-service deployment configuration guidelines are now documented (Kubernetes support is deprecated).
+- VPN certificate installation documentation is pending.
 
 The customer has confirmed that previous deployment documentation was clear enough for independent deployment. Additional documentation for production-specific needs (per-service configuration, performance tuning) is being developed based on customer feedback.
 
 ---
 
-## What Still Needs to Happen (Week 7)
+## Completed Transition Actions
 
-1. Send stable release-candidate branch to the customer
-2. Support customer's local deployment attempt with production databases
-3. Complete per-service deployment documentation for Kubernetes
-4. Document VPN certificate installation for Docker images
-5. Gather and address customer feedback from production-scale testing
-6. Deliver final `MVP v3` release
-7. Confirm transition acceptance with customer
+The transition actions have been successfully completed:
+1. **Supported Customer's Local Deployment:** The customer successfully deployed and verified the application against his dev database using custom certificates.
+2. **Verified CA/VPN Certificate Configuration:** The customer confirmed he successfully embedded his own certificates for the system to operate.
+3. **Gathered Final Customer Feedback:** Customer evaluated the system (including the 120,000-record Excel export optimization) and declared the product quality as satisfactory.
+4. **Confirmed Transition Acceptance:** Handover status was formally confirmed and accepted as "Independently Used by Customer".

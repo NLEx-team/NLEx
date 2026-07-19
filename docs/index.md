@@ -77,9 +77,24 @@ flowchart LR
 - 🌐 [Network & Communication](architecture/network.md) — topology, ports, CORS, auth flow
 - 🗄️ [Database Schema](architecture/database.md) — tables, relationships, migration strategy
 - 🐳 [Docker Compose Deployment](deployment/docker-compose.md) — local & production Compose setup
-- ☸️ [Per-Service (DevOps) Deployment](deployment/per-service.md) — Kubernetes manifests, scaling, shared storage
+- 📦 [Per-Service (DevOps) Deployment](deployment/per-service.md) — independent service configuration, scaling, shared storage (Kubernetes manifests are deprecated)
 - 🔐 [Environment Variables](deployment/environment.md) — complete env var reference
-- 🗺️ [Roadmap](roadmap.md) · 🤝 [Contributing](contributing.md) · 🧪 [Testing](testing.md)
+- 🗺️ [Roadmap](roadmap.md) · 🤝 [Contributing](../CONTRIBUTING.md) · 🧪 [Testing](testing.md)
+
+---
+
+## Team & Roles
+
+NLEx was designed and developed by a dedicated team of students at Innopolis University:
+
+- **Maksim Merkushev** — Product Owner & Network/Deployment Engineer
+- **Serafim Soldatov** — Scrum Master & Lead Business Analyst
+- **Maksim Maltsev** — Frontend Developer & System Architect
+- **Polina Systerova** — QA Engineer & Frontend Developer
+- **Ramina Ianturina** — UI/UX Designer & Frontend Developer
+- **Liubov Savchenko** — DevOps & Backend Developer
+
+For a detailed description of each team member's contributions, see [TEAM.md](../TEAM.md).
 
 ---
 

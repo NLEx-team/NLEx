@@ -1,137 +1,170 @@
-# Руководство для разработчиков NLEx (CONTRIBUTING.md)
+# NLEx Developer Guide
 
-Прочитай этот файл один раз перед тем, как писать первую строчку кода. Здесь описаны все правила работы с Git и GitHub в нашем проекте.
+Read this file once before writing your first line of code. It outlines all the rules for working with Git and GitHub in our project, as well as testing and code standards.
 
-## 🌳 Ветки (Branches)
+## 🌳 Branches
 
-В проекте есть 2 защищённые ветки и множество личных рабочих веток.
+The project has 2 protected branches and many personal working branches.
 
-| Ветка | Назначение | Кто может пушить? |
-|-------|------------|-------------------|
-| main | Готовый продукт (релизы) | Никто напрямую. Только через PR с Approve |
-| develop | Общий рабочий черновик | Никто напрямую. Только через PR с Approve |
-| feature/... | Твоя личная ветка для задачи | Ты сам, свободно |
+| Branch | Purpose | Who can push? |
+| --- | --- | --- |
+| main | Finished product (releases) | No one directly. Only via PR with an Approve |
+| develop | Shared working draft | No one directly. Only via PR with an Approve |
+| feature/... | Your personal branch for the task | You, freely |
 
-## 📛 Как называть свои ветки?
+## 📛 How to name your branches?
 
-Формат: `feature/<команда>/<краткое-описание-задачи>`
+Format: `feature/<team>/<short-task-description>`
 
-**Примеры:**
-- Frontend
-  - `feature/frontend/chat-ui`
-  - `feature/frontend/excel-download-button`
-  - `feature/frontend/database-selector`
-- Backend
-  - `feature/backend/postgres-connector`
-  - `feature/backend/excel-export`
-  - `feature/backend/api-routes`
-- AI / LLM
-  - `feature/ai/system-prompt`
-  - `feature/ai/text-to-sql-chain`
-  - `feature/ai/clarification-logic`
-- Багфиксы (для всех)
-  - `fix/backend/timeout-error`
-  - `fix/frontend/button-not-clickable`
-  - `fix/ai/wrong-sql-dialect`
+**Examples:**
 
-**Правила:**
-- Только латиница, строчные буквы, слова через дефис (-).
-- Никаких пробелов, кириллицы и спецсимволов.
-- Название должно быть коротким и понятным (2-4 слова).
+* Frontend
+* `feature/frontend/chat-ui`
+* `feature/frontend/excel-download-button`
+* `feature/frontend/database-selector`
 
-## 🔄 Ежедневный рабочий процесс (Пошагово)
+* Backend
+* `feature/backend/postgres-connector`
+* `feature/backend/excel-export`
+* `feature/backend/api-routes`
 
-**1. Начинаешь работу — обнови develop**
-Перед тем как писать код, всегда стягивай последнюю версию общего черновика:
+* AI / LLM
+* `feature/ai/system-prompt`
+* `feature/ai/text-to-sql-chain`
+* `feature/ai/clarification-logic`
+
+* Bugfixes (for everyone)
+* `fix/backend/timeout-error`
+* `fix/frontend/button-not-clickable`
+* `fix/ai/wrong-sql-dialect`
+
+**Rules:**
+
+* Only Latin characters, lowercase letters, words separated by hyphens (-).
+* No spaces, Cyrillic characters, or special characters.
+* The name must be short and clear (2-4 words).
+
+## 🔄 Daily Workflow (Step-by-Step)
+
+**1. Starting work — update develop**
+Before writing code, always pull the latest version of the shared draft:
+
 ```bash
 git checkout develop
 git pull origin develop
 ```
 
-**2. Создай свою ветку**
+**2. Create your branch**
+
 ```bash
 git checkout -b feature/backend/excel-export
 ```
-Теперь ты в своей личной "комнате". Пиши код, ломай, тестируй — никто кроме тебя этого не увидит.
 
-**3. Сохраняй прогресс (Коммиты)**
-Делай коммиты часто (каждые 1-2 часа работы), а не один гигантский коммит в конце дня.
+Now you are in your personal "room". Write code, break things, test — no one but you will see it.
+
+**3. Save your progress (Commits)**
+Commit frequently (every 1-2 hours of work) rather than making one giant commit at the end of the day.
+
 ```bash
 git add .
-git commit -m "feat: добавил генерацию Excel из DataFrame"
+git commit -m "feat: added Excel generation from DataFrame"
 ```
 
-**4. Отправь ветку на GitHub**
+**4. Push your branch to GitHub**
+
 ```bash
-# Первый раз (создание ветки на сервере):
+# First time (creating the branch on the server):
 git push -u origin feature/backend/excel-export
 
-# Все последующие разы:
+# All subsequent times:
 git push
 ```
 
-**5. Открой Pull Request (Когда задача готова)**
-- Зайди на сайт GitHub в наш репозиторий.
-- GitHub сам покажет жёлтый баннер: "feature/backend/excel-export had recent pushes" и кнопку "Compare & pull request". Нажми её.
-- В заголовке PR коротко опиши, что ты сделал.
-- В описании (Description) напиши подробности: что изменилось, что протестировал, есть ли баги.
-- Убедись, что PR направлен в ветку `develop` (а не в `main`!).
-- Скинь ссылку на PR в общий чат команды.
+**5. Open a Pull Request (When the task is ready)**
 
-**6. Жди Approve**
-Один из двух модераторов (Owners) зайдёт, проверит твой код и нажмёт Approve. После этого код автоматически вольётся в develop. Твоя ветка `feature/...` автоматически удалится.
+* Go to our repository on the GitHub website.
+* GitHub will automatically show a yellow banner: "feature/backend/excel-export had recent pushes" and a "Compare & pull request" button. Click it.
+* In the PR title, briefly describe what you did.
+* In the Description, write the details: what changed, what you tested, and if there are any bugs.
+* Make sure the PR is targeted at the `develop` branch (not `main`!).
+* Every PR must reference the related GitHub Issue.
+* Drop the PR link into the team's general chat.
 
-## ✍️ Как писать коммиты? (Conventional Commits)
+**6. Wait for Approve**
+One of the two moderators (Owners) will review your code and click Approve. After that, the code will automatically merge into develop. Your `feature/...` branch will be automatically deleted.
 
-Мы используем стандарт Conventional Commits. Каждое сообщение коммита начинается с типа изменения.
-Формат: `тип: краткое описание`
+## ✍️ How to write commits? (Conventional Commits)
 
-| Тип | Когда использовать | Пример |
-|-----|--------------------|--------|
-| feat: | Новая функциональность | feat: добавил чат-интерфейс |
-| fix: | Исправление бага | fix: починил таймаут SQL-запроса |
-| docs: | Документация | docs: обновил API-контракты |
-| refactor: | Переписал код без изменения поведения | refactor: упростил коннектор к БД |
-| chore: | Настройка проекта, зависимости | chore: добавил Docker Compose |
-| style: | Форматирование (пробелы, отступы) | style: поправил отступы в prompts.py |
-| test: | Добавление/изменение тестов | test: добавил тесты для excel_exporter |
+We use the Conventional Commits standard. Every commit message starts with the type of change.
+Format: `type: short description`
 
-Пиши коммиты на русском или английском, но кратко и по делу.
+| Type | When to use | Example |
+| --- | --- | --- |
+| feat: | New functionality | feat: added chat interface |
+| fix: | Bug fix | fix: fixed SQL query timeout |
+| docs: | Documentation | docs: updated API contracts |
+| refactor: | Rewrote code without changing behavior | refactor: simplified DB connector |
+| chore: | Project setup, dependencies | chore: added Docker Compose |
+| style: | Formatting (spaces, indents) | style: fixed indentation in prompts.py |
+| test: | Adding/changing tests | test: added tests for excel_exporter |
 
-✅ Хорошо:
-- `feat: добавил кнопку скачивания Excel`
-- `fix: исправил ошибку подключения к PostgreSQL`
+Write commits in Russian or English, but keep them short and to the point.
 
-❌ Плохо:
-- `fix`
-- `апдейт`
-- `ыыыы работает`
+✅ Good:
 
-## ⚠️ Чего НЕЛЬЗЯ делать
-- Нельзя пушить напрямую в `main` или `develop` — GitHub заблокирует.
-- Нельзя называть ветки кириллицей: `feature/кнопка` ❌
-- Нельзя коммитить файлы с паролями, API-ключами или токенами. Храни их в файле `.env` (он уже добавлен в `.gitignore`).
-- Нельзя коммитить папки `node_modules/`, `__pycache__/`, `venv/` — они уже в `.gitignore`.
+* `feat: added Excel download button`
+* `fix: fixed PostgreSQL connection error`
 
-## 🆘 Частые проблемы и решения
+❌ Bad:
 
-**"У меня конфликт при pull!"**
+* `fix`
+* `update`
+* `uhhh it works`
+
+## ⚠️ What you MUST NOT do
+
+* Do not push directly to `main` or `develop` — GitHub will block it.
+* Do not name branches using Cyrillic characters: `feature/кнопка` ❌
+* Do not commit files with passwords, API keys, or tokens. Store them in a `.env` file (it is already added to `.gitignore`).
+* Do not commit `node_modules/`, `__pycache__/`, or `venv/` folders — they are already in `.gitignore`.
+
+## 🆘 Common Problems and Solutions
+
+**"I have a conflict on pull!"**
+
 ```bash
-git stash                # Временно спрячь свои изменения
-git pull origin develop  # Стяни свежий код
-git stash pop            # Верни свои изменения обратно
-# Если есть конфликты — открой файл, найди строки с <<<< и >>>>, выбери правильный вариант
+git stash                 # Temporarily hide your changes
+git pull origin develop  # Pull the fresh code
+git stash pop            # Bring your changes back
+# If there are conflicts, open the file, find the lines with <<<< and >>>>, and choose the correct version
 ```
 
-**"Я случайно начал писать код в develop!"**
+**"I accidentally started writing code in develop!"**
+
 ```bash
-git stash                           # Спрячь изменения
-git checkout -b feature/ai/my-task  # Создай правильную ветку
-git stash pop                       # Верни изменения в новую ветку
+git stash                               # Hide changes
+git checkout -b feature/ai/my-task      # Create the correct branch
+git stash pop                           # Bring changes back into the new branch
 ```
 
-**"Мне нужен свежий код из develop в моей ветке"**
+**"I need the latest code from develop in my branch"**
+
 ```bash
-git checkout feature/backend/my-task  # Убедись, что ты в своей ветке
-git merge develop                     # Влей туда свежий develop
+git checkout feature/backend/my-task  # Make sure you are in your branch
+git merge develop                     # Merge the fresh develop into it
 ```
+
+## 🏗️ Code Quality & Standards
+- **Python (Backend)**: Follow PEP 8 guidelines. Use type hints for function arguments and return types. Include docstrings for public APIs.
+- **TypeScript/React (Frontend)**: Follow the ESLint configuration. Use functional components with hooks and ensure strict mode is enabled.
+- **Dependencies**: Do not introduce new dependencies without team discussion.
+
+## 🧪 Testing Requirements
+- Write or update tests for any new code or bug fixes.
+- Code coverage must not drop below the 30% threshold for critical modules.
+- **Backend Tests**: Run `cd backend && pytest tests/ -v`
+- **Frontend Build Validation**: Run `cd frontend && npm run build`
+- **Docker Compose**: Verify container builds locally via `docker compose --profile dev build`
+
+## 📚 Maintained Documentation
+When making changes, ensure relevant documentation is updated. See `AGENTS.md` for a full list of maintained documents and when to update them. In particular, any user-visible change must be recorded in `CHANGELOG.md` following the [Keep a Changelog](https://keepachangelog.com/) format.
