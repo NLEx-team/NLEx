@@ -18,6 +18,7 @@ interface ChatHistoryProps {
   folders: ChatFolder[];
   activeSessionId: string;
   onSelectSession: (id: string) => void;
+  onNewChat?: () => void;
   onRenameChat?: (id: string, newTitle: string) => void;
   onDeleteChat?: (id: string) => void;
   onCreateFolder?: (name: string) => Promise<ChatFolder | null>;
@@ -184,8 +185,6 @@ export function ChatHistory({
   blocked = false
 }: ChatHistoryProps) {
   const { t } = useTranslation();
-  const { user } = useAuth();
-  const navigate = useNavigate();
 
   // Chat CRUD state
   const [deletingId, setDeletingId] = useState<string | null>(null);
@@ -320,7 +319,6 @@ export function ChatHistory({
             if (item.type === 'folder') {
               const folder = folders.find(f => f.id === item.folderId);
               if (!folder) return null;
-              const count = item.children.length;
               return (
                 <div key={`folder-${folder.id}`}>
                   <div className="chat-history__folder-header">
