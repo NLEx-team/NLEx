@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { Icon } from '@iconify/react';
 import type { ChatMessageProps, OptionsBlock, TableBlock, ChartBlock, ErrorBlock } from './ChatMessage.types';
 import { useTranslation } from 'react-i18next';
+import { config } from '../../../utils/config';
 import {
   ResponsiveContainer,
   BarChart, Bar, LineChart, Line, PieChart, Pie, AreaChart, Area, ScatterChart, Scatter,
@@ -118,8 +119,7 @@ function TableBlockView({ block, exportUrl, exportFilename, onExport }: { block:
     // We call onExport but also track the result ourselves
     if (onExport) {
       // Fire and track via a direct fetch so we can show progress
-      const apiUrl = (import.meta as any).env?.VITE_API_URL || '';
-      fetch(`${apiUrl}${exportUrl}`, { credentials: 'include' })
+      fetch(`${config.apiUrl}${exportUrl}`, { credentials: 'include' })
         .then(async (response) => {
           if (!response.ok) throw new Error('Export download failed');
           const blob = await response.blob();
