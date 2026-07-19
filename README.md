@@ -16,6 +16,22 @@
 - **Week 4 report (index):** [reports/week4/README.md](reports/week4/README.md)
 - **Week 3 report (index):** [reports/week3/README.md](reports/week3/README.md)
 - **Week 2 report (index):** [reports/week2/README.md](reports/week2/README.md)
+- **Changelog:** [CHANGELOG.md](CHANGELOG.md)
+- **Roadmap:** [docs/roadmap.md](docs/roadmap.md)
+- **Testing:** [docs/testing.md](docs/testing.md)
+- **User Acceptance Tests:** [docs/user-acceptance-tests.md](docs/user-acceptance-tests.md)
+## Team & Roles
+
+NLEx was designed and developed by a dedicated team of students at Innopolis University:
+
+- **Maksim Merkushev** — Product Owner & Network/Deployment Engineer
+- **Serafim Soldatov** — Scrum Master & Lead Business Analyst
+- **Maksim Maltsev** — Frontend Developer & System Architect
+- **Polina Systerova** — QA Engineer & Frontend Developer
+- **Ramina Ianturina** — UI/UX Designer & Frontend Developer
+- **Liubov Savchenko** — DevOps & Backend Developer
+
+For a detailed description of each team member's contributions, see [TEAM.md](TEAM.md).
 
 ## How to Run with Docker
 

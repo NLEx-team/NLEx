@@ -5,7 +5,9 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [v3.0.0] - 2026-07-15
+## [Unreleased]
+
+## [3.0.0] - 2026-07-15
 ### Added
 - Excel export performance improvements replacing openpyxl with xlsxwriter (PBI-033).
 - Rich download animation for Excel export.
@@ -21,7 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - UI bugs and LLM configuration cleanup.
 - Excel exported data cells formatting.
 
-## [v2.1.0] - 2026-07-12
+## [2.1.0] - 2026-07-12 (Week 6 Trial Release)
 ### Added
 - Chat folder organization, allowing users to group related chats (PBI-031).
 - Admin user table filtering and sorting by email, name, registration date, and query count (PBI-030).
@@ -36,7 +38,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - UI translation inconsistencies (e.g., untranslated words like "successfully" in Russian UI) (PBI-034).
 
-## [v2.0.0] - 2026-07-05
+## [2.0.0] - 2026-07-05
 ### Added
 - Cross-database request capabilities (query multiple database targets).
 - Admin Panel for administrative controls and environment configuration.
@@ -45,7 +47,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Deprecated
 - All saved templates and template-sharing functionality have been deprecated and removed from the roadmap based on changing product vision.
 
-## [v1.2.0] - 2026-06-28
+## [1.2.0] - 2026-06-28
 ### Added
 - Oracle DBMS connector for Trino (PBI-032).
 - Explicit database selector control before query submission (PBI-019).
@@ -65,10 +67,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Input field blocking issue during response generation (PBI-020).
 - Password requirements validation & feedback on registration form (PBI-026).
 
-## [v1.0.0] - 2026-06-14
+## [1.0.0] - 2026-06-14
 ### Added
 - Initial MVP release.
 - Natural language query input field.
 - Result preview table and SQL preview component.
 - Clarification logic and UI support for clarification bubbles.
 - Persistent database connection management (PostgreSQL).
+
+[Unreleased]: https://github.com/NLEx-team/NLEx/compare/v3.0.0...HEAD
+[3.0.0]: https://github.com/NLEx-team/NLEx/compare/v2.1.0...v3.0.0
+[2.1.0]: https://github.com/NLEx-team/NLEx/compare/v2.0.0...v2.1.0
+[2.0.0]: https://github.com/NLEx-team/NLEx/compare/v1.2.0...v2.0.0
+[1.2.0]: https://github.com/NLEx-team/NLEx/compare/v1.0.0...v1.2.0
+[1.0.0]: https://github.com/NLEx-team/NLEx/releases/tag/v1.0.0

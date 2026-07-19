@@ -16,10 +16,10 @@ NLEx (Natural Language To Excel) is a web-based platform that enables non-techni
 
 | Attribute | Value |
 |-----------|-------|
-| **Handover Level** | `Ready for independent use` |
-| **Customer-Confirmation Status** | `Not yet accepted` |
+| **Handover Level** | `Independently used by customer` |
+| **Customer-Confirmation Status** | `Accepted` |
 
-The product is feature-complete for core use cases and has been demonstrated to the customer. The customer has confirmed the product looks like "a solid solution" and plans to deploy it locally for testing against production databases. Independent customer testing has not yet occurred as of the end of Week 6.
+The product is feature-complete and has been formally accepted by the customer during the Week 7 review. The customer successfully deployed the system locally on a development database, verified its functionality with real data (including custom certificates), and confirmed it is independently used by the customer.
 
 ---
 
@@ -186,7 +186,7 @@ For independent service deployment, each service requires its own configuration:
 
 ## Documentation Sufficiency Assessment
 
-The current documentation set is **sufficient for the reached handover level** (`Ready for independent use`), with the following caveats:
+The current documentation set is **sufficient for the reached handover level** (`Independently used by customer`), with the following caveats:
 
 - Docker Compose deployment is fully documented and has been validated by the customer.
 - Per-service deployment configuration guidelines are now documented (Kubernetes support is deprecated).
@@ -196,10 +196,10 @@ The customer has confirmed that previous deployment documentation was clear enou
 
 ---
 
-## Pending Transition Actions
+## Completed Transition Actions
 
-Since the customer meeting for Week 7 has not yet been conducted, the following actions are still pending:
-1. Support the customer's local deployment attempt with production databases, ensuring they successfully run the system using the provided configuration guides.
-2. Document VPN certificate installation for Docker images if required by the customer's final environment.
-3. Gather and address customer feedback from production-scale testing.
-4. Confirm final transition acceptance with the customer.
+The transition actions have been successfully completed:
+1. **Supported Customer's Local Deployment:** The customer successfully deployed and verified the application against his dev database using custom certificates.
+2. **Verified CA/VPN Certificate Configuration:** The customer confirmed he successfully embedded his own certificates for the system to operate.
+3. **Gathered Final Customer Feedback:** Customer evaluated the system (including the 120,000-record Excel export optimization) and declared the product quality as satisfactory.
+4. **Confirmed Transition Acceptance:** Handover status was formally confirmed and accepted as "Independently Used by Customer".

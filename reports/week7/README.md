@@ -48,22 +48,20 @@ Sprint 5 focused heavily on completing the transition documentation and unblocki
 
 ## Final Transition Outcome
 
-*(Note: We have not yet met with the customer during Week 7, so the transition and acceptance outcomes remain unconfirmed. We will update this section and our customer handover document once the meeting concludes.)*
-
-- **Handover Level Reached**: `Ready for independent use`
-- **Customer-Confirmation Status**: `Not yet accepted` (Pending Week 7 Meeting)
+- **Handover Level Reached**: `Independently used by customer`
+- **Customer-Confirmation Status**: `Accepted`
 
 ### Transition Scope
-As documented in [docs/customer-handover.md](../../docs/customer-handover.md), we have made available:
-- Full repository access on the stable branch (`v3.0.0`).
-- Detailed deployment configuration requirements (Note: Kubernetes support is deprecated and no longer part of the handover scope).
-- We intentionally retained management of the `nlex.tech` domain and current demo deployments until the customer completes their internal setup.
+As documented in [docs/customer-handover.md](../../docs/customer-handover.md), we have transitioned:
+- Full repository access on the stable branch (`v3.0.0`) under the MIT License.
+- Detailed deployment configuration guidelines for self-hosting with Docker Compose.
+- We intentionally retain management of the `nlex.tech` domain and current demo deployments until the customer is fully ready to switch DNS.
 
 ### Transition Blockers & Limitations
-Since we haven't met the customer yet, the primary external blocker is waiting for the customer's confirmation that they have successfully followed the per-service documentation to deploy in their environment.
+All primary transition blockers have been resolved. The customer successfully verified local deployment by embedding his own custom CA/VPN certificates.
 
 ### Independent Use Evidence
-Pending customer meeting. No independent deployment evidence is confirmed yet.
+During the Week 7 review, the customer confirmed that he successfully deployed the system locally against a development database, embedded necessary certificates, and verified its functionality.
 
 ---
 
@@ -81,14 +79,16 @@ Pending customer meeting. No independent deployment evidence is confirmed yet.
 
 ## UAT and Customer Trial Results
 
-Since the Week 7 customer meeting has not occurred yet, the customer has not formally executed the UAT on the final `MVP v3` release during Week 7. We anticipate these UAT scenarios to pass during the transition meeting.
+The customer successfully deployed the stable version of NLEx locally on a development database with real data and verified its functionality. The UAT scenarios for MVP v3 passed, with specific verification of:
+1. **Performance at Scale:** Switched to a faster Excel-export library, reducing export time for 120,000 records to ~13 seconds.
+2. **Container Persistence:** Verified that download links remain valid and files are preserved across Docker container restarts.
 
 ---
 
 ## Release & Demo Video
 
 - **Final Release (MVP v3)**: [v3.0.0](https://github.com/NLEx-team/NLEx/releases/tag/v3.0.0) 
-- **Public Sanitized Demo Video**: [YouTube Demo Link](https://youtube.com/example)
+- **Public Sanitized Demo Video**: [Demo Video (Google Drive)](https://drive.google.com/file/d/1-30xjnNSBdMfxz_5ALgvwesLMLa36H3Z/view?usp=sharing)
 
 ---
 
@@ -98,9 +98,11 @@ The team has prepared the final presentation slide deck and completed the requir
 
 ---
 
-## Sprint Review
+## Sprint Review & Customer Review
 
-- **Sprint Review Notes**: Due to the fact that we have not met with the customer yet, a formal transcript is not available. Please see our [Sprint Review Notes](sprint-review-notes.md).
+- **Sprint Review Notes**: [sprint-review-notes.md](sprint-review-notes.md)
+- **Customer Review Transcript**: [customer-review-transcript.md](customer-review-transcript.md)
+- **Customer Review Summary**: [customer-review-summary.md](customer-review-summary.md)
 
 ---
 
@@ -144,4 +146,8 @@ The team has prepared the final presentation slide deck and completed the requir
 
 ### Traceability: Issue-Linked PRs
 * **PR Example 1**:
-  ![PR Example 1](images/PR_example.png)
+  ![PR Example 1](images/PR_example(1).png)
+* **PR Example 2**:
+  ![PR Example 2](images/PR_example(2).png)
+* **PR Example 3**:
+  ![PR Example 3](images/PR_example(3).png)

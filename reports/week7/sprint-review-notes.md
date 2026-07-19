@@ -1,3 +1,7 @@
 # Sprint 5 Review Notes
 
-*Note: The team has not met with the customer during Week 7 yet. Therefore, there are no customer Sprint Review notes or transcript available at this time. We are waiting to schedule the final transition-readiness meeting with the customer. Once the meeting takes place, these notes will be updated.*
+The Sprint 5 Review meeting was conducted on July 17, 2026, as part of the customer review session.
+
+For detailed notes, discussion, and outcomes, please refer to:
+- [Customer Review Transcript](customer-review-transcript.md)
+- [Customer Review Summary](customer-review-summary.md)
