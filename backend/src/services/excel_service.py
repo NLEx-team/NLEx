@@ -185,24 +185,6 @@ class ExcelExportService:
         # wb = xlsxwriter.Workbook(file_path, {"constant_memory": True})
         
         ws = wb.create_sheet("Query Results")
-        # in develop it was:
-        ws = wb.add_worksheet("Query Results")
-        
-        header_fmt = wb.add_format({
-            "font_name": "Calibri",
-            "font_size": 11,
-            "bold": True,
-            "font_color": "#FFFFFF",
-            "bg_color": "#4472C4",
-            "align": "center",
-            "valign": "vcenter",
-            "border": 1,
-        })
-        data_fmt = wb.add_format({
-            "align": "center",
-            "valign": "vcenter",
-            "border": 1,
-        })
 
         # --- Header styling ---
         from openpyxl.cell import WriteOnlyCell
@@ -220,16 +202,23 @@ class ExcelExportService:
         col_widths = [min(len(str(h)) + 4, _MAX_COL_WIDTH) for h in headers]
 
         # Write header row
-        for ci, h in enumerate(headers):
-            ws.write(0, ci, h, header_fmt)
-
-        # Freeze header row so it stays visible when scrolling
-        ws.freeze_panes(1, 0)
+        header_cells = []
+        for h in headers:
+            c = WriteOnlyCell(ws, value=h)
+            c.font = header_font
+            c.fill = header_fill
+            c.alignment = header_alignment
+            c.border = thin_border
+            header_cells.append(c)
+        ws.append(header_cells)
 
         # Stream data from DB via the read-only guarded path: export must never
         # execute anything other than a single SELECT/CTE, even on re-run.
         row_idx = 1
+        row_count = 0
         for row_data in db_service.execute_readonly_sync_stream(sql, chunk_size=2000):
+            row_idx += 1
+            data_cells = []
             for ci, val in enumerate(row_data):
                 # Keep numeric types for chart support; stringify unsupported types
                 if val is not None and not isinstance(val, (int, float, str, bool)):
