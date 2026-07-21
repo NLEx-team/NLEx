@@ -275,11 +275,12 @@ class ChatController:
             export_filename = self._generate_export_filename(original_sql, catalog_mapping)
 
             self.excel_service.save_export_metadata(
-                export_id, 
-                original_sql, 
+                export_id,
+                original_sql,
                 result.get("headers", []),
                 catalog_mapping,
-                export_filename
+                export_filename,
+                chart=result.get("chart")
             )
             response["export_url"] = f"/chats/{chat_id}/export/{export_id}"
             response["export_filename"] = export_filename

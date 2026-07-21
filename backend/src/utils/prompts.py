@@ -25,7 +25,38 @@ Case A — you are confident and can generate SQL:
 }
   • "sql" — ONE valid SELECT query in Trino SQL dialect, without a trailing semicolon. Important: use full table names in `catalog.schema.table` format. Use strictly the "sql_catalog_name" field for the catalog name.
   • "headers" — human-readable column names in English, STRICTLY in the same order and quantity as the SELECT columns.
-  • "explanation" — 1-3 sentences in English. 
+  • "explanation" — 1-3 sentences in English.
+
+  Optionally, if the data is suitable for visualization (aggregated data with at least one categorical column and one or more numeric columns), you MAY include a "chart" field:
+  {
+    "status": "success",
+    "sql": "SELECT ...",
+    "headers": ["Category", "Value1", "Value2"],
+    "explanation": "...",
+    "chart": {
+      "type": "bar|line|pie|area|scatter",
+      "title": "Chart Title",
+      "x_column": "Category",
+      "y_columns": ["Value1", "Value2"]
+    }
+  }
+  For pie charts use "category_column" instead of "x_column" and "value_column" instead of "y_columns":
+  {
+    "chart": {
+      "type": "pie",
+      "title": "Distribution",
+      "category_column": "Category",
+      "value_column": "Count"
+    }
+  }
+  Rules for charts:
+  - Bar/line/area: use x_column (categorical) + y_columns (1 or more numeric columns).
+  - Pie: use category_column + value_column. Limit to 10-15 categories max.
+  - Scatter: use x_column (numeric) + y_columns (numeric, typically 1).
+  - Only include chart when data is aggregated (GROUP BY) or has few rows.
+  - Do NOT include chart for raw row-by-row data listing.
+  - Optional: "stacked": true for bar/area to stack series.
+  - CRITICAL for line and scatter charts: add ORDER BY on the x_column (or on the numeric column used as x_column for scatter). Without sorting, line/scatter charts render incorrectly. Bar charts should also be sorted for consistent display.
 
 Case B — query is ambiguous / missing data for a definitive SQL:
 {
@@ -97,6 +128,37 @@ CRITICAL LANGUAGE RULE: You MUST answer all user-facing text fields (explanation
   • "sql" — ОДИН валидный SELECT-запрос на диалекте Trino SQL, без точки с запятой в конце. Важно: используй полные имена таблиц в формате `каталог.схема.таблица`. В качестве имени каталога используй СТРОГО значение из поля "sql_catalog_name", а НЕ "ui_display_name".
   • "headers" — человекочитаемые названия колонок на языке пользователя, СТРОГО в том же порядке и количестве, что и колонки в SELECT.
   • "explanation" — 1–3 предложения на языке пользователя. ВАЖНО: Различай понятия "Имя" (First name) и "ФИО" (Full name).
+
+  Опционально, если данные подходят для визуализации (агрегированные данные с хотя бы одной категориальной колонкой и одной или более числовыми), ты МОЖЕШЬ добавить поле "chart":
+  {
+    "status": "success",
+    "sql": "SELECT ...",
+    "headers": ["Категория", "Значение1", "Значение2"],
+    "explanation": "...",
+    "chart": {
+      "type": "bar|line|pie|area|scatter",
+      "title": "Название графика",
+      "x_column": "Категория",
+      "y_columns": ["Значение1", "Значение2"]
+    }
+  }
+  Для круговых диаграмм используй "category_column" вместо "x_column" и "value_column" вместо "y_columns":
+  {
+    "chart": {
+      "type": "pie",
+      "title": "Распределение",
+      "category_column": "Категория",
+      "value_column": "Количество"
+    }
+  }
+  Правила для графиков:
+  - Bar/line/area: используй x_column (категориальная) + y_columns (одна или более числовых колонок).
+  - Pie: используй category_column + value_column. Максимум 10-15 категорий.
+  - Scatter: используй x_column (числовая) + y_columns (числовая, обычно одна).
+  - Включай график ТОЛЬКО когда данные агрегированы (GROUP BY) или строк мало.
+  - НЕ включай график для сырых построчных данных.
+  - Опционально: "stacked": true для bar/area, чтобы серии накладывались друг на друга.
+  - КРИТИЧЕСКИ ВАЖНО для line и scatter: добавь ORDER BY по x_column (или по числовой колонке, используемой как x_column для scatter). Без сортировки line/scatter графики отображаются некорректно (линии перекрещиваются). Bar графики тоже рекомендуется сортировать для единообразного отображения.
 
 Случай B — запрос неоднозначен / не хватает данных для однозначного SQL:
 {

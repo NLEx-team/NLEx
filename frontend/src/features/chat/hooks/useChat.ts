@@ -1,12 +1,12 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { chatApi } from '../api';
-import type { ChatMessage, ChatSession, ContentBlock } from '../types';
+import type { ChatMessage, ChatSession, ChatFolder, ContentBlock } from '../types';
 
 function generateId() {
   return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
 }
 
-function parseBlocks(response: { result: { status: string; question?: string; options?: string[]; data?: any[][]; headers?: string[]; explanation?: string; sql?: string; message?: string; total_rows?: number } }): ContentBlock[] {
+function parseBlocks(response: { result: { status: string; question?: string; options?: string[]; data?: any[][]; headers?: string[]; explanation?: string; sql?: string; message?: string; total_rows?: number; chart?: { type: string; title?: string; x_column?: string; y_columns?: string[]; category_column?: string; value_column?: string; stacked?: boolean } } }): ContentBlock[] {
   const r = response.result;
   const blocks: ContentBlock[] = [];
 
@@ -30,6 +30,21 @@ function parseBlocks(response: { result: { status: string; question?: string; op
         explanation: r.explanation,
         totalRows: r.total_rows,
       });
+      // Add chart block if chart spec is present
+      if (r.chart) {
+        blocks.push({
+          type: 'chart',
+          chartType: r.chart.type as 'bar' | 'line' | 'pie' | 'area' | 'scatter',
+          title: r.chart.title,
+          xColumn: r.chart.x_column,
+          yColumns: r.chart.y_columns,
+          categoryColumn: r.chart.category_column,
+          valueColumn: r.chart.value_column,
+          stacked: r.chart.stacked,
+          data: r.data,
+          headers: r.headers,
+        });
+      }
     }
     if (!r.explanation && !r.data) {
       blocks.push({ type: 'text', text: 'Request completed successfully.' });
@@ -47,6 +62,7 @@ function parseBlocks(response: { result: { status: string; question?: string; op
 
 export function useChat(_userId: string, selectedCatalogIds: string[], blocked: boolean = false) {
   const [sessions, setSessions] = useState<ChatSession[]>([]);
+  const [folders, setFolders] = useState<ChatFolder[]>([]);
   const [activeSessionId, setActiveSessionId] = useState<string>('');
   const [messagesBySession, setMessagesBySession] = useState<Record<string, ChatMessage[]>>({});
   const [loadedSessions, setLoadedSessions] = useState<Set<string>>(new Set());
@@ -58,39 +74,43 @@ export function useChat(_userId: string, selectedCatalogIds: string[], blocked: 
   const pendingStatus = pendingStatusBySession[activeSessionId] || '';
   const [initialized, setInitialized] = useState(false);
 
-  // Load sessions list from the server on mount
+  // Load sessions list and folders from the server on mount
   useEffect(() => {
     if (initialized) return;
     setInitialized(true);
 
-    chatApi.getChats()
-      .then(serverChats => {
-        if (serverChats.length > 0) {
-          const mapped: ChatSession[] = serverChats.map(c => ({
-            id: c.id,
-            title: c.title,
-            catalogIds: c.catalog_ids || [],
-          }));
-          setSessions(mapped);
-          setActiveSessionId(mapped[0].id);
-        } else if (!blocked) {
-          // No chats yet — create one. Blocked users are read-only, so skip.
-          chatApi.create(selectedCatalogIds).then(chat => {
-            const session: ChatSession = { id: chat.id, title: chat.name, catalogIds: chat.catalog_ids || [] };
-            setSessions([session]);
-            setActiveSessionId(chat.id);
-          });
-        }
-      })
-      .catch(() => {
-        // Fallback: create a new chat (skip for blocked users)
-        if (blocked) return;
-        chatApi.create().then(chat => {
+    Promise.all([
+      chatApi.getChats(),
+      chatApi.getFolders(),
+    ]).then(([serverChats, serverFolders]) => {
+      setFolders(serverFolders.map(f => ({ id: f.id, name: f.name, chatCount: f.chat_count })));
+
+      if (serverChats.length > 0) {
+        const mapped: ChatSession[] = serverChats.map(c => ({
+          id: c.id,
+          title: c.title,
+          catalogIds: c.catalog_ids || [],
+          folderId: c.folder_id || undefined,
+        }));
+        setSessions(mapped);
+        setActiveSessionId(mapped[0].id);
+      } else if (!blocked) {
+        // No chats yet — create one. Blocked users are read-only, so skip.
+        chatApi.create(selectedCatalogIds).then(chat => {
           const session: ChatSession = { id: chat.id, title: chat.name, catalogIds: chat.catalog_ids || [] };
           setSessions([session]);
           setActiveSessionId(chat.id);
-        }).catch(() => {});
-      });
+        });
+      }
+    }).catch(() => {
+      // Fallback: create a new chat (skip for blocked users)
+      if (blocked) return;
+      chatApi.create().then(chat => {
+        const session: ChatSession = { id: chat.id, title: chat.name, catalogIds: chat.catalog_ids || [] };
+        setSessions([session]);
+        setActiveSessionId(chat.id);
+      }).catch(() => {});
+    });
   }, [initialized]);
 
   // Poll status when pending
@@ -295,6 +315,76 @@ export function useChat(_userId: string, selectedCatalogIds: string[], blocked: 
     setSessions(prev => prev.map(s => s.id === id ? { ...s, catalogIds } : s));
   }, []);
 
+  const createFolder = useCallback(async (name: string) => {
+    try {
+      const res = await chatApi.createFolder(name);
+      const folder: ChatFolder = { id: res.id, name: res.name, chatCount: 0 };
+      setFolders(prev => [...prev, folder]);
+      return folder;
+    } catch (err) {
+      console.error("Failed to create folder", err);
+      return null;
+    }
+  }, []);
+
+  const renameFolder = useCallback(async (folderId: string, name: string) => {
+    try {
+      await chatApi.renameFolder(folderId, name);
+      setFolders(prev => prev.map(f => f.id === folderId ? { ...f, name } : f));
+    } catch (err) {
+      console.error("Failed to rename folder", err);
+    }
+  }, []);
+
+  const deleteFolder = useCallback(async (folderId: string, deleteChats: boolean = false) => {
+    try {
+      await chatApi.deleteFolder(folderId, deleteChats);
+      setFolders(prev => prev.filter(f => f.id !== folderId));
+      if (deleteChats) {
+        setSessions(prev => {
+          const next = prev.filter(s => s.folderId !== folderId);
+          if (next.length === 0) {
+            setActiveSessionId('');
+          } else if (!next.find(s => s.id === activeSessionId)) {
+            setActiveSessionId(next[0].id);
+          }
+          return next;
+        });
+      } else {
+        setSessions(prev => prev.map(s => s.folderId === folderId ? { ...s, folderId: undefined } : s));
+      }
+    } catch (err) {
+      console.error("Failed to delete folder", err);
+    }
+  }, [activeSessionId]);
+
+  const moveChatToFolder = useCallback(async (chatId: string, folderId: string) => {
+    try {
+      await chatApi.moveChatToFolder(chatId, folderId);
+      setSessions(prev => prev.map(s => s.id === chatId ? { ...s, folderId } : s));
+      setFolders(prev => prev.map(f => {
+        if (f.id === folderId) return { ...f, chatCount: f.chatCount + 1 };
+        if (f.id === sessions.find(s => s.id === chatId)?.folderId) return { ...f, chatCount: Math.max(0, f.chatCount - 1) };
+        return f;
+      }));
+    } catch (err) {
+      console.error("Failed to move chat to folder", err);
+    }
+  }, [sessions]);
+
+  const removeChatFromFolder = useCallback(async (chatId: string) => {
+    const oldFolderId = sessions.find(s => s.id === chatId)?.folderId;
+    try {
+      await chatApi.removeChatFromFolder(chatId);
+      setSessions(prev => prev.map(s => s.id === chatId ? { ...s, folderId: undefined } : s));
+      if (oldFolderId) {
+        setFolders(prev => prev.map(f => f.id === oldFolderId ? { ...f, chatCount: Math.max(0, f.chatCount - 1) } : f));
+      }
+    } catch (err) {
+      console.error("Failed to remove chat from folder", err);
+    }
+  }, [sessions]);
+
   const renameSession = useCallback(async (id: string, newTitle: string) => {
     try {
       await chatApi.update(id, newTitle);
@@ -326,6 +416,7 @@ export function useChat(_userId: string, selectedCatalogIds: string[], blocked: 
 
   return {
     sessions,
+    folders,
     activeSessionId,
     activeSession,
     messages: currentMessages,
@@ -340,5 +431,10 @@ export function useChat(_userId: string, selectedCatalogIds: string[], blocked: 
     renameSession,
     removeSession,
     updateSessionCatalogs,
+    createFolder,
+    renameFolder,
+    deleteFolder,
+    moveChatToFolder,
+    removeChatFromFolder,
   };
 }

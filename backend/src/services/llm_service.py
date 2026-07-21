@@ -312,6 +312,24 @@ class LLMService:
                 if not isinstance(headers, list) or len(headers) == 0:
                     raise ValueError("Field 'headers' is empty or not an array")
 
+                # Validate optional chart field
+                if "chart" in result:
+                    chart = result["chart"]
+                    if not isinstance(chart, dict):
+                        raise ValueError("Field 'chart' must be a JSON object")
+                    chart_type = chart.get("type")
+                    valid_types = {"bar", "line", "pie", "area", "scatter"}
+                    if chart_type not in valid_types:
+                        raise ValueError(f"Invalid chart type '{chart_type}'. Valid: {valid_types}")
+                    if chart_type == "pie":
+                        if not chart.get("category_column") or not chart.get("value_column"):
+                            raise ValueError("Pie chart requires 'category_column' and 'value_column'")
+                    else:
+                        if not chart.get("x_column") or not chart.get("y_columns"):
+                            raise ValueError(f"'{chart_type}' chart requires 'x_column' and 'y_columns'")
+                        if not isinstance(chart.get("y_columns"), list) or len(chart["y_columns"]) == 0:
+                            raise ValueError("'y_columns' must be a non-empty list")
+
         elif task_type == "inference":
             # Relationship inference prompt expects {"relationships": [...]}
             if "relationships" not in result and "status" not in result:
